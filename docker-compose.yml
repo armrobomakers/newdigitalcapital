@@ -5,11 +5,12 @@
     ports:
       - "38147:80"
     volumes:
-      - ./index.html:/usr/share/nginx/html/index.html:ro
-      - ./oferta.html:/usr/share/nginx/html/oferta.html:ro
-      - ./politik.html:/usr/share/nginx/html/politik.html:ro
-      - ./soglasie.html:/usr/share/nginx/html/soglasie.html:ro
-      - ./soglasie_material.html:/usr/share/nginx/html/soglasie_material.html:ro
-      - ./assets:/usr/share/nginx/html/assets:ro
+      - ./public/landing.html:/usr/share/nginx/html/index.html:ro
+      - ./public/landing.html:/usr/share/nginx/html/landing.html:ro
+      - ./public/oferta.html:/usr/share/nginx/html/oferta.html:ro
+      - ./public/politik.html:/usr/share/nginx/html/politik.html:ro
+      - ./public/soglasie.html:/usr/share/nginx/html/soglasie.html:ro
+      - ./public/soglasie_material.html:/usr/share/nginx/html/soglasie_material.html:ro
+      - ./public/assets:/usr/share/nginx/html/assets:ro
     restart: unless-stopped
 
