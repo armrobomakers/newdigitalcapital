@@ -1,0 +1,15 @@
+﻿services:
+  landing:
+    image: nginx:1.27-alpine
+    container_name: ekbconfa-landing
+    ports:
+      - "38147:80"
+    volumes:
+      - ./index.html:/usr/share/nginx/html/index.html:ro
+      - ./oferta.html:/usr/share/nginx/html/oferta.html:ro
+      - ./politik.html:/usr/share/nginx/html/politik.html:ro
+      - ./soglasie.html:/usr/share/nginx/html/soglasie.html:ro
+      - ./soglasie_material.html:/usr/share/nginx/html/soglasie_material.html:ro
+      - ./assets:/usr/share/nginx/html/assets:ro
+    restart: unless-stopped
+
