@@ -1,0 +1,306 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ваучер для VIP гостей | Цифровой капитал</title>
+  <meta name="description" content="Поясняющая информация по ваучеру для VIP гостей конференции Цифровой капитал." />
+  <meta property="og:title" content="Ваучер для VIP гостей | Цифровой капитал" />
+  <meta property="og:description" content="Поясняющая информация по ваучеру для VIP гостей конференции Цифровой капитал." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://digital-capital-ekb.vercel.app/voucher.html" />
+  <link rel="canonical" href="https://digital-capital-ekb.vercel.app/voucher.html" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #222222;
+      --card: rgba(67, 66, 66, 0.94);
+      --card-soft: rgba(73, 43, 108, 0.92);
+      --text: #ffffff;
+      --muted: #d5d1cb;
+      --accent: #f3c99b;
+      --accent-dark: #492b6c;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); }
+    body {
+      font-family: "Montserrat", Arial, sans-serif;
+      line-height: 1.55;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    a { color: inherit; }
+    .voucher-page {
+      position: relative;
+      min-height: 100vh;
+      padding: 32px 20px 56px;
+      overflow: hidden;
+    }
+    .voucher-page::before,
+    .voucher-page::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(64px);
+      opacity: 0.62;
+      pointer-events: none;
+    }
+    .voucher-page::before {
+      width: 280px;
+      height: 280px;
+      left: -110px;
+      top: 260px;
+      background: rgba(243, 201, 155, 0.55);
+    }
+    .voucher-page::after {
+      width: 320px;
+      height: 320px;
+      right: -160px;
+      top: 110px;
+      background: rgba(73, 43, 108, 0.82);
+    }
+    .voucher-shell {
+      position: relative;
+      z-index: 1;
+      max-width: 980px;
+      margin: 0 auto;
+    }
+    .voucher-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 32px;
+      padding: 12px 18px;
+      border-radius: 999px;
+      background: #ffffff;
+      color: var(--accent-dark);
+    }
+    .voucher-brand {
+      font-family: "Playfair Display", serif;
+      font-size: 28px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .voucher-back {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 0 24px;
+      border-radius: 999px;
+      background: var(--accent);
+      color: var(--accent-dark);
+      font-size: 15px;
+      font-weight: 700;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .voucher-hero {
+      margin-bottom: 26px;
+    }
+    .voucher-kicker {
+      margin: 0 0 14px;
+      color: var(--accent);
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .voucher-title {
+      margin: 0 0 18px;
+      font-family: "Playfair Display", serif;
+      font-size: clamp(34px, 6vw, 62px);
+      line-height: 1.04;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .voucher-lead {
+      margin: 0;
+      max-width: 860px;
+      color: var(--text);
+      font-size: 20px;
+      line-height: 1.5;
+    }
+    .voucher-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 22px;
+      align-items: start;
+    }
+    .voucher-card {
+      padding: 28px 28px 30px;
+      border-radius: 24px;
+      background: var(--card);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.22);
+    }
+    .voucher-card--accent {
+      background: linear-gradient(180deg, rgba(73,43,108,0.96) 0%, rgba(67,66,66,0.96) 100%);
+    }
+    .voucher-card h2 {
+      margin: 0 0 18px;
+      font-family: "Playfair Display", serif;
+      font-size: 32px;
+      line-height: 1.12;
+      color: var(--accent);
+    }
+    .voucher-card p {
+      margin: 0 0 14px;
+      font-size: 18px;
+      color: var(--muted);
+    }
+    .voucher-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 12px;
+    }
+    .voucher-list li {
+      position: relative;
+      padding-left: 24px;
+      font-size: 18px;
+      color: var(--text);
+    }
+    .voucher-list li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: var(--accent);
+      font-size: 24px;
+      line-height: 1;
+    }
+    .voucher-note {
+      margin-top: 22px;
+      padding: 18px 20px;
+      border-radius: 18px;
+      background: rgba(34, 34, 34, 0.56);
+      color: var(--muted);
+      font-size: 16px;
+    }
+    .voucher-note strong {
+      color: var(--accent);
+    }
+    .voucher-meta {
+      display: grid;
+      gap: 16px;
+    }
+    .voucher-pill {
+      padding: 18px 20px;
+      border-radius: 18px;
+      background: rgba(34,34,34,0.66);
+    }
+    .voucher-pill__label {
+      margin: 0 0 6px;
+      color: var(--accent);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .voucher-pill__text {
+      margin: 0;
+      color: var(--text);
+      font-size: 17px;
+      line-height: 1.45;
+    }
+    @media screen and (max-width: 959px) {
+      .voucher-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media screen and (max-width: 479px) {
+      .voucher-page {
+        padding: 16px 12px 40px;
+      }
+      .voucher-topbar {
+        flex-direction: column;
+        align-items: stretch;
+        border-radius: 22px;
+      }
+      .voucher-brand {
+        font-size: 24px;
+        text-align: center;
+      }
+      .voucher-back {
+        width: 100%;
+      }
+      .voucher-lead,
+      .voucher-list li,
+      .voucher-card p,
+      .voucher-pill__text {
+        font-size: 16px;
+      }
+      .voucher-card {
+        padding: 22px 18px 24px;
+        border-radius: 18px;
+      }
+      .voucher-card h2 {
+        font-size: 26px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="voucher-page">
+    <div class="voucher-shell">
+      <div class="voucher-topbar">
+        <a class="voucher-brand" href="/index.html">Цифровой капитал</a>
+        <a class="voucher-back" href="/index.html#tickets">Вернуться на лендинг</a>
+      </div>
+
+      <section class="voucher-hero">
+        <p class="voucher-kicker">VIP бонус</p>
+        <h1 class="voucher-title">Ваучер на путешествие для VIP гостей</h1>
+        <p class="voucher-lead">Для гостей тарифа <strong>VIP</strong> предусмотрен подарочный ваучер на исторический тур «Анталия-Памуккале-Каппадокия». Ниже собрана краткая поясняющая информация: что входит в подарочную часть ваучера и какие расходы оплачиваются отдельно.</p>
+      </section>
+
+      <section class="voucher-grid">
+        <article class="voucher-card voucher-card--accent">
+          <h2>Что входит в ваучер</h2>
+          <ul class="voucher-list">
+            <li>Исторический тур «Анталия-Памуккале-Каппадокия», разработанный совместно с Министерством Туризма Турции.</li>
+            <li>Продолжительность тура: 8 дней / 7 ночей.</li>
+            <li>Проживание в отелях 5* на Анталийском побережье, а также 4*-5* в Памуккале и Каппадокии.</li>
+            <li>Питание: завтраки по системе «Шведский стол».</li>
+            <li>Двухдневная экскурсия в Каппадокию с проживанием в отеле 4*-5* и посещением объектов наследия ЮНЕСКО.</li>
+            <li>Экскурсия в Памуккале с проживанием в отеле 4*-5* и доступом к термальным бассейнам.</li>
+            <li>Экскурсия по современным и историческим частям Анталии.</li>
+            <li>Отдых на пляжах Анталийского побережья.</li>
+            <li>Медицинское страхование с покрытием 35 000 $.</li>
+            <li>Трансфер между городами по маршруту экскурсий.</li>
+            <li>Сопровождение гида-историка от Министерства Туризма на всем маршруте.</li>
+            <li>Сопровождение гида от принимающей компании на всем маршруте.</li>
+            <li>Ежедневная развлекательная программа.</li>
+          </ul>
+          <div class="voucher-note"><strong>Важно:</strong> ваучер является подарочной частью VIP-формата участия и предоставляется как бонус для гостей конференции.</div>
+        </article>
+
+        <div class="voucher-meta">
+          <article class="voucher-card">
+            <h2>Что оплачивается отдельно</h2>
+            <ul class="voucher-list">
+              <li>Авиабилеты в Анталию и обратно.</li>
+              <li>Сервисный сбор 10 800 руб. за 2-х человек.</li>
+              <li>Трансфер аэропорт - отель - аэропорт: 20 $ с человека в обе стороны, если вы хотите воспользоваться услугой.</li>
+            </ul>
+          </article>
+
+          <div class="voucher-pill">
+            <p class="voucher-pill__label">Для кого</p>
+            <p class="voucher-pill__text">Страница подготовлена для гостей тарифа <strong>VIP</strong>, которым важно заранее понять условия использования ваучера.</p>
+          </div>
+
+          <div class="voucher-pill">
+            <p class="voucher-pill__label">Формат</p>
+            <p class="voucher-pill__text">Это поясняющая информация по бонусу. Детали использования ваучера и порядок его активации уточняются у организаторов после регистрации.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</body>
+</html>
