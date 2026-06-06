@@ -12,6 +12,7 @@
       - ./public/soglasie.html:/usr/share/nginx/html/soglasie.html:ro
       - ./public/soglasie_material.html:/usr/share/nginx/html/soglasie_material.html:ro
       - ./public/voucher.html:/usr/share/nginx/html/voucher.html:ro
+      - ./public/yandex_07a9fa675d7f0628.html:/usr/share/nginx/html/yandex_07a9fa675d7f0628.html:ro
       - ./public/assets:/usr/share/nginx/html/assets:ro
     restart: unless-stopped
 
