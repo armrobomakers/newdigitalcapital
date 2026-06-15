@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: dark; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: #08061c;
+  color: white;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+::selection { background: rgba(165, 107, 255, .45); }
+
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+.glass {
+  background: linear-gradient(135deg, rgba(255,255,255,.12), rgba(255,255,255,.04));
+  border: 1px solid rgba(255,255,255,.16);
+  backdrop-filter: blur(18px);
+}
+
+.input {
+  width: 100%;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(255,255,255,.07);
+  padding: 14px 16px;
+  color: white;
+  outline: none;
+}
+
+.input::placeholder { color: rgba(255,255,255,.48); }
+
+.input:focus { border-color: rgba(241,194,104,.85); box-shadow: 0 0 0 3px rgba(241,194,104,.12); }
