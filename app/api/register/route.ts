@@ -59,8 +59,13 @@ export async function POST(request: Request) {
     phone,
     telegram,
     comment,
+    utm_source: clean(formData.get('utm_source')),
+    utm_medium: clean(formData.get('utm_medium')),
+    utm_campaign: clean(formData.get('utm_campaign')),
+    utm_content: clean(formData.get('utm_content')),
+    utm_term: clean(formData.get('utm_term')),
     referrer,
-    landing_page: url.origin + '/' + eventSlug,
+    landing_page: clean(formData.get('landing_page')) || `${url.origin}/${eventSlug}`,
     user_agent: userAgent
   };
 
@@ -71,6 +76,9 @@ export async function POST(request: Request) {
     `Телефон: ${phone}`,
     telegram ? `Telegram: ${telegram}` : '',
     comment ? `Комментарий: ${comment}` : '',
+    payload.utm_source ? `Источник: ${payload.utm_source}` : '',
+    payload.utm_campaign ? `Кампания: ${payload.utm_campaign}` : '',
+    payload.utm_content ? `Креатив: ${payload.utm_content}` : '',
     referrer ? `Referrer: ${referrer}` : ''
   ].filter(Boolean).join('\n');
 
