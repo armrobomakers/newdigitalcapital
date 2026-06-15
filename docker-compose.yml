@@ -1,0 +1,8 @@
+services:
+  app:
+    build: .
+    ports:
+      - "7485:3000"
+    env_file:
+      - .env.local
+    command: npm run dev
