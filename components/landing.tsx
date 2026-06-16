@@ -652,7 +652,7 @@ export function LandingPage() {
         <div className="mt-6 grid gap-5 rounded-[34px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03))] p-5 shadow-soft backdrop-blur-2xl lg:grid-cols-[1fr_1.05fr]">
           <div className="flex flex-col justify-between gap-6">
             <div>
-              <h3 className="mt-3 max-w-[420px] font-display text-4xl leading-tight text-white">
+              <h3 className="mt-3 max-w-[520px] font-display text-4xl leading-tight text-white">
                 {eventData.partnersLead}
               </h3>
             </div>
