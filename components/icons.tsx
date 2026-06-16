@@ -118,6 +118,28 @@ export function SparkIcon(props: IconProps) {
   );
 }
 
+export function HexNetworkIcon(props: IconProps) {
+  return (
+    <BaseIcon {...props}>
+      <path d="M12 3 19 7.2V16.8L12 21 5 16.8V7.2L12 3Z" />
+      <circle cx="9" cy="8.5" r="0.9" />
+      <circle cx="15" cy="8.5" r="0.9" />
+      <circle cx="12" cy="12" r="0.9" />
+      <circle cx="9" cy="15.5" r="0.9" />
+      <circle cx="15" cy="15.5" r="0.9" />
+      <path d="M9 8.5 12 12l3-3.5M9 15.5 12 12l3 3.5M9 8.5v7M15 8.5v7" />
+    </BaseIcon>
+  );
+}
+
+export function CloudIcon(props: IconProps) {
+  return (
+    <BaseIcon {...props}>
+      <path d="M7.5 18.5h9a4.5 4.5 0 0 0 .7-8.94A5.5 5.5 0 0 0 6.9 8.7 3.8 3.8 0 0 0 7.5 18.5Z" />
+    </BaseIcon>
+  );
+}
+
 export function TicketIcon(props: IconProps) {
   return (
     <BaseIcon {...props}>

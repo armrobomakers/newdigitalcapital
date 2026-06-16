@@ -12,6 +12,8 @@ import {
   CheckIcon,
   InvestIcon,
   HandshakeIcon,
+  CloudIcon,
+  HexNetworkIcon,
   LinkedInIcon,
   MailIcon,
   MicrophoneIcon,
@@ -149,12 +151,6 @@ function HeroVisual() {
       />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_22%,rgba(124,60,255,0.12),transparent_24%),radial-gradient(circle_at_82%_18%,rgba(178,133,255,0.08),transparent_22%),linear-gradient(90deg,rgba(4,3,13,0.28)_0%,rgba(4,3,13,0.18)_42%,rgba(4,3,13,0.08)_68%,rgba(4,3,13,0.18)_100%)]" />
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,3,13,0.02)_0%,rgba(4,3,13,0.05)_35%,rgba(4,3,13,0.2)_100%)]" />
-      <div className="absolute left-6 top-6 rounded-full border border-white/10 bg-black/20 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/78 backdrop-blur-xl">
-        БЦ «Саммит» · Екатеринбург
-      </div>
-      <div className="absolute right-6 top-6 rounded-full border border-white/10 bg-black/20 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/78 backdrop-blur-xl">
-        13 июня 2026
-      </div>
     </div>
   );
 }
@@ -175,9 +171,6 @@ function SpeakerCard({ speaker, index }: { speaker: Speaker; index: number }) {
       </div>
 
       <div className="flex flex-1 flex-col px-6 pb-6 text-center">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-violet-200/85">
-          {speaker.role}
-        </p>
         <h3 className="mt-3 text-[2.1rem] font-semibold leading-tight text-white">{speaker.name}</h3>
         <p className="mt-3 text-sm font-medium leading-6 text-violet-200/90">{speaker.company}</p>
         <p className="mt-5 px-2 text-[15px] leading-7 text-white/68">{speaker.topic}</p>
@@ -247,14 +240,14 @@ function PartnerBadge({ name }: { name: string }) {
   }
 
   if (name === "Tech Club") {
-    return <SparkIcon className="h-[4.5rem] w-[4.5rem] text-white/90" />;
+    return <HexNetworkIcon className="h-[4.5rem] w-[4.5rem] text-white/90" />;
   }
 
   if (name === "Future Bank") {
     return <ShieldIcon className="h-[4.5rem] w-[4.5rem] text-white/90" />;
   }
 
-  return <NetworkIcon className="h-[4.5rem] w-[4.5rem] text-white/90" />;
+  return <CloudIcon className="h-[4.5rem] w-[4.5rem] text-white/90" />;
 }
 
 function FAQItem({ item, index }: { item: { question: string; answer: string }; index: number }) {
