@@ -118,6 +118,23 @@ export function SparkIcon(props: IconProps) {
   );
 }
 
+export function StarIcon(props: IconProps) {
+  return (
+    <BaseIcon {...props}>
+      <path d="m12 3 2.4 5.1 5.6.8-4 3.9.9 5.5L12 15.7 7.1 18.3l.9-5.5-4-3.9 5.6-.8L12 3Z" />
+    </BaseIcon>
+  );
+}
+
+export function CrownIcon(props: IconProps) {
+  return (
+    <BaseIcon {...props}>
+      <path d="M4 8.5 7.2 11 12 5.8l4.8 5.2L20 8.5 18.2 18H5.8L4 8.5Z" />
+      <path d="M6.8 18h10.4" />
+    </BaseIcon>
+  );
+}
+
 export function HexNetworkIcon(props: IconProps) {
   return (
     <BaseIcon {...props}>

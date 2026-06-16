@@ -10,6 +10,7 @@ import {
   BrandMarkIcon,
   CalendarIcon,
   CheckIcon,
+  CrownIcon,
   InvestIcon,
   HandshakeIcon,
   CloudIcon,
@@ -23,6 +24,7 @@ import {
   PhoneIcon,
   ShieldIcon,
   SparkIcon,
+  StarIcon,
   TelegramIcon,
   TicketIcon,
   UsersIcon,
@@ -192,32 +194,77 @@ function SpeakerCard({ speaker, index }: { speaker: Speaker; index: number }) {
   );
 }
 
-function ProgramRow({ item, emphasis = false }: { item: ProgramItem; emphasis?: boolean }) {
+function ProgramRow({
+  item,
+  accent,
+}: {
+  item: ProgramItem;
+  accent?: "featured" | "final";
+}) {
+  const isFeatured = accent === "featured";
+  const isFinal = accent === "final";
+
   return (
-    <li className="relative rounded-[22px] border border-white/10 bg-white/[0.04] px-4 py-4 transition hover:border-violet-300/25 hover:bg-white/[0.06]">
+    <li
+      className={`relative overflow-hidden rounded-[22px] border px-4 py-4 transition ${
+        isFinal
+          ? "border-violet-400/50 bg-[linear-gradient(180deg,rgba(124,60,255,0.24),rgba(255,255,255,0.05))] shadow-[0_0_0_1px_rgba(124,60,255,0.14)] lg:pr-16"
+          : isFeatured
+            ? "border-violet-300/35 bg-white/[0.055] shadow-[0_0_34px_rgba(124,60,255,0.16)] lg:pr-16"
+            : "border-white/10 bg-white/[0.04] hover:border-violet-300/25 hover:bg-white/[0.06]"
+      }`}
+    >
       <div className="grid gap-3 lg:grid-cols-[96px_18px_1fr] lg:items-start">
-        <div className="text-[2.3rem] font-medium leading-none text-violet-300 lg:justify-self-start lg:pt-0.5">
+        <div
+          className={`text-[2.3rem] font-medium leading-none ${
+            isFinal ? "text-white" : "text-violet-300"
+          } lg:justify-self-start lg:pt-0.5`}
+        >
           {item.time}
         </div>
         <div className="relative hidden items-center justify-center lg:flex">
-          <span className="h-3 w-3 rounded-full border border-white/20 bg-violet-200 shadow-[0_0_0_6px_rgba(124,60,255,0.12)]" />
+          <span
+            className={`h-3 w-3 rounded-full border ${
+              isFinal
+                ? "border-white/25 bg-white shadow-[0_0_0_6px_rgba(124,60,255,0.16)]"
+                : "border-white/20 bg-violet-200 shadow-[0_0_0_6px_rgba(124,60,255,0.12)]"
+            }`}
+          />
         </div>
         <div className="flex items-start gap-3">
           <div
             className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border bg-[linear-gradient(180deg,rgba(124,60,255,0.24),rgba(255,255,255,0.03))] ${
-              emphasis ? "border-violet-300/35" : "border-white/10"
+              isFinal ? "border-violet-300/45" : isFeatured ? "border-violet-300/35" : "border-white/10"
             }`}
           >
             <ProgramIcon icon={item.icon} />
           </div>
           <div className="min-w-0">
-            <p className={`text-lg font-semibold text-white ${emphasis ? "lg:text-[1.2rem]" : ""}`}>
+            <p
+              className={`text-lg font-semibold text-white ${
+                isFinal ? "lg:text-[1.25rem]" : isFeatured ? "lg:text-[1.2rem]" : ""
+              }`}
+            >
               {item.title}
             </p>
             <p className="mt-1 text-sm text-white/58">{item.speaker}</p>
-            {item.note ? <p className="mt-2 text-sm leading-6 text-white/72">{item.note}</p> : null}
+            {item.note ? (
+              <p className={`mt-2 text-sm leading-6 ${isFinal ? "text-white/78" : "text-white/72"}`}>
+                {item.note}
+              </p>
+            ) : null}
           </div>
         </div>
+        {isFeatured ? (
+          <div className="absolute right-4 top-1/2 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-[18px] border border-violet-300/25 bg-black/20 text-violet-200 lg:flex">
+            <StarIcon className="h-5 w-5" />
+          </div>
+        ) : null}
+        {isFinal ? (
+          <div className="absolute right-4 top-1/2 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-[18px] border border-amber-300/30 bg-black/20 text-amber-300 lg:flex">
+            <CrownIcon className="h-5 w-5" />
+          </div>
+        ) : null}
       </div>
     </li>
   );
@@ -300,7 +347,6 @@ function RegistrationTicket() {
       <div className="relative flex h-full flex-col">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.26em] text-white/45">Билет</p>
             <h3 className="mt-4 font-display text-3xl leading-tight text-white">
               {eventData.registration.ticketTitle}
             </h3>
@@ -526,7 +572,7 @@ export function LandingPage() {
                   <ProgramRow
                     key={`${item.time}-${item.title}`}
                     item={item}
-                    emphasis={item.time === "15:30" || item.time === "17:00"}
+                    accent={item.time === "15:30" ? "featured" : item.time === "17:00" ? "final" : undefined}
                   />
                 ))}
               </ul>
@@ -540,40 +586,23 @@ export function LandingPage() {
           <div className="grid gap-8 lg:grid-cols-[0.92fr_1.08fr] lg:items-start">
             <div className="space-y-6">
               <SectionTitle
-
                 title="Забронируйте место на конференции"
                 description={eventData.registration.lead}
               />
 
               <div id="register-form" className="rounded-[28px] border border-white/10 bg-black/18 p-5">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="text-[11px] uppercase tracking-[0.26em] text-white/45">Форма заявки</p>
-                    <h3 className="mt-3 text-2xl font-semibold text-white">
-                      {eventData.registration.formTitle}
-                    </h3>
-                    <p className="mt-2 text-sm leading-6 text-white/62">
-                      {eventData.registration.formLead}
-                    </p>
-                  </div>
-                  <div className="hidden rounded-full border border-white/10 bg-white/5 p-3 sm:block">
-                    <TicketIcon className="h-5 w-5 text-violet-200" />
-                  </div>
-                </div>
-                <div className="mt-5">
-                  <Suspense
-                    fallback={
-                      <div className="space-y-4 rounded-[24px] border border-white/10 bg-white/[0.03] p-5">
-                        <div className="h-12 rounded-[18px] bg-white/10" />
-                        <div className="h-12 rounded-[18px] bg-white/10" />
-                        <div className="h-12 rounded-[18px] bg-white/10" />
-                        <div className="h-12 rounded-[18px] bg-white/10" />
-                      </div>
-                    }
-                  >
-                    <RegistrationForm />
-                  </Suspense>
-                </div>
+                <Suspense
+                  fallback={
+                    <div className="space-y-4 rounded-[24px] border border-white/10 bg-white/[0.03] p-5">
+                      <div className="h-12 rounded-[18px] bg-white/10" />
+                      <div className="h-12 rounded-[18px] bg-white/10" />
+                      <div className="h-12 rounded-[18px] bg-white/10" />
+                      <div className="h-12 rounded-[18px] bg-white/10" />
+                    </div>
+                  }
+                >
+                  <RegistrationForm />
+                </Suspense>
               </div>
             </div>
 
