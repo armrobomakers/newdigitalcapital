@@ -652,7 +652,7 @@ export function LandingPage() {
         <div className="mt-6 grid gap-5 rounded-[34px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03))] p-5 shadow-soft backdrop-blur-2xl lg:grid-cols-[1fr_1.05fr]">
           <div className="flex flex-col justify-between gap-6">
             <div>
-              <h3 className="mt-3 font-display text-4xl leading-tight text-white">
+              <h3 className="mt-3 max-w-[420px] font-display text-4xl leading-tight text-white">
                 {eventData.partnersLead}
               </h3>
             </div>
@@ -749,7 +749,7 @@ export function LandingPage() {
                 <p className="mt-3 text-sm leading-7 text-white/66">{eventData.footer.ctaCopy}</p>
               </div>
 
-              <div className="flex flex-col items-start gap-4 lg:absolute lg:left-[60%] lg:top-[50%] lg:z-20 lg:flex-row lg:-translate-x-1/2 lg:-translate-y-1/2 lg:items-center">
+              <div className="flex flex-col items-start gap-4 lg:absolute lg:left-[62%] lg:top-[56%] lg:z-20 lg:flex-row lg:-translate-x-1/2 lg:-translate-y-1/2 lg:items-center">
                 <Link href="#register" className="btn-primary min-w-[286px]">
                   {eventData.footer.ctaButton}
                 </Link>
