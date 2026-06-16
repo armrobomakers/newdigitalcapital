@@ -512,7 +512,9 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section id="audience" className="section-shell py-16 md:py-24">
+      <section id="audience" className="section-shell relative overflow-hidden py-16 md:py-24">
+        <div className="pointer-events-none absolute left-[-120px] top-[-60px] h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle_at_35%_35%,rgba(124,60,255,0.22),transparent_28%),radial-gradient(circle_at_65%_65%,rgba(124,60,255,0.15),transparent_35%)] blur-2xl" />
+        <div className="pointer-events-none absolute right-[-120px] top-[80px] h-[340px] w-[340px] rounded-full bg-[radial-gradient(circle_at_center,rgba(124,60,255,0.12),transparent_62%)] blur-2xl" />
         <SectionTitle
 
           title="Кому будет полезно"
@@ -537,7 +539,8 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section id="speakers" className="section-shell py-16 md:py-24">
+      <section id="speakers" className="section-shell relative overflow-hidden py-16 md:py-24">
+        <div className="pointer-events-none absolute right-[-80px] top-[-20px] h-[320px] w-[680px] bg-[radial-gradient(circle_at_20%_50%,rgba(124,60,255,0.18),transparent_18%),radial-gradient(circle_at_45%_15%,rgba(124,60,255,0.22),transparent_18%),radial-gradient(circle_at_70%_45%,rgba(124,60,255,0.16),transparent_18%),linear-gradient(115deg,rgba(124,60,255,0.18),transparent_60%)] blur-2xl" />
         <SectionTitle
 
           title="Спикеры"
@@ -620,7 +623,9 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section id="partners" className="section-shell py-16 md:py-24">
+      <section id="partners" className="section-shell relative overflow-hidden py-16 md:py-24">
+        <div className="pointer-events-none absolute right-[-100px] top-[10px] h-[360px] w-[360px] rounded-full bg-[radial-gradient(circle_at_center,rgba(124,60,255,0.12),transparent_60%)] blur-2xl" />
+        <div className="pointer-events-none absolute left-[-120px] bottom-[120px] h-[260px] w-[520px] bg-[radial-gradient(circle_at_0%_100%,rgba(124,60,255,0.18),transparent_35%),radial-gradient(circle_at_100%_0%,rgba(124,60,255,0.08),transparent_35%)] blur-2xl" />
         <SectionTitle
 
           title="Партнеры мероприятия"
@@ -660,7 +665,9 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section id="faq" className="section-shell py-16 md:py-24">
+      <section id="faq" className="section-shell relative overflow-hidden py-16 md:py-24">
+        <div className="pointer-events-none absolute left-[-160px] top-[20px] h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle_at_35%_30%,rgba(124,60,255,0.18),transparent_28%),radial-gradient(circle_at_50%_70%,rgba(124,60,255,0.12),transparent_30%)] blur-2xl" />
+        <div className="pointer-events-none absolute right-[-120px] bottom-[-40px] h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle_at_55%_45%,rgba(124,60,255,0.16),transparent_28%),radial-gradient(circle_at_10%_90%,rgba(124,60,255,0.09),transparent_34%)] blur-2xl" />
         <SectionTitle
 
           title="FAQ"
