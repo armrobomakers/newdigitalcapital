@@ -771,22 +771,22 @@ export function LandingPage() {
             </div>
           </div>
 
-          <div className="mt-8 grid gap-8 lg:grid-cols-[1.1fr_0.7fr_0.7fr_0.8fr_0.9fr]">
+          <div className="mt-8 grid gap-10 lg:grid-cols-[1.08fr_0.72fr_0.72fr_0.82fr_0.96fr]">
             <div>
               <Link href="#top" className="inline-flex items-start gap-3">
-                <BrandMarkIcon className="h-12 w-12 text-violet-300" />
+                <BrandMarkIcon className="h-14 w-14 text-violet-300" />
                 <div className="leading-none">
-                  <span className="block font-display text-2xl leading-none text-white">Цифровой</span>
-                  <span className="block font-display text-2xl leading-none text-white">капитал</span>
+                  <span className="block font-display text-[2.1rem] leading-none text-white">Цифровой</span>
+                  <span className="block font-display text-[2.1rem] leading-none text-white">капитал</span>
                 </div>
               </Link>
               <p className="mt-4 max-w-md text-sm leading-7 text-white/62">{eventData.footer.about}</p>
-              <div className="mt-5 flex items-center gap-3">
+              <div className="mt-5 flex items-center gap-4">
                 {eventData.socials.map((social) => (
                   <Link
                     key={social.label}
                     href={social.href}
-                    className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/[0.05] text-white/82 transition hover:border-violet-300/30 hover:bg-violet-500/20"
+                    className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/[0.05] text-white/82 transition hover:border-violet-300/30 hover:bg-violet-500/20"
                     aria-label={social.label}
                   >
                     {social.label === "Telegram" ? (
