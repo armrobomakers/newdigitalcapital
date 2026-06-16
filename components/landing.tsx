@@ -47,9 +47,9 @@ function SectionTitle({
     : "mt-0 max-w-5xl font-display text-4xl leading-[0.92] text-white sm:text-6xl lg:text-[5.5rem]";
 
   return (
-    <div className={center ? "mx-auto max-w-4xl text-center" : "max-w-4xl"}>
+    <div className={center ? "mx-auto w-full max-w-none text-center" : "max-w-4xl"}>
       {kicker ? <p className="section-kicker">{kicker}</p> : null}
-      <h2 className={titleClass}>{title}</h2>
+      <h2 className={center && kicker ? "section-title-center" : titleClass}>{title}</h2>
       {description ? <p className="section-copy mt-4">{description}</p> : null}
     </div>
   );

@@ -77,6 +77,10 @@ a {
     @apply mt-4 max-w-5xl font-display text-4xl leading-[0.92] text-white sm:text-6xl lg:text-[5.5rem];
   }
 
+  .section-title-center {
+    @apply mt-4 max-w-7xl whitespace-nowrap font-display text-4xl leading-[0.92] text-white sm:text-5xl lg:text-[3.1rem];
+  }
+
   .section-copy {
     @apply max-w-2xl text-base leading-7 text-white/65 sm:text-lg;
   }
