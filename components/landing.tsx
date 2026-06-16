@@ -652,7 +652,6 @@ export function LandingPage() {
         <div className="mt-6 grid gap-5 rounded-[34px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03))] p-5 shadow-soft backdrop-blur-2xl lg:grid-cols-[1fr_1.05fr]">
           <div className="flex flex-col justify-between gap-6">
             <div>
-              <p className="text-[11px] uppercase tracking-[0.26em] text-white/45">Партнерский пакет</p>
               <h3 className="mt-3 font-display text-4xl leading-tight text-white">
                 {eventData.partnersLead}
               </h3>
@@ -722,7 +721,14 @@ export function LandingPage() {
 
           <MapCardExact />
         </div>
-        <p className="mt-5 text-center text-sm leading-7 text-white/58">
+        <div className="mt-6 flex items-center gap-4">
+          <div className="h-px flex-1 bg-white/10" />
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-violet-400/50 bg-black/20 text-lg font-medium text-violet-200">
+            i
+          </div>
+          <div className="h-px flex-1 bg-white/10" />
+        </div>
+        <p className="mt-3 text-center text-sm leading-7 text-white/58">
           {eventData.location.note}
         </p>
       </section>
