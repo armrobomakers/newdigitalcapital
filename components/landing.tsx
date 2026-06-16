@@ -749,7 +749,7 @@ export function LandingPage() {
                 <p className="mt-3 text-sm leading-7 text-white/66">{eventData.footer.ctaCopy}</p>
               </div>
 
-              <div className="flex flex-col items-start gap-4 lg:absolute lg:left-[62%] lg:top-[56%] lg:z-20 lg:flex-row lg:-translate-x-1/2 lg:-translate-y-1/2 lg:items-center">
+              <div className="flex flex-col items-start gap-4 lg:absolute lg:left-[58%] lg:top-[54%] lg:z-20 lg:flex-row lg:-translate-x-1/2 lg:-translate-y-1/2 lg:items-center">
                 <Link href="#register" className="btn-primary min-w-[286px]">
                   {eventData.footer.ctaButton}
                 </Link>
