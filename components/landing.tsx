@@ -49,10 +49,14 @@ function SectionTitle({
     : "mt-0 max-w-5xl font-display text-4xl leading-[0.92] text-white sm:text-6xl lg:text-[5.5rem]";
 
   return (
-    <div className={center ? "mx-auto w-full max-w-none text-center" : "max-w-4xl"}>
+    <div className={center ? "mx-auto w-full max-w-[1200px] text-center" : "max-w-4xl"}>
       {kicker ? <p className="section-kicker">{kicker}</p> : null}
       <h2 className={center && kicker ? "section-title-center" : titleClass}>{title}</h2>
-      {description ? <p className="section-copy mt-4">{description}</p> : null}
+      {description ? (
+        <p className={center ? "section-copy mx-auto mt-4 max-w-4xl text-center" : "section-copy mt-4"}>
+          {description}
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -192,7 +196,7 @@ function ProgramRow({ item, emphasis = false }: { item: ProgramItem; emphasis?: 
   return (
     <li className="relative rounded-[22px] border border-white/10 bg-white/[0.04] px-4 py-4 transition hover:border-violet-300/25 hover:bg-white/[0.06]">
       <div className="grid gap-3 lg:grid-cols-[96px_18px_1fr] lg:items-start">
-        <div className="inline-flex rounded-full border border-white/10 bg-black/20 px-3 py-1 text-sm font-semibold text-violet-100 lg:justify-self-start">
+        <div className="text-[2.3rem] font-medium leading-none text-violet-300 lg:justify-self-start lg:pt-0.5">
           {item.time}
         </div>
         <div className="relative hidden items-center justify-center lg:flex">
@@ -692,7 +696,7 @@ export function LandingPage() {
           <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_15%_20%,rgba(124,60,255,0.2),transparent_26%),linear-gradient(135deg,rgba(255,255,255,0.03),rgba(255,255,255,0.06))] p-6">
             <div className="relative grid gap-6 lg:grid-cols-[1.75fr_0.55fr] lg:items-center">
               <div className="relative z-10 max-w-[980px] lg:pr-6">
-                <h3 className="mt-3 font-display text-[2.7rem] leading-[0.94] tracking-[-0.03em] text-white lg:text-[3rem]">
+                <h3 className="mt-3 font-display text-[2.7rem] leading-[0.94] tracking-[-0.03em] text-white lg:text-[4rem]">
                   <span className="block whitespace-nowrap">
                     {footerCtaTitleParts?.[1] ?? eventData.footer.ctaTitle}
                   </span>
@@ -703,7 +707,7 @@ export function LandingPage() {
                 <p className="mt-3 text-sm leading-7 text-white/66">{eventData.footer.ctaCopy}</p>
               </div>
 
-              <div className="flex flex-col items-start gap-4 lg:absolute lg:left-[70%] lg:top-[56%] lg:z-20 lg:flex-row lg:-translate-x-1/2 lg:-translate-y-1/2 lg:items-center">
+              <div className="flex flex-col items-start gap-4 lg:absolute lg:left-[63%] lg:top-[56%] lg:z-20 lg:flex-row lg:-translate-x-1/2 lg:-translate-y-1/2 lg:items-center">
                 <Link href="#register" className="btn-primary min-w-[286px]">
                   {eventData.footer.ctaButton}
                 </Link>

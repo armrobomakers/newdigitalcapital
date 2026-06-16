@@ -66,7 +66,7 @@ a {
 
 @layer components {
   .section-shell {
-    @apply mx-auto w-full max-w-[1440px] px-4 sm:px-6 lg:px-8;
+    @apply mx-auto w-full max-w-[1536px] px-4 sm:px-6 lg:px-8;
   }
 
   .section-kicker {
@@ -78,7 +78,7 @@ a {
   }
 
   .section-title-center {
-    @apply mt-4 max-w-7xl font-display text-4xl leading-[0.92] text-white sm:text-6xl lg:whitespace-nowrap lg:text-[5.2rem];
+    @apply mt-4 max-w-[1200px] font-display text-4xl leading-[0.92] text-white sm:text-6xl lg:whitespace-nowrap lg:text-[5.2rem];
   }
 
   .section-copy {
