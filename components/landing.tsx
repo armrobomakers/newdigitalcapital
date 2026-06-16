@@ -743,7 +743,7 @@ export function LandingPage() {
                 <p className="mt-3 text-sm leading-7 text-white/66">{eventData.footer.ctaCopy}</p>
               </div>
 
-              <div className="flex flex-col items-start gap-4 lg:absolute lg:left-[63%] lg:top-[56%] lg:z-20 lg:flex-row lg:-translate-x-1/2 lg:-translate-y-1/2 lg:items-center">
+              <div className="flex flex-col items-start gap-4 lg:absolute lg:left-[60%] lg:top-[50%] lg:z-20 lg:flex-row lg:-translate-x-1/2 lg:-translate-y-1/2 lg:items-center">
                 <Link href="#register" className="btn-primary min-w-[286px]">
                   {eventData.footer.ctaButton}
                 </Link>
@@ -752,10 +752,10 @@ export function LandingPage() {
                 </Link>
               </div>
 
-              <div className="relative min-h-[250px] overflow-hidden lg:min-h-[280px]">
+              <div className="relative min-h-[250px] overflow-hidden lg:min-h-[320px]">
                 <div
                   aria-hidden="true"
-                  className="pointer-events-none absolute right-[-105px] top-[-88px] h-[420px] w-[420px] bg-[url('/footer-orb.svg')] bg-cover bg-right-top bg-no-repeat opacity-100 lg:right-[-125px] lg:top-[-98px] lg:h-[560px] lg:w-[560px]"
+                  className="pointer-events-none absolute right-[-105px] top-[-88px] h-[420px] w-[420px] bg-[url('/footer-orb.svg')] bg-cover bg-right-top bg-no-repeat opacity-100 lg:right-[-120px] lg:top-[-108px] lg:h-[620px] lg:w-[620px]"
                 />
                 <div
                   aria-hidden="true"
@@ -767,10 +767,12 @@ export function LandingPage() {
 
           <div className="mt-8 grid gap-8 lg:grid-cols-[1.1fr_0.7fr_0.7fr_0.8fr_0.9fr]">
             <div>
-              <Link href="#top" className="inline-flex items-center gap-3">
+              <Link href="#top" className="inline-flex items-start gap-3">
                 <BrandMarkIcon className="h-12 w-12 text-violet-300" />
-                <span className="block font-display text-2xl leading-none text-white">Цифровой</span>
-                <span className="block font-display text-2xl leading-none text-white">капитал</span>
+                <div className="leading-none">
+                  <span className="block font-display text-2xl leading-none text-white">Цифровой</span>
+                  <span className="block font-display text-2xl leading-none text-white">капитал</span>
+                </div>
               </Link>
               <p className="mt-4 max-w-md text-sm leading-7 text-white/62">{eventData.footer.about}</p>
               <div className="mt-5 flex items-center gap-3">
