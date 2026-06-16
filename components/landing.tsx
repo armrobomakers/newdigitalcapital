@@ -365,6 +365,8 @@ function PartnerVisualExact() {
   );
 }
 
+const footerCtaTitleParts = eventData.footer.ctaTitle.match(/^(.*конференции)\s+(«.*»)$/);
+
 export function LandingPage() {
   return (
     <main className="relative pb-24 md:pb-0">
@@ -695,29 +697,36 @@ export function LandingPage() {
       <footer className="section-shell pb-10 pt-16 md:pb-16">
         <div className="rounded-[34px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.04))] p-5 shadow-soft backdrop-blur-2xl md:p-6">
           <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_15%_20%,rgba(124,60,255,0.2),transparent_26%),linear-gradient(135deg,rgba(255,255,255,0.03),rgba(255,255,255,0.06))] p-6">
-            <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-              <div className="relative z-10 max-w-2xl">
-                <h3 className="mt-3 font-display text-4xl leading-tight text-white">
-                  {eventData.footer.ctaTitle}
+            <div className="relative grid gap-6 lg:grid-cols-[1.55fr_0.7fr] lg:items-center">
+              <div className="relative z-10 max-w-[920px] lg:pr-6">
+                <h3 className="mt-3 font-display text-[2.9rem] leading-[0.95] tracking-[-0.02em] text-white lg:text-[3.25rem]">
+                  <span className="block">{footerCtaTitleParts?.[1] ?? eventData.footer.ctaTitle}</span>
+                  <span className="block text-violet-300">{footerCtaTitleParts?.[2]}</span>
                 </h3>
                 <p className="mt-3 text-sm leading-7 text-white/66">{eventData.footer.ctaCopy}</p>
-                <Link href="#register" className="btn-primary mt-5 w-fit">
+              </div>
+
+              <div className="flex flex-col items-start gap-4 lg:absolute lg:left-[64%] lg:top-1/2 lg:z-20 lg:flex-row lg:-translate-x-1/2 lg:-translate-y-1/2 lg:items-center">
+                <Link href="#register" className="btn-primary min-w-[286px]">
                   {eventData.footer.ctaButton}
+                </Link>
+                <Link href="#program" className="btn-secondary min-w-[286px]">
+                  {eventData.programCta}
                 </Link>
               </div>
 
-              <div className="relative min-h-[250px] lg:min-h-[280px]">
+              <div className="relative min-h-[250px] overflow-hidden lg:min-h-[280px]">
                 <div
                   aria-hidden="true"
-                  className="pointer-events-none absolute left-1/2 top-[-40px] h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle_at_35%_35%,rgba(248,242,255,0.96),rgba(194,117,255,0.94)_16%,rgba(123,50,255,0.8)_34%,rgba(52,18,87,0.94)_58%,rgba(10,9,20,0)_75%)] shadow-[0_0_180px_rgba(124,60,255,0.45)] lg:h-[500px] lg:w-[500px]"
+                  className="pointer-events-none absolute right-[-130px] top-[-120px] h-[430px] w-[430px] rounded-full bg-[radial-gradient(circle_at_35%_35%,rgba(248,242,255,0.96),rgba(194,117,255,0.94)_16%,rgba(123,50,255,0.82)_34%,rgba(52,18,87,0.94)_58%,rgba(10,9,20,0)_76%)] shadow-[0_0_180px_rgba(124,60,255,0.45)] lg:right-[-150px] lg:top-[-110px] lg:h-[560px] lg:w-[560px]"
                 />
                 <div
                   aria-hidden="true"
-                  className="pointer-events-none absolute left-1/2 top-[20px] h-[340px] w-[340px] -translate-x-1/2 rounded-full opacity-90 bg-[repeating-linear-gradient(90deg,transparent_0_18px,rgba(255,255,255,0.18)_18px_19px),repeating-linear-gradient(0deg,transparent_0_18px,rgba(255,255,255,0.18)_18px_19px)] [mask-image:radial-gradient(circle_at_center,black_38%,transparent_76%)] lg:h-[400px] lg:w-[400px]"
+                  className="pointer-events-none absolute right-[-106px] top-[-98px] h-[318px] w-[318px] rounded-full opacity-90 bg-[repeating-linear-gradient(90deg,transparent_0_18px,rgba(255,255,255,0.18)_18px_19px),repeating-linear-gradient(0deg,transparent_0_18px,rgba(255,255,255,0.18)_18px_19px)] [mask-image:radial-gradient(circle_at_center,black_38%,transparent_76%)] lg:right-[-116px] lg:top-[-84px] lg:h-[430px] lg:w-[430px]"
                 />
                 <div
                   aria-hidden="true"
-                  className="pointer-events-none absolute left-1/2 top-[54px] h-[240px] w-[240px] -translate-x-1/2 rounded-full border border-white/12 bg-transparent opacity-55 lg:h-[300px] lg:w-[300px]"
+                  className="pointer-events-none absolute right-[-72px] top-[-60px] h-[230px] w-[230px] rounded-full border border-white/12 bg-transparent opacity-55 lg:right-[-82px] lg:top-[-44px] lg:h-[330px] lg:w-[330px]"
                 />
               </div>
             </div>
@@ -819,6 +828,7 @@ export function LandingPage() {
               <Link href="#" className="transition hover:text-white">
                 {eventData.footer.policy}
               </Link>
+              <span className="hidden h-4 w-px bg-white/14 sm:block" aria-hidden="true" />
               <Link href="#" className="transition hover:text-white">
                 {eventData.footer.offer}
               </Link>
