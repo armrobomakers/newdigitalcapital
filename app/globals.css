@@ -1,0 +1,134 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-0: #04030d;
+  --bg-1: #060417;
+  --bg-2: #08061c;
+  --glass: rgba(255, 255, 255, 0.06);
+  --glass-strong: rgba(255, 255, 255, 0.1);
+  --border: rgba(255, 255, 255, 0.12);
+  --text-soft: rgba(255, 255, 255, 0.65);
+  --font-display: "Cormorant Garamond", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --font-sans: "Manrope", "Inter", "Segoe UI", system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+  min-height: 100%;
+  background-color: var(--bg-0);
+  background:
+    radial-gradient(circle at 12% 10%, rgba(124, 60, 255, 0.22), transparent 24%),
+    radial-gradient(circle at 78% 8%, rgba(178, 133, 255, 0.16), transparent 22%),
+    radial-gradient(circle at 50% 105%, rgba(241, 194, 104, 0.08), transparent 28%),
+    linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 60%, var(--bg-0) 100%);
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+  color: white;
+  font-family: var(--font-sans), sans-serif;
+  background-color: var(--bg-0);
+  background-image:
+    radial-gradient(circle at 12% 10%, rgba(124, 60, 255, 0.22), transparent 24%),
+    radial-gradient(circle at 78% 8%, rgba(178, 133, 255, 0.16), transparent 22%),
+    radial-gradient(circle at 50% 105%, rgba(241, 194, 104, 0.08), transparent 28%),
+    linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 60%, var(--bg-0) 100%);
+  background-attachment: fixed;
+}
+
+.font-display {
+  font-family: var(--font-display), serif;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 24px 24px;
+  opacity: 0.15;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.85), transparent 90%);
+}
+
+::selection {
+  background: rgba(124, 60, 255, 0.35);
+  color: white;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+@layer components {
+  .section-shell {
+    @apply mx-auto w-full max-w-[1440px] px-4 sm:px-6 lg:px-8;
+  }
+
+  .section-kicker {
+    @apply text-[11px] uppercase tracking-[0.32em] text-white/45;
+  }
+
+  .section-title {
+    @apply mt-4 max-w-4xl font-display text-4xl leading-tight text-white sm:text-5xl lg:text-6xl;
+  }
+
+  .section-copy {
+    @apply max-w-2xl text-base leading-7 text-white/65 sm:text-lg;
+  }
+
+  .glass-panel {
+    @apply rounded-[32px] border border-white/10 bg-white/[0.05] shadow-soft backdrop-blur-2xl;
+  }
+
+  .chip {
+    @apply inline-flex items-center rounded-full border border-white/10 bg-white/[0.05] px-4 py-2 text-[11px] uppercase tracking-[0.28em] text-white/65 sm:whitespace-nowrap;
+  }
+
+  .info-pill {
+    @apply inline-flex min-h-14 items-center gap-3 rounded-[22px] border border-white/10 bg-black/25 px-4 py-3 text-sm leading-5 text-white/70 backdrop-blur-xl;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center gap-2 rounded-full bg-violet-500 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_16px_48px_rgba(124,60,255,0.35)] transition duration-300 hover:-translate-y-0.5 hover:bg-violet-400 hover:shadow-[0_20px_56px_rgba(124,60,255,0.45)];
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-6 py-3.5 text-sm font-semibold text-white/90 backdrop-blur-xl transition duration-300 hover:-translate-y-0.5 hover:border-violet-300/30 hover:bg-white/[0.07];
+  }
+
+  .field-label {
+    @apply text-[11px] uppercase tracking-[0.24em] text-white/45;
+  }
+
+  .field-input {
+    @apply w-full rounded-[18px] border border-white/10 bg-black/20 px-4 py-3 text-sm text-white placeholder:text-white/30 outline-none transition focus:border-violet-300/50 focus:bg-black/30;
+  }
+
+  .icon-badge {
+    @apply flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-[linear-gradient(180deg,rgba(124,60,255,0.24),rgba(255,255,255,0.04))] text-violet-200 shadow-[0_0_0_1px_rgba(124,60,255,0.08)];
+  }
+
+  .timeline-time {
+    @apply text-sm font-semibold text-violet-200 sm:pt-1;
+  }
+
+  .timeline-title {
+    @apply text-base font-semibold text-white sm:text-lg;
+  }
+}
+
+.conference-scene::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 20%),
+    linear-gradient(90deg, transparent, rgba(124, 60, 255, 0.1), transparent);
+  mix-blend-mode: screen;
+}

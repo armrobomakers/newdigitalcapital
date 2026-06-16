@@ -1,0 +1,19 @@
+node_modules
+.next
+dist
+coverage
+.env
+.env.local
+.env.*.local
+*.log
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Local design references and verification artifacts
+maket/
+codex_redesign_digital_capital_landing.txt
+ChatGPT Image*.png
+_*.png
