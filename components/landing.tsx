@@ -783,22 +783,22 @@ export function LandingPage() {
                 </div>
               </Link>
               <p className="mt-4 max-w-md text-sm leading-7 text-white/62">{eventData.footer.about}</p>
-              <div className="mt-5 flex items-center gap-4">
+              <div className="mt-5 flex items-center gap-5">
                 {eventData.socials.map((social) => (
                   <Link
                     key={social.label}
                     href={social.href}
-                    className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/[0.05] text-white/82 transition hover:border-violet-300/30 hover:bg-violet-500/20"
+                    className="flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-white/[0.05] text-white/82 transition hover:border-violet-300/30 hover:bg-violet-500/20"
                     aria-label={social.label}
                   >
                     {social.label === "Telegram" ? (
-                      <TelegramIcon className="h-4 w-4" />
+                      <TelegramIcon className="h-5 w-5" />
                     ) : social.label === "VK" ? (
-                      <VkIcon className="h-4 w-4" />
+                      <VkIcon className="h-5 w-5" />
                     ) : social.label === "YouTube" ? (
-                      <YouTubeIcon className="h-4 w-4" />
+                      <YouTubeIcon className="h-5 w-5" />
                     ) : (
-                      <LinkedInIcon className="h-4 w-4" />
+                      <LinkedInIcon className="h-5 w-5" />
                     )}
                   </Link>
                 ))}
