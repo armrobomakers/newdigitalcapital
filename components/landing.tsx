@@ -737,8 +737,8 @@ export function LandingPage() {
         <div className="rounded-[34px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.04))] p-5 shadow-soft backdrop-blur-2xl md:p-6">
           <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_15%_20%,rgba(124,60,255,0.2),transparent_26%),linear-gradient(135deg,rgba(255,255,255,0.03),rgba(255,255,255,0.06))] p-6">
             <div className="relative grid gap-6 lg:grid-cols-[1.75fr_0.55fr] lg:items-center">
-              <div className="relative z-10 max-w-[980px] lg:pr-6">
-                <h3 className="mt-3 font-display text-[2.7rem] leading-[0.94] tracking-[-0.03em] text-white lg:text-[4rem]">
+              <div className="relative z-10 max-w-[900px] lg:pr-6">
+                <h3 className="mt-3 font-display text-[2.7rem] leading-[0.94] tracking-[-0.03em] text-white lg:text-[3.55rem]">
                   <span className="block whitespace-nowrap">
                     {footerCtaTitleParts?.[1] ?? eventData.footer.ctaTitle}
                   </span>
