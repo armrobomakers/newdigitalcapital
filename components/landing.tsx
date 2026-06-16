@@ -715,6 +715,7 @@ export function LandingPage() {
               ))}
             </ul>
             <Link href={eventData.location.routeUrl} className="btn-primary mt-6 inline-flex" target="_blank" rel="noreferrer">
+              <ArrowUpRightIcon className="h-4 w-4" />
               Построить маршрут
             </Link>
           </div>
@@ -857,7 +858,7 @@ export function LandingPage() {
                   className="field-input min-w-0 flex-1"
                 />
                 <button type="button" className="btn-primary px-5">
-                  <ArrowUpRightIcon className="h-4 w-4" />
+                  <ArrowRightIcon className="h-4 w-4" />
                 </button>
               </div>
             </div>
