@@ -203,6 +203,15 @@ export function ArrowRightIcon(props: IconProps) {
   );
 }
 
+export function PlaneIcon(props: IconProps) {
+  return (
+    <BaseIcon {...props}>
+      <path d="m3.5 11.5 16.5-7-4.5 15-4.2-5.1-3.8 2.7-.9-4.2 8.4-6.4" />
+      <path d="m11.3 12.2 4.7-4.7" />
+    </BaseIcon>
+  );
+}
+
 export function MicrophoneIcon(props: IconProps) {
   return (
     <BaseIcon {...props}>

@@ -22,6 +22,7 @@ import {
   PinIcon,
   PieChartIcon,
   PhoneIcon,
+  PlaneIcon,
   ShieldIcon,
   SparkIcon,
   StarIcon,
@@ -715,7 +716,7 @@ export function LandingPage() {
               ))}
             </ul>
             <Link href={eventData.location.routeUrl} className="btn-primary mt-6 inline-flex" target="_blank" rel="noreferrer">
-              <ArrowUpRightIcon className="h-4 w-4" />
+              <PlaneIcon className="h-4 w-4" />
               Построить маршрут
             </Link>
           </div>
