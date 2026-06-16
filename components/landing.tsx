@@ -44,7 +44,7 @@ function SectionTitle({
 }) {
   const titleClass = kicker
     ? "section-title"
-    : "mt-0 max-w-4xl font-display text-4xl leading-tight text-white sm:text-5xl lg:text-6xl";
+    : "mt-0 max-w-5xl font-display text-4xl leading-[0.92] text-white sm:text-6xl lg:text-[5.5rem]";
 
   return (
     <div className={center ? "mx-auto max-w-4xl text-center" : "max-w-4xl"}>
@@ -405,7 +405,7 @@ export function LandingPage() {
                 <SparkIcon className="h-4 w-4 text-violet-300" />
                 <span>{eventData.badge}</span>
               </div>
-              <h1 className="mt-5 max-w-2xl font-display text-5xl leading-[0.88] text-white sm:text-6xl lg:text-[7.4rem]">
+              <h1 className="mt-5 max-w-2xl font-display text-5xl leading-[0.88] text-white sm:text-7xl lg:text-[8.15rem]">
                 <span className="block">Цифровой</span>
                 <span className="block">капитал</span>
               </h1>
@@ -697,16 +697,20 @@ export function LandingPage() {
       <footer className="section-shell pb-10 pt-16 md:pb-16">
         <div className="rounded-[34px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.04))] p-5 shadow-soft backdrop-blur-2xl md:p-6">
           <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_15%_20%,rgba(124,60,255,0.2),transparent_26%),linear-gradient(135deg,rgba(255,255,255,0.03),rgba(255,255,255,0.06))] p-6">
-            <div className="relative grid gap-6 lg:grid-cols-[1.55fr_0.7fr] lg:items-center">
-              <div className="relative z-10 max-w-[920px] lg:pr-6">
-                <h3 className="mt-3 font-display text-[2.9rem] leading-[0.95] tracking-[-0.02em] text-white lg:text-[3.25rem]">
-                  <span className="block">{footerCtaTitleParts?.[1] ?? eventData.footer.ctaTitle}</span>
-                  <span className="block text-violet-300">{footerCtaTitleParts?.[2]}</span>
+            <div className="relative grid gap-6 lg:grid-cols-[1.75fr_0.55fr] lg:items-center">
+              <div className="relative z-10 max-w-[980px] lg:pr-6">
+                <h3 className="mt-3 font-display text-[2.7rem] leading-[0.94] tracking-[-0.03em] text-white lg:text-[3rem]">
+                  <span className="block whitespace-nowrap">
+                    {footerCtaTitleParts?.[1] ?? eventData.footer.ctaTitle}
+                  </span>
+                  <span className="block whitespace-nowrap text-violet-300">
+                    {footerCtaTitleParts?.[2]}
+                  </span>
                 </h3>
                 <p className="mt-3 text-sm leading-7 text-white/66">{eventData.footer.ctaCopy}</p>
               </div>
 
-              <div className="flex flex-col items-start gap-4 lg:absolute lg:left-[64%] lg:top-1/2 lg:z-20 lg:flex-row lg:-translate-x-1/2 lg:-translate-y-1/2 lg:items-center">
+              <div className="flex flex-col items-start gap-4 lg:absolute lg:left-[70%] lg:top-[56%] lg:z-20 lg:flex-row lg:-translate-x-1/2 lg:-translate-y-1/2 lg:items-center">
                 <Link href="#register" className="btn-primary min-w-[286px]">
                   {eventData.footer.ctaButton}
                 </Link>
@@ -718,15 +722,11 @@ export function LandingPage() {
               <div className="relative min-h-[250px] overflow-hidden lg:min-h-[280px]">
                 <div
                   aria-hidden="true"
-                  className="pointer-events-none absolute right-[-130px] top-[-120px] h-[430px] w-[430px] rounded-full bg-[radial-gradient(circle_at_35%_35%,rgba(248,242,255,0.96),rgba(194,117,255,0.94)_16%,rgba(123,50,255,0.82)_34%,rgba(52,18,87,0.94)_58%,rgba(10,9,20,0)_76%)] shadow-[0_0_180px_rgba(124,60,255,0.45)] lg:right-[-150px] lg:top-[-110px] lg:h-[560px] lg:w-[560px]"
+                  className="pointer-events-none absolute right-[-105px] top-[-88px] h-[420px] w-[420px] bg-[url('/footer-orb.svg')] bg-cover bg-right-top bg-no-repeat opacity-100 lg:right-[-125px] lg:top-[-98px] lg:h-[560px] lg:w-[560px]"
                 />
                 <div
                   aria-hidden="true"
-                  className="pointer-events-none absolute right-[-106px] top-[-98px] h-[318px] w-[318px] rounded-full opacity-90 bg-[repeating-linear-gradient(90deg,transparent_0_18px,rgba(255,255,255,0.18)_18px_19px),repeating-linear-gradient(0deg,transparent_0_18px,rgba(255,255,255,0.18)_18px_19px)] [mask-image:radial-gradient(circle_at_center,black_38%,transparent_76%)] lg:right-[-116px] lg:top-[-84px] lg:h-[430px] lg:w-[430px]"
-                />
-                <div
-                  aria-hidden="true"
-                  className="pointer-events-none absolute right-[-72px] top-[-60px] h-[230px] w-[230px] rounded-full border border-white/12 bg-transparent opacity-55 lg:right-[-82px] lg:top-[-44px] lg:h-[330px] lg:w-[330px]"
+                  className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_70%_28%,rgba(124,60,255,0.28),transparent_36%),linear-gradient(90deg,transparent_0%,transparent_44%,rgba(7,6,26,0.16)_70%,rgba(7,6,26,0.25)_100%)]"
                 />
               </div>
             </div>

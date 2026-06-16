@@ -74,7 +74,7 @@ a {
   }
 
   .section-title {
-    @apply mt-4 max-w-4xl font-display text-4xl leading-tight text-white sm:text-5xl lg:text-6xl;
+    @apply mt-4 max-w-5xl font-display text-4xl leading-[0.92] text-white sm:text-6xl lg:text-[5.5rem];
   }
 
   .section-copy {

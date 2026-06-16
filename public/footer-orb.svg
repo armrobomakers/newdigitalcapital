@@ -1,0 +1,95 @@
+<svg width="900" height="620" viewBox="0 0 900 620" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="orbGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(650 150) rotate(140) scale(520 420)">
+      <stop offset="0" stop-color="#F8F2FF" stop-opacity="1" />
+      <stop offset="0.18" stop-color="#C475FF" stop-opacity="0.95" />
+      <stop offset="0.38" stop-color="#7B32FF" stop-opacity="0.82" />
+      <stop offset="0.62" stop-color="#361237" stop-opacity="0.95" />
+      <stop offset="1" stop-color="#0A0914" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="orbSurface" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(630 160) rotate(140) scale(520 420)">
+      <stop offset="0" stop-color="#F8F2FF" stop-opacity="0.18" />
+      <stop offset="0.12" stop-color="#F3E9FF" stop-opacity="0.08" />
+      <stop offset="0.55" stop-color="#7C3CFF" stop-opacity="0.05" />
+      <stop offset="1" stop-color="#7C3CFF" stop-opacity="0" />
+    </radialGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="7" result="blur" />
+      <feColorMatrix in="blur" type="matrix" values="
+        1 0 0 0 0.35
+        0 1 0 0 0.12
+        0 0 1 0 1
+        0 0 0 0.85 0" result="colored" />
+      <feMerge>
+        <feMergeNode in="colored" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <filter id="softBlur" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="18" />
+    </filter>
+  </defs>
+
+  <g opacity="0.9">
+    <circle cx="720" cy="150" r="430" fill="url(#orbGlow)" />
+    <circle cx="700" cy="170" r="400" fill="url(#orbSurface)" />
+    <circle cx="640" cy="200" r="330" stroke="rgba(255,255,255,0.14)" stroke-width="1.5" />
+    <circle cx="640" cy="200" r="246" stroke="rgba(255,255,255,0.1)" stroke-width="1.2" />
+    <circle cx="640" cy="200" r="185" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
+  </g>
+
+  <g filter="url(#softBlur)" opacity="0.35">
+    <path d="M310 40C430 90 520 120 650 125" stroke="#C475FF" stroke-width="2.5" stroke-linecap="round" />
+    <path d="M265 130C405 168 560 175 740 145" stroke="#A464FF" stroke-width="2" stroke-linecap="round" />
+  </g>
+
+  <g filter="url(#glow)" stroke="#D7A8FF" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M315 112L395 86L458 132L522 104L595 148L675 118L746 152" stroke-opacity="0.36" stroke-width="1.2" />
+    <path d="M330 170L386 148L462 188L530 156L614 198L688 170L764 198" stroke-opacity="0.3" stroke-width="1" />
+    <path d="M314 240L394 212L460 260L542 224L620 272L701 236L782 272" stroke-opacity="0.26" stroke-width="1" />
+    <path d="M360 330L430 298L500 340L578 304L654 354L734 322" stroke-opacity="0.2" stroke-width="1" />
+
+    <path d="M315 112L330 170L314 240L360 330" stroke-opacity="0.28" stroke-width="1" />
+    <path d="M395 86L386 148L394 212L430 298" stroke-opacity="0.28" stroke-width="1" />
+    <path d="M458 132L462 188L460 260L500 340" stroke-opacity="0.28" stroke-width="1" />
+    <path d="M522 104L530 156L542 224L578 304" stroke-opacity="0.28" stroke-width="1" />
+    <path d="M595 148L614 198L620 272L654 354" stroke-opacity="0.28" stroke-width="1" />
+    <path d="M675 118L688 170L701 236L734 322" stroke-opacity="0.28" stroke-width="1" />
+    <path d="M746 152L764 198L782 272" stroke-opacity="0.28" stroke-width="1" />
+
+    <circle cx="315" cy="112" r="7" fill="#F2DFFF" />
+    <circle cx="395" cy="86" r="8" fill="#F2DFFF" />
+    <circle cx="458" cy="132" r="7" fill="#F2DFFF" />
+    <circle cx="522" cy="104" r="8" fill="#F2DFFF" />
+    <circle cx="595" cy="148" r="7" fill="#F2DFFF" />
+    <circle cx="675" cy="118" r="7" fill="#F2DFFF" />
+    <circle cx="746" cy="152" r="8" fill="#F2DFFF" />
+    <circle cx="330" cy="170" r="7" fill="#F2DFFF" />
+    <circle cx="386" cy="148" r="6" fill="#F2DFFF" />
+    <circle cx="462" cy="188" r="8" fill="#F2DFFF" />
+    <circle cx="530" cy="156" r="7" fill="#F2DFFF" />
+    <circle cx="614" cy="198" r="8" fill="#F2DFFF" />
+    <circle cx="688" cy="170" r="7" fill="#F2DFFF" />
+    <circle cx="764" cy="198" r="6" fill="#F2DFFF" />
+    <circle cx="314" cy="240" r="7" fill="#F2DFFF" />
+    <circle cx="394" cy="212" r="8" fill="#F2DFFF" />
+    <circle cx="460" cy="260" r="7" fill="#F2DFFF" />
+    <circle cx="542" cy="224" r="8" fill="#F2DFFF" />
+    <circle cx="620" cy="272" r="7" fill="#F2DFFF" />
+    <circle cx="701" cy="236" r="8" fill="#F2DFFF" />
+    <circle cx="782" cy="272" r="6" fill="#F2DFFF" />
+    <circle cx="360" cy="330" r="7" fill="#F2DFFF" />
+    <circle cx="430" cy="298" r="8" fill="#F2DFFF" />
+    <circle cx="500" cy="340" r="7" fill="#F2DFFF" />
+    <circle cx="578" cy="304" r="7" fill="#F2DFFF" />
+    <circle cx="654" cy="354" r="7" fill="#F2DFFF" />
+    <circle cx="734" cy="322" r="6" fill="#F2DFFF" />
+  </g>
+
+  <g opacity="0.4" filter="url(#glow)">
+    <circle cx="595" cy="150" r="18" fill="#F2DFFF" />
+    <circle cx="682" cy="170" r="15" fill="#F2DFFF" />
+    <circle cx="620" cy="272" r="16" fill="#F2DFFF" />
+    <circle cx="530" cy="156" r="13" fill="#F2DFFF" />
+  </g>
+</svg>
