@@ -660,7 +660,7 @@ export function LandingPage() {
         <div className="mt-6 grid gap-5 rounded-[34px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03))] p-5 shadow-soft backdrop-blur-2xl lg:grid-cols-[1fr_1.05fr]">
           <div className="flex flex-col justify-between gap-6">
             <div>
-              <h3 className="mt-3 max-w-[440px] font-display text-4xl leading-tight text-white">
+              <h3 className="mt-3 max-w-[620px] font-display text-4xl leading-tight text-white">
                 {eventData.partnersLead}
               </h3>
             </div>
@@ -746,8 +746,8 @@ export function LandingPage() {
         <div className="rounded-[34px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.04))] p-5 shadow-soft backdrop-blur-2xl md:p-6">
           <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_15%_20%,rgba(124,60,255,0.2),transparent_26%),linear-gradient(135deg,rgba(255,255,255,0.03),rgba(255,255,255,0.06))] p-6">
             <div className="relative grid gap-6 lg:grid-cols-[1.75fr_0.55fr] lg:items-center">
-              <div className="relative z-10 max-w-[900px] lg:pr-6">
-                <h3 className="mt-3 font-display text-[2.7rem] leading-[0.94] tracking-[-0.03em] text-white lg:text-[3.55rem]">
+              <div className="relative z-10 max-w-[820px] lg:pr-8">
+                <h3 className="mt-3 font-display text-[2.7rem] leading-[0.94] tracking-[-0.03em] text-white lg:text-[3.1rem]">
                   <span className="block whitespace-nowrap">
                     {footerCtaTitleParts?.[1] ?? eventData.footer.ctaTitle}
                   </span>
@@ -758,7 +758,7 @@ export function LandingPage() {
                 <p className="mt-3 text-sm leading-7 text-white/66">{eventData.footer.ctaCopy}</p>
               </div>
 
-              <div className="flex flex-col items-start gap-4 lg:absolute lg:left-[66%] lg:top-[68%] lg:z-20 lg:flex-row lg:-translate-x-1/2 lg:-translate-y-1/2 lg:items-center">
+              <div className="flex flex-col items-start gap-4 lg:absolute lg:left-[73%] lg:top-[73%] lg:z-20 lg:flex-row lg:-translate-x-1/2 lg:-translate-y-1/2 lg:items-center">
                 <Link href="#register" className="btn-primary min-w-[286px]">
                   {eventData.footer.ctaButton}
                 </Link>
