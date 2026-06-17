@@ -121,7 +121,7 @@ function HeroMetaCard({
   copy: string;
 }) {
   return (
-    <div className="flex min-h-[88px] items-start gap-2 rounded-[22px] border border-white/10 bg-black/22 px-4 py-3.5 backdrop-blur-xl">
+    <div className="flex min-h-[84px] items-start gap-2 rounded-[22px] border border-white/10 bg-black/22 px-4 py-3.5 backdrop-blur-xl">
       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-violet-400/30 bg-[radial-gradient(circle_at_35%_30%,rgba(124,60,255,0.34),rgba(8,7,22,0.96))] text-violet-100">
         {icon}
       </div>
@@ -157,7 +157,7 @@ function ProgramIcon({ icon }: { icon?: ProgramItem["icon"] }) {
 
 function HeroVisual() {
   return (
-    <div className="relative min-h-[680px] overflow-hidden rounded-[38px] bg-[#050411]">
+    <div className="relative min-h-[580px] overflow-hidden rounded-[38px] bg-[#050411]">
       <Image
         src="/hero-stage-3.png"
         alt=""
@@ -172,16 +172,19 @@ function HeroVisual() {
 }
 
 function SpeakerCard({ speaker, index }: { speaker: Speaker; index: number }) {
+  const imagePositionClass = "object-center";
+  const imageSrc = `/speaker-${index + 1}-face.png`;
+
   return (
     <article className="group flex h-full min-h-[640px] flex-col overflow-hidden rounded-[32px] border border-white/10 bg-white/[0.045] shadow-soft backdrop-blur-2xl transition duration-300 hover:-translate-y-1 hover:border-violet-300/30 hover:bg-white/[0.06]">
       <div className="relative px-5 pb-3 pt-6">
         <div className="absolute inset-x-0 top-0 h-28 bg-[radial-gradient(circle_at_50%_0%,rgba(124,60,255,0.3),transparent_60%)]" />
         <div className="relative mx-auto h-60 w-60 overflow-hidden rounded-full border border-white/12 bg-[radial-gradient(circle_at_32%_28%,rgba(255,255,255,0.16),rgba(124,60,255,0.3)_45%,rgba(8,7,22,0.98))] p-2.5 shadow-[0_0_0_1px_rgba(124,60,255,0.06),0_0_60px_rgba(124,60,255,0.18)]">
           <Image
-            src={`/speaker-${index + 1}-face.png`}
+            src={imageSrc}
             alt={speaker.name}
             fill
-            className="object-cover object-center"
+            className={`object-cover ${imagePositionClass}`}
           />
         </div>
       </div>
@@ -216,12 +219,12 @@ function ProgramRow({
 
   return (
     <li
-      className={`relative overflow-hidden rounded-[22px] border px-4 py-4 transition ${
+      className={`relative py-5 transition ${
         isFinal
-          ? "border-violet-400/50 bg-[linear-gradient(180deg,rgba(124,60,255,0.24),rgba(255,255,255,0.05))] shadow-[0_0_0_1px_rgba(124,60,255,0.14)] lg:pr-16"
+          ? "rounded-[22px] border border-violet-400/50 bg-[linear-gradient(180deg,rgba(124,60,255,0.18),rgba(255,255,255,0.04))] px-4 shadow-[0_0_0_1px_rgba(124,60,255,0.12)] lg:pr-16"
           : isFeatured
-            ? "border-violet-300/35 bg-white/[0.055] shadow-[0_0_34px_rgba(124,60,255,0.16)] lg:pr-16"
-            : "border-white/10 bg-white/[0.04] hover:border-violet-300/25 hover:bg-white/[0.06]"
+            ? "rounded-[22px] border border-violet-300/35 bg-white/[0.04] px-4 shadow-[0_0_34px_rgba(124,60,255,0.12)] lg:pr-16"
+            : "border-b border-white/10 last:border-b-0"
       }`}
     >
       <div className="grid gap-3 lg:grid-cols-[96px_18px_1fr] lg:items-start">
@@ -315,21 +318,21 @@ function FAQItem({ item, index }: { item: { question: string; answer: string }; 
   return (
     <details
       open={index === 0}
-      className="group rounded-[26px] border border-white/10 bg-white/[0.045] p-4 shadow-soft backdrop-blur-2xl"
+      className="group min-h-[164px] rounded-[26px] border border-white/10 bg-white/[0.045] p-5 shadow-soft backdrop-blur-2xl lg:min-h-[172px]"
     >
       <summary className="flex cursor-pointer list-none items-center gap-4 marker:hidden">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-black/20 text-sm font-semibold text-white/72">
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/10 bg-black/20 text-sm font-semibold text-white/72">
           {String(index + 1).padStart(2, "0")}
         </span>
-        <span className="min-w-0 flex-1 text-left text-lg font-medium text-white">
+        <span className="min-w-0 flex-1 text-left text-[1.15rem] font-medium leading-tight text-white sm:text-[1.2rem]">
           {item.question}
         </span>
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-black/20 text-lg text-white/70">
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/10 bg-black/20 text-lg text-white/70">
           <span className="group-open:hidden">+</span>
           <span className="hidden group-open:inline">-</span>
         </span>
       </summary>
-      <p className="mt-4 ml-14 text-sm leading-7 text-white/65">{item.answer}</p>
+      <p className="mt-5 ml-16 max-w-[620px] text-[15px] leading-7 text-white/65">{item.answer}</p>
     </details>
   );
 }
@@ -452,13 +455,13 @@ export function LandingPage() {
             </Link>
           </header>
 
-          <div id="top" className="mt-8 grid gap-8 lg:mt-10 lg:grid-cols-[1.08fr_0.92fr] lg:items-center">
+          <div id="top" className="mt-6 grid gap-6 lg:mt-8 lg:grid-cols-[1.08fr_0.92fr] lg:items-center">
             <div className="max-w-3xl">
               <div className="chip gap-2">
                 <SparkIcon className="h-4 w-4 text-violet-300" />
                 <span>{eventData.badge}</span>
               </div>
-              <h1 className="mt-5 max-w-2xl font-display text-5xl leading-[0.88] text-white sm:text-7xl lg:text-[8.15rem]">
+              <h1 className="mt-5 max-w-2xl font-display text-5xl leading-[0.88] text-white sm:text-7xl lg:text-[7.7rem] lg:leading-[0.86]">
                 <span className="block">Цифровой</span>
                 <span className="block">капитал</span>
               </h1>
@@ -466,7 +469,7 @@ export function LandingPage() {
                 {eventData.subtitle}
               </p>
 
-              <div className="mt-7 grid gap-3 sm:grid-cols-3">
+              <div className="mt-6 grid gap-3 sm:grid-cols-3">
                 <HeroMetaCard
                   icon={<CalendarIcon className="h-5 w-5" />}
                   title={eventData.dateLabel}
@@ -484,7 +487,7 @@ export function LandingPage() {
                 />
               </div>
 
-              <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <Link href="#register" className="btn-primary min-w-[270px] justify-between">
                   <span>{eventData.heroCta}</span>
                   <ArrowRightIcon className="h-5 w-5" />
@@ -499,11 +502,11 @@ export function LandingPage() {
             <HeroVisual />
           </div>
 
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {eventData.stats.map((stat, index) => (
               <div
                 key={stat.label}
-                className="min-h-[180px] rounded-[26px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.02))] p-5 shadow-soft"
+                className="min-h-[160px] rounded-[26px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.02))] p-5 shadow-soft"
               >
                 <div className="flex h-full items-start justify-between gap-4">
                   <div>
@@ -581,7 +584,7 @@ export function LandingPage() {
           <div className="rounded-[32px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.065),rgba(255,255,255,0.03))] p-4 shadow-soft backdrop-blur-2xl md:p-5">
             <div className="relative rounded-[26px] border border-white/10 bg-black/18 p-4 md:p-5 lg:pl-[120px]">
               <div className="pointer-events-none absolute left-[120px] top-8 bottom-8 hidden w-px bg-white/10 lg:block" />
-              <ul className="space-y-3">
+              <ul className="divide-y divide-white/10">
                 {eventData.program.map((item) => (
                   <ProgramRow
                     key={`${item.time}-${item.title}`}
