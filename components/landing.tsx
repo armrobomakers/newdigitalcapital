@@ -41,18 +41,23 @@ function SectionTitle({
   title,
   description,
   center = false,
+  maxWidthClass,
 }: {
   kicker?: string;
   title: string;
   description?: string;
   center?: boolean;
+  maxWidthClass?: string;
 }) {
   const titleClass = kicker
     ? "section-title"
     : "mt-0 max-w-5xl font-display text-4xl leading-[0.92] text-white sm:text-6xl lg:text-[5.5rem]";
+  const wrapperClass = center
+    ? `mx-auto w-full ${maxWidthClass ?? "max-w-[1200px]"} text-center`
+    : "max-w-4xl";
 
   return (
-    <div className={center ? "mx-auto w-full max-w-[1200px] text-center" : "max-w-4xl"}>
+    <div className={wrapperClass}>
       {kicker ? <p className="section-kicker">{kicker}</p> : null}
       <h2 className={center && kicker ? "section-title-center" : titleClass}>{title}</h2>
       {description ? (
@@ -517,9 +522,10 @@ export function LandingPage() {
         <div className="pointer-events-none absolute left-[-120px] top-[-60px] h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle_at_35%_35%,rgba(124,60,255,0.22),transparent_28%),radial-gradient(circle_at_65%_65%,rgba(124,60,255,0.15),transparent_35%)] blur-2xl" />
         <div className="pointer-events-none absolute right-[-120px] top-[80px] h-[340px] w-[340px] rounded-full bg-[radial-gradient(circle_at_center,rgba(124,60,255,0.12),transparent_62%)] blur-2xl" />
         <SectionTitle
-
           title="Кому будет полезно"
           description="Мероприятие для тех, кто хочет использовать бизнес, инвестиции и цифровые инструменты для роста капитала и окружения."
+          center
+          maxWidthClass="max-w-[780px]"
         />
         <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
           {eventData.audience.map((item) => (
