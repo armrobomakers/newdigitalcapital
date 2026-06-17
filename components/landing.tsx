@@ -315,25 +315,42 @@ function PartnerBadge({ name }: { name: string }) {
 }
 
 function FAQItem({ item, index }: { item: { question: string; answer: string }; index: number }) {
+  if (index === 0) {
+    return (
+      <article className="rounded-[26px] border border-violet-300/45 bg-[linear-gradient(180deg,rgba(124,60,255,0.24),rgba(255,255,255,0.05))] p-5 shadow-[0_0_34px_rgba(124,60,255,0.22)] backdrop-blur-2xl lg:min-h-[236px]">
+        <div className="flex items-center gap-4">
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/10 bg-black/20 text-sm font-semibold text-violet-100">
+            {String(index + 1).padStart(2, "0")}
+          </span>
+          <span className="min-w-0 flex-1 text-left text-[1.15rem] font-medium leading-tight text-white sm:text-[1.2rem]">
+            {item.question}
+          </span>
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-violet-300/45 bg-violet-500/30 text-lg text-white">
+            -
+          </span>
+        </div>
+        <div className="mt-5 h-px bg-violet-300/35" />
+        <p className="mt-6 ml-16 max-w-[520px] text-[15px] leading-7 text-white/70 lg:text-[17px]">
+          {item.answer}
+        </p>
+      </article>
+    );
+  }
+
   return (
-    <details
-      open={index === 0}
-      className="group min-h-[164px] rounded-[26px] border border-white/10 bg-white/[0.045] p-5 shadow-soft backdrop-blur-2xl lg:min-h-[172px]"
-    >
-      <summary className="flex cursor-pointer list-none items-center gap-4 marker:hidden">
+    <article className="rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.045),rgba(255,255,255,0.03))] p-5 shadow-soft backdrop-blur-2xl">
+      <div className="flex items-center gap-4">
         <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/10 bg-black/20 text-sm font-semibold text-white/72">
           {String(index + 1).padStart(2, "0")}
         </span>
-        <span className="min-w-0 flex-1 text-left text-[1.15rem] font-medium leading-tight text-white sm:text-[1.2rem]">
+        <span className="min-w-0 flex-1 text-left text-[1.1rem] font-medium leading-tight text-white sm:text-[1.15rem]">
           {item.question}
         </span>
         <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/10 bg-black/20 text-lg text-white/70">
-          <span className="group-open:hidden">+</span>
-          <span className="hidden group-open:inline">-</span>
+          +
         </span>
-      </summary>
-      <p className="mt-5 ml-16 max-w-[620px] text-[15px] leading-7 text-white/65">{item.answer}</p>
-    </details>
+      </div>
+    </article>
   );
 }
 
