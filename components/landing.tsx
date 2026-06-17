@@ -528,8 +528,8 @@ export function LandingPage() {
         <SectionTitle
           title="Кому будет полезно"
           description="Мероприятие для тех, кто хочет использовать бизнес, инвестиции и цифровые инструменты для роста капитала и окружения."
-          center
-          maxWidthClass="max-w-[780px]"
+          maxWidthClass="max-w-[560px]"
+          titleClassName="lg:text-[4.95rem]"
         />
         <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
           {eventData.audience.map((item) => (
