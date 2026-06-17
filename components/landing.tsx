@@ -42,24 +42,28 @@ function SectionTitle({
   description,
   center = false,
   maxWidthClass,
+  titleClassName,
 }: {
   kicker?: string;
   title: string;
   description?: string;
   center?: boolean;
   maxWidthClass?: string;
+  titleClassName?: string;
 }) {
   const titleClass = kicker
     ? "section-title"
     : "mt-0 max-w-5xl font-display text-4xl leading-[0.92] text-white sm:text-6xl lg:text-[5.5rem]";
   const wrapperClass = center
     ? `mx-auto w-full ${maxWidthClass ?? "max-w-[1200px]"} text-center`
-    : "max-w-4xl";
+    : maxWidthClass ?? "max-w-4xl";
 
   return (
     <div className={wrapperClass}>
       {kicker ? <p className="section-kicker">{kicker}</p> : null}
-      <h2 className={center && kicker ? "section-title-center" : titleClass}>{title}</h2>
+      <h2 className={`${center && kicker ? "section-title-center" : titleClass} ${titleClassName ?? ""}`.trim()}>
+        {title}
+      </h2>
       {description ? (
         <p className={center ? "section-copy mx-auto mt-4 max-w-4xl text-center" : "section-copy mt-4"}>
           {description}
@@ -598,7 +602,8 @@ export function LandingPage() {
               <SectionTitle
                 title="Забронируйте место на конференции"
                 description={eventData.registration.lead}
-                maxWidthClass="max-w-[760px]"
+                maxWidthClass="max-w-[860px]"
+                titleClassName="lg:text-[4.75rem]"
               />
 
               <div id="register-form" className="rounded-[28px] border border-white/10 bg-black/18 p-5">
