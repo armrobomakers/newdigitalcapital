@@ -797,7 +797,7 @@ export function LandingPage() {
               <div className="relative min-h-[250px] overflow-hidden lg:min-h-[320px]">
                 <div
                   aria-hidden="true"
-                  className="pointer-events-none absolute right-[-146px] top-[-140px] h-[540px] w-[540px] bg-[url('/footer-orb.svg')] bg-cover bg-right-top bg-no-repeat opacity-100 lg:right-[-160px] lg:top-[-164px] lg:h-[840px] lg:w-[840px]"
+                  className="pointer-events-none absolute right-[-146px] top-[-140px] h-[540px] w-[540px] overflow-hidden rounded-full bg-[url('/footer-orb.svg')] bg-cover bg-right-top bg-no-repeat opacity-100 lg:right-[-160px] lg:top-[-164px] lg:h-[840px] lg:w-[840px]"
                 />
                 <div
                   aria-hidden="true"
