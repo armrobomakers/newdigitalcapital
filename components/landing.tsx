@@ -769,10 +769,10 @@ export function LandingPage() {
 
       <footer className="section-shell pb-10 pt-16 md:pb-16">
         <div className="rounded-[34px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.04))] p-5 shadow-soft backdrop-blur-2xl md:p-6">
-          <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_15%_20%,rgba(124,60,255,0.2),transparent_26%),linear-gradient(135deg,rgba(255,255,255,0.03),rgba(255,255,255,0.06))] p-6">
-            <div className="relative grid gap-6 lg:grid-cols-[1.75fr_0.55fr] lg:items-center">
-              <div className="relative z-10 max-w-[820px] lg:pr-8">
-                <h3 className="mt-3 font-display text-[2.7rem] leading-[0.94] tracking-[-0.03em] text-white lg:text-[3.1rem]">
+          <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_15%_20%,rgba(124,60,255,0.2),transparent_26%),linear-gradient(135deg,rgba(255,255,255,0.03),rgba(255,255,255,0.06))] p-7 lg:min-h-[320px] lg:p-10">
+            <div className="relative grid gap-8 lg:min-h-[250px] lg:grid-cols-[1.55fr_0.45fr] lg:items-center">
+              <div className="relative z-10 max-w-[820px] lg:pr-10">
+                <h3 className="mt-1 font-display text-[2.7rem] leading-[0.94] tracking-[-0.03em] text-white lg:text-[3.35rem]">
                   <span className="block whitespace-nowrap">
                     {footerCtaTitleParts?.[1] ?? eventData.footer.ctaTitle}
                   </span>
@@ -783,7 +783,7 @@ export function LandingPage() {
                 <p className="mt-3 text-sm leading-7 text-white/66">{eventData.footer.ctaCopy}</p>
               </div>
 
-              <div className="flex flex-col items-start gap-4 lg:absolute lg:left-[68%] lg:top-[81%] lg:z-20 lg:flex-row lg:-translate-x-1/2 lg:-translate-y-1/2 lg:items-center">
+              <div className="flex flex-col items-start gap-4 lg:absolute lg:left-[64%] lg:top-[58%] lg:z-20 lg:flex-row lg:-translate-x-1/2 lg:-translate-y-1/2 lg:items-center">
                 <Link href="#register" className="btn-primary min-w-[286px]">
                   {eventData.footer.ctaButton}
                 </Link>
@@ -795,7 +795,7 @@ export function LandingPage() {
               <div className="relative min-h-[250px] overflow-hidden lg:min-h-[320px]">
                 <div
                   aria-hidden="true"
-                  className="pointer-events-none absolute right-[-105px] top-[-88px] h-[420px] w-[420px] bg-[url('/footer-orb.svg')] bg-cover bg-right-top bg-no-repeat opacity-100 lg:right-[-120px] lg:top-[-108px] lg:h-[620px] lg:w-[620px]"
+                  className="pointer-events-none absolute right-[-96px] top-[-84px] h-[460px] w-[460px] bg-[url('/footer-orb.svg')] bg-cover bg-right-top bg-no-repeat opacity-100 lg:right-[-112px] lg:top-[-118px] lg:h-[680px] lg:w-[680px]"
                 />
                 <div
                   aria-hidden="true"
