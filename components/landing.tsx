@@ -10,8 +10,18 @@ import screen7 from "@/maket/desktop/7.png";
 import screen8 from "@/maket/desktop/8.png";
 import screen9 from "@/maket/desktop/9.png";
 
-const screens: Array<{ image: StaticImageData; alt: string; priority?: boolean }> = [
-  { image: screen1, alt: "Экран 1: титульный блок конференции", priority: true },
+const screens: Array<{
+  image: StaticImageData;
+  alt: string;
+  priority?: boolean;
+  compact?: boolean;
+}> = [
+  {
+    image: screen1,
+    alt: "Экран 1: титульный блок конференции",
+    priority: true,
+    compact: true,
+  },
   { image: screen2, alt: "Экран 2: для кого будет полезно" },
   { image: screen3, alt: "Экран 3: спикеры конференции" },
   { image: screen4, alt: "Экран 4: программа мероприятия" },
@@ -25,17 +35,31 @@ const screens: Array<{ image: StaticImageData; alt: string; priority?: boolean }
 export function LandingPage() {
   return (
     <main className="bg-black">
-      {screens.map(({ image, alt, priority }) => (
+      {screens.map(({ image, alt, priority, compact }) => (
         <section key={alt} className="bg-black">
-          <img
-            src={image.src}
-            alt={alt}
-            width={image.width}
-            height={image.height}
-            loading={priority ? "eager" : "eager"}
-            decoding="async"
-            className="block h-auto w-full"
-          />
+          {compact ? (
+            <div className="aspect-[1586/940] w-full overflow-hidden bg-black">
+              <img
+                src={image.src}
+                alt={alt}
+                width={image.width}
+                height={image.height}
+                loading="eager"
+                decoding="async"
+                className="block h-full w-full object-cover object-top"
+              />
+            </div>
+          ) : (
+            <img
+              src={image.src}
+              alt={alt}
+              width={image.width}
+              height={image.height}
+              loading={priority ? "eager" : "lazy"}
+              decoding="async"
+              className="block h-auto w-full"
+            />
+          )}
         </section>
       ))}
     </main>
