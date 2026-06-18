@@ -1,93 +1,106 @@
-<svg width="900" height="620" viewBox="0 0 900 620" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="960" height="720" viewBox="0 0 960 720" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <radialGradient id="orbGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(760 95) rotate(135) scale(540 500)">
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(790 120) rotate(135) scale(620 540)">
       <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.95" />
-      <stop offset="0.08" stop-color="#F3E7FF" stop-opacity="0.92" />
-      <stop offset="0.18" stop-color="#D29CFF" stop-opacity="0.95" />
-      <stop offset="0.34" stop-color="#A252FF" stop-opacity="0.82" />
-      <stop offset="0.58" stop-color="#5F24D8" stop-opacity="0.42" />
+      <stop offset="0.08" stop-color="#F6EEFF" stop-opacity="0.9" />
+      <stop offset="0.18" stop-color="#DDAAFF" stop-opacity="0.95" />
+      <stop offset="0.34" stop-color="#AB5CFF" stop-opacity="0.84" />
+      <stop offset="0.56" stop-color="#6426E0" stop-opacity="0.46" />
+      <stop offset="0.82" stop-color="#38114C" stop-opacity="0.14" />
       <stop offset="1" stop-color="#0A0914" stop-opacity="0" />
     </radialGradient>
-    <radialGradient id="orbCore" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(745 118) rotate(135) scale(400 360)">
-      <stop offset="0" stop-color="#F7ECFF" stop-opacity="0.34" />
-      <stop offset="0.18" stop-color="#D49EFF" stop-opacity="0.2" />
-      <stop offset="0.5" stop-color="#8B41FF" stop-opacity="0.08" />
-      <stop offset="1" stop-color="#8B41FF" stop-opacity="0" />
+    <radialGradient id="core" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(760 150) rotate(135) scale(470 430)">
+      <stop offset="0" stop-color="#F8F0FF" stop-opacity="0.24" />
+      <stop offset="0.16" stop-color="#E9D1FF" stop-opacity="0.15" />
+      <stop offset="0.42" stop-color="#B56CFF" stop-opacity="0.08" />
+      <stop offset="1" stop-color="#7C3CFF" stop-opacity="0" />
     </radialGradient>
-    <radialGradient id="orbRim" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(748 120) rotate(135) scale(450 420)">
-      <stop offset="0.62" stop-color="#F5E8FF" stop-opacity="0" />
-      <stop offset="0.81" stop-color="#D18CFF" stop-opacity="0.15" />
-      <stop offset="1" stop-color="#B25DFF" stop-opacity="0.55" />
-    </radialGradient>
-    <filter id="blurSoft" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="10" />
+    <filter id="softBlur" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" />
     </filter>
-    <filter id="blurGlow" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="4" />
+    <filter id="glowBlur" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="3.5" />
     </filter>
-    <clipPath id="orbClip">
-      <circle cx="760" cy="120" r="430" />
+    <clipPath id="sphere">
+      <circle cx="790" cy="120" r="430" />
     </clipPath>
   </defs>
 
-  <g clip-path="url(#orbClip)">
-    <circle cx="760" cy="120" r="430" fill="url(#orbGlow)" />
-    <circle cx="760" cy="120" r="380" fill="url(#orbCore)" />
-    <circle cx="760" cy="120" r="430" fill="url(#orbRim)" opacity="0.9" />
+  <g clip-path="url(#sphere)">
+    <circle cx="790" cy="120" r="440" fill="url(#glow)" />
+    <circle cx="790" cy="120" r="390" fill="url(#core)" />
 
-    <g opacity="0.34" filter="url(#blurSoft)" stroke="#C88CFF" stroke-linecap="round">
-      <path d="M530 18C624 58 694 96 760 122" stroke-width="2.2" />
-      <path d="M510 110C618 148 705 156 828 132" stroke-width="2.1" />
-      <path d="M500 214C614 250 722 248 844 206" stroke-width="2" />
-      <path d="M530 308C636 344 720 352 842 318" stroke-width="1.9" />
+    <g opacity="0.28" filter="url(#softBlur)" stroke="#DFAEFF" stroke-linecap="round">
+      <path d="M470 20C620 78 712 112 790 126" stroke-width="2.2" />
+      <path d="M450 110C598 155 700 162 860 130" stroke-width="2.2" />
+      <path d="M450 208C606 248 708 250 876 206" stroke-width="2.1" />
+      <path d="M486 304C628 345 724 350 876 316" stroke-width="1.9" />
     </g>
 
-    <g filter="url(#blurGlow)" stroke="#D8A9FF" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M520 70L606 42L666 78L724 54L786 84L852 56" stroke-opacity="0.38" stroke-width="1.2" />
-      <path d="M502 132L586 104L654 146L720 118L792 154L862 124" stroke-opacity="0.34" stroke-width="1.1" />
-      <path d="M490 196L572 170L646 214L718 188L800 226L872 194" stroke-opacity="0.3" stroke-width="1.05" />
-      <path d="M504 266L590 236L666 278L744 244L820 286L892 258" stroke-opacity="0.28" stroke-width="1" />
-      <path d="M536 338L616 306L692 342L772 314L846 356" stroke-opacity="0.22" stroke-width="1" />
+    <g filter="url(#glowBlur)" stroke="#E9C4FF" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="790" cy="120" r="372" stroke="rgba(255,255,255,0.24)" stroke-width="1.8" />
+      <circle cx="790" cy="120" r="302" stroke="rgba(255,255,255,0.14)" stroke-width="1.4" />
+      <circle cx="790" cy="120" r="228" stroke="rgba(255,255,255,0.11)" stroke-width="1.2" />
 
-      <path d="M520 70L502 132L490 196L504 266L536 338" stroke-opacity="0.26" stroke-width="1" />
-      <path d="M606 42L586 104L572 170L590 236L616 306" stroke-opacity="0.26" stroke-width="1" />
-      <path d="M666 78L654 146L646 214L666 278L692 342" stroke-opacity="0.26" stroke-width="1" />
-      <path d="M724 54L720 118L718 188L744 244L772 314" stroke-opacity="0.26" stroke-width="1" />
-      <path d="M786 84L792 154L800 226L820 286L846 356" stroke-opacity="0.26" stroke-width="1" />
-      <path d="M852 56L862 124L872 194L892 258" stroke-opacity="0.26" stroke-width="1" />
+      <ellipse cx="790" cy="120" rx="355" ry="132" transform="rotate(-18 790 120)" stroke="rgba(255,255,255,0.12)" stroke-width="1.2" />
+      <ellipse cx="790" cy="120" rx="355" ry="132" transform="rotate(18 790 120)" stroke="rgba(255,255,255,0.12)" stroke-width="1.2" />
+      <ellipse cx="790" cy="120" rx="290" ry="106" transform="rotate(-35 790 120)" stroke="rgba(255,255,255,0.1)" stroke-width="1.1" />
+      <ellipse cx="790" cy="120" rx="290" ry="106" transform="rotate(35 790 120)" stroke="rgba(255,255,255,0.1)" stroke-width="1.1" />
+      <ellipse cx="790" cy="120" rx="210" ry="82" transform="rotate(-58 790 120)" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
+      <ellipse cx="790" cy="120" rx="210" ry="82" transform="rotate(58 790 120)" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
 
-      <circle cx="520" cy="70" r="7" fill="#F7E8FF" />
-      <circle cx="606" cy="42" r="8" fill="#F7E8FF" />
-      <circle cx="666" cy="78" r="7" fill="#F7E8FF" />
-      <circle cx="724" cy="54" r="8" fill="#F7E8FF" />
-      <circle cx="786" cy="84" r="7" fill="#F7E8FF" />
-      <circle cx="852" cy="56" r="8" fill="#F7E8FF" />
-      <circle cx="586" cy="104" r="7" fill="#F7E8FF" />
-      <circle cx="654" cy="146" r="8" fill="#F7E8FF" />
-      <circle cx="720" cy="118" r="7" fill="#F7E8FF" />
-      <circle cx="792" cy="154" r="7" fill="#F7E8FF" />
-      <circle cx="862" cy="124" r="6" fill="#F7E8FF" />
-      <circle cx="572" cy="170" r="7" fill="#F7E8FF" />
-      <circle cx="646" cy="214" r="8" fill="#F7E8FF" />
-      <circle cx="718" cy="188" r="7" fill="#F7E8FF" />
-      <circle cx="800" cy="226" r="8" fill="#F7E8FF" />
-      <circle cx="872" cy="194" r="6" fill="#F7E8FF" />
-      <circle cx="590" cy="236" r="7" fill="#F7E8FF" />
-      <circle cx="666" cy="278" r="8" fill="#F7E8FF" />
-      <circle cx="744" cy="244" r="7" fill="#F7E8FF" />
-      <circle cx="820" cy="286" r="8" fill="#F7E8FF" />
-      <circle cx="892" cy="258" r="6" fill="#F7E8FF" />
-      <circle cx="616" cy="306" r="8" fill="#F7E8FF" />
-      <circle cx="692" cy="342" r="7" fill="#F7E8FF" />
-      <circle cx="772" cy="314" r="8" fill="#F7E8FF" />
-      <circle cx="846" cy="356" r="6" fill="#F7E8FF" />
+      <path d="M500 72L588 44L654 76L720 50L792 84L864 56L914 70" stroke="rgba(255,255,255,0.22)" stroke-width="1.2" />
+      <path d="M484 134L568 106L642 146L712 120L788 156L866 128L930 140" stroke="rgba(255,255,255,0.2)" stroke-width="1.15" />
+      <path d="M476 198L558 172L636 214L712 190L796 230L876 202L938 220" stroke="rgba(255,255,255,0.18)" stroke-width="1.1" />
+      <path d="M500 264L584 236L660 278L742 246L826 286L908 258" stroke="rgba(255,255,255,0.16)" stroke-width="1.05" />
+      <path d="M540 332L620 304L700 344L784 314L866 352" stroke="rgba(255,255,255,0.13)" stroke-width="1" />
+
+      <path d="M500 72L484 134L476 198L500 264L540 332" stroke="rgba(255,255,255,0.17)" stroke-width="1" />
+      <path d="M588 44L568 106L558 172L584 236L620 304" stroke="rgba(255,255,255,0.17)" stroke-width="1" />
+      <path d="M654 76L642 146L636 214L660 278L700 344" stroke="rgba(255,255,255,0.17)" stroke-width="1" />
+      <path d="M720 50L712 120L712 190L742 246L784 314" stroke="rgba(255,255,255,0.17)" stroke-width="1" />
+      <path d="M792 84L788 156L796 230L826 286L866 352" stroke="rgba(255,255,255,0.17)" stroke-width="1" />
+      <path d="M864 56L866 128L876 202L908 258" stroke="rgba(255,255,255,0.17)" stroke-width="1" />
+
+      <circle cx="500" cy="72" r="7" fill="#FBF4FF" />
+      <circle cx="588" cy="44" r="8" fill="#FBF4FF" />
+      <circle cx="654" cy="76" r="7" fill="#FBF4FF" />
+      <circle cx="720" cy="50" r="8" fill="#FBF4FF" />
+      <circle cx="792" cy="84" r="8" fill="#FBF4FF" />
+      <circle cx="864" cy="56" r="7" fill="#FBF4FF" />
+      <circle cx="914" cy="70" r="6" fill="#FBF4FF" />
+      <circle cx="484" cy="134" r="7" fill="#FBF4FF" />
+      <circle cx="568" cy="106" r="7" fill="#FBF4FF" />
+      <circle cx="642" cy="146" r="8" fill="#FBF4FF" />
+      <circle cx="712" cy="120" r="7" fill="#FBF4FF" />
+      <circle cx="788" cy="156" r="8" fill="#FBF4FF" />
+      <circle cx="866" cy="128" r="7" fill="#FBF4FF" />
+      <circle cx="930" cy="140" r="6" fill="#FBF4FF" />
+      <circle cx="476" cy="198" r="7" fill="#FBF4FF" />
+      <circle cx="558" cy="172" r="7" fill="#FBF4FF" />
+      <circle cx="636" cy="214" r="8" fill="#FBF4FF" />
+      <circle cx="712" cy="190" r="7" fill="#FBF4FF" />
+      <circle cx="796" cy="230" r="8" fill="#FBF4FF" />
+      <circle cx="876" cy="202" r="7" fill="#FBF4FF" />
+      <circle cx="938" cy="220" r="6" fill="#FBF4FF" />
+      <circle cx="500" cy="264" r="7" fill="#FBF4FF" />
+      <circle cx="584" cy="236" r="8" fill="#FBF4FF" />
+      <circle cx="660" cy="278" r="7" fill="#FBF4FF" />
+      <circle cx="742" cy="246" r="8" fill="#FBF4FF" />
+      <circle cx="826" cy="286" r="8" fill="#FBF4FF" />
+      <circle cx="908" cy="258" r="6" fill="#FBF4FF" />
+      <circle cx="540" cy="332" r="7" fill="#FBF4FF" />
+      <circle cx="620" cy="304" r="8" fill="#FBF4FF" />
+      <circle cx="700" cy="344" r="7" fill="#FBF4FF" />
+      <circle cx="784" cy="314" r="8" fill="#FBF4FF" />
+      <circle cx="866" cy="352" r="6" fill="#FBF4FF" />
     </g>
 
-    <g opacity="0.55" filter="url(#blurGlow)">
-      <circle cx="783" cy="70" r="18" fill="#F8F0FF" />
-      <circle cx="842" cy="132" r="12" fill="#F8F0FF" />
-      <circle cx="726" cy="224" r="14" fill="#F8F0FF" />
-      <circle cx="650" cy="104" r="11" fill="#F8F0FF" />
+    <g opacity="0.5" filter="url(#glowBlur)">
+      <circle cx="815" cy="60" r="18" fill="#FFF5FF" />
+      <circle cx="868" cy="128" r="12" fill="#FFF5FF" />
+      <circle cx="750" cy="224" r="14" fill="#FFF5FF" />
+      <circle cx="675" cy="88" r="11" fill="#FFF5FF" />
     </g>
   </g>
 </svg>

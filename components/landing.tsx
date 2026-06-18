@@ -785,7 +785,7 @@ export function LandingPage() {
                 </p>
               </div>
 
-              <div className="flex flex-col items-start gap-4 lg:absolute lg:left-[60%] lg:top-[70%] lg:z-20 lg:flex-row lg:-translate-x-1/2 lg:-translate-y-1/2 lg:items-center">
+              <div className="flex flex-col items-start gap-4 lg:absolute lg:left-[64%] lg:top-[73%] lg:z-20 lg:flex-row lg:-translate-x-1/2 lg:-translate-y-1/2 lg:items-center">
                 <Link href="#register" className="btn-primary min-w-[286px]">
                   {eventData.footer.ctaButton}
                 </Link>
@@ -797,7 +797,7 @@ export function LandingPage() {
               <div className="relative min-h-[250px] overflow-hidden lg:min-h-[320px]">
                 <div
                   aria-hidden="true"
-                  className="pointer-events-none absolute right-[-146px] top-[-140px] h-[540px] w-[540px] overflow-hidden rounded-full bg-[url('/footer-orb.svg')] bg-cover bg-right-top bg-no-repeat opacity-100 lg:right-[-160px] lg:top-[-164px] lg:h-[840px] lg:w-[840px]"
+                  className="pointer-events-none absolute right-[-146px] top-[-140px] h-[540px] w-[540px] overflow-hidden rounded-full bg-[url('/footer-orb.svg')] bg-[length:130%_130%] bg-right-top bg-no-repeat opacity-100 lg:right-[-160px] lg:top-[-164px] lg:h-[840px] lg:w-[840px]"
                 />
                 <div
                   aria-hidden="true"
