@@ -157,7 +157,7 @@ function ProgramIcon({ icon }: { icon?: ProgramItem["icon"] }) {
 
 function HeroVisual() {
   return (
-    <div className="relative min-h-[580px] overflow-hidden rounded-[38px] bg-[#050411] lg:min-h-[560px]">
+    <div className="relative min-h-[520px] overflow-hidden rounded-[38px] bg-[#050411] lg:min-h-[500px]">
       <Image
         src="/hero-stage-3.png"
         alt=""
@@ -454,7 +454,7 @@ export function LandingPage() {
 
           <div id="top" className="mt-5 grid gap-5 lg:mt-6 lg:grid-cols-[1.08fr_0.92fr] lg:items-center">
             <div className="max-w-3xl">
-              <h1 className="mt-0 max-w-2xl font-display text-5xl leading-[0.88] text-white sm:text-7xl lg:text-[8.15rem]">
+              <h1 className="mt-0 max-w-2xl font-display text-5xl leading-[0.88] text-white sm:text-7xl lg:text-[7.15rem] lg:leading-[0.82]">
                 <span className="block">Цифровой</span>
                 <span className="block">капитал</span>
               </h1>
@@ -462,7 +462,7 @@ export function LandingPage() {
                 {eventData.subtitle}
               </p>
 
-              <div className="mt-6 grid gap-3 sm:grid-cols-3">
+              <div className="mt-5 grid gap-3 sm:grid-cols-3">
                 <HeroMetaCard
                   icon={<CalendarIcon className="h-5 w-5" />}
                   title={eventData.dateLabel}
@@ -480,7 +480,7 @@ export function LandingPage() {
                 />
               </div>
 
-              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <div className="mt-5 flex flex-col gap-3 sm:flex-row">
                 <Link href="#register" className="btn-primary min-w-[270px] justify-between">
                   <span>{eventData.heroCta}</span>
                   <ArrowRightIcon className="h-5 w-5" />
@@ -495,11 +495,11 @@ export function LandingPage() {
             <HeroVisual />
           </div>
 
-          <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {eventData.stats.map((stat, index) => (
               <div
                 key={stat.label}
-                className="min-h-[180px] rounded-[26px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.02))] p-5 shadow-soft"
+                className="min-h-[168px] rounded-[26px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.02))] p-5 shadow-soft"
               >
                 <div className="flex h-full items-start justify-between gap-4">
                   <div>
