@@ -157,7 +157,7 @@ function ProgramIcon({ icon }: { icon?: ProgramItem["icon"] }) {
 
 function HeroVisual() {
   return (
-    <div className="relative min-h-[680px] overflow-hidden rounded-[38px] bg-[#050411]">
+    <div className="relative min-h-[620px] overflow-hidden rounded-[38px] bg-[#050411] lg:min-h-[600px]">
       <Image
         src="/hero-stage-3.png"
         alt=""
@@ -425,7 +425,7 @@ export function LandingPage() {
     <main className="relative pb-24 md:pb-0">
       <StickyCTA />
 
-      <section className="section-shell pt-4 md:pt-6">
+      <section className="section-shell pt-2 md:pt-4">
         <div className="relative p-0 md:pt-1">
           <header className="flex items-center justify-between gap-4">
             <Link href="#top" className="inline-flex items-center gap-3">
@@ -452,7 +452,7 @@ export function LandingPage() {
             </Link>
           </header>
 
-          <div id="top" className="mt-8 grid gap-8 lg:mt-10 lg:grid-cols-[1.08fr_0.92fr] lg:items-center">
+          <div id="top" className="mt-6 grid gap-6 lg:mt-8 lg:grid-cols-[1.08fr_0.92fr] lg:items-center">
             <div className="max-w-3xl">
               <div className="chip gap-2">
                 <SparkIcon className="h-4 w-4 text-violet-300" />
@@ -499,7 +499,7 @@ export function LandingPage() {
             <HeroVisual />
           </div>
 
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {eventData.stats.map((stat, index) => (
               <div
                 key={stat.label}
