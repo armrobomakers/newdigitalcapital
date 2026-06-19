@@ -52,7 +52,7 @@ export const eventData = {
   timeLabel: "12:00 — 17:00",
   cityLabel: "Екатеринбург",
   venueLabel: "БЦ «Саммит»",
-  formatLabel: "Очное участие",
+  formatLabel: "Формат участия",
   navItems: [
     { label: "Программа", href: "#program" },
     { label: "Спикеры", href: "#speakers" },
@@ -191,7 +191,7 @@ export const eventData = {
     priceCaption: "Количество мест ограничено",
     note: "Количество мест ограничено. Регистрация обязательна.",
     benefits: [
-      "Очное участие",
+      "Живой формат",
       "Доступ ко всем выступлениям",
       "Материалы мероприятия",
       "Нетворкинг с участниками",
