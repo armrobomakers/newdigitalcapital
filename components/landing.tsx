@@ -518,29 +518,29 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section id="audience" className="section-shell relative overflow-hidden py-16 md:py-24">
+      <section id="audience" className="section-shell relative overflow-hidden py-10 md:py-14">
         <div className="pointer-events-none absolute left-[-120px] top-[-60px] h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle_at_35%_35%,rgba(124,60,255,0.22),transparent_28%),radial-gradient(circle_at_65%_65%,rgba(124,60,255,0.15),transparent_35%)] blur-2xl" />
         <div className="pointer-events-none absolute right-[-120px] top-[80px] h-[340px] w-[340px] rounded-full bg-[radial-gradient(circle_at_center,rgba(124,60,255,0.12),transparent_62%)] blur-2xl" />
         <SectionTitle
           title="Кому будет полезно"
-          description="Мероприятие для тех, кто хочет использовать бизнес, инвестиции и цифровые инструменты для роста капитала и окружения."
-          maxWidthClass="max-w-[560px]"
-          titleClassName="lg:text-[4.95rem]"
+          description="Для предпринимателей, инвесторов, экспертов и команд, которые хотят усилить рост и окружение."
+          maxWidthClass="max-w-[520px]"
+          titleClassName="lg:text-[4.45rem]"
         />
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+        <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
           {eventData.audience.map((item) => (
             <article
               key={item.title}
-              className="group flex min-h-[500px] flex-col rounded-[28px] border border-white/10 bg-white/[0.045] p-6 text-center shadow-soft backdrop-blur-2xl transition duration-300 hover:-translate-y-1 hover:border-violet-300/25 hover:bg-white/[0.06]"
+              className="group flex min-h-[390px] flex-col rounded-[28px] border border-white/10 bg-white/[0.045] p-4 text-center shadow-soft backdrop-blur-2xl transition duration-300 hover:-translate-y-1 hover:border-violet-300/25 hover:bg-white/[0.06]"
             >
-              <div className="mx-auto flex h-36 w-36 items-center justify-center rounded-full border border-violet-400/30 bg-[radial-gradient(circle_at_35%_30%,rgba(124,60,255,0.22),rgba(8,7,22,0.96))]">
-                <AudienceIcon icon={item.icon} className="h-12 w-12 text-violet-200" />
+              <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full border border-violet-400/30 bg-[radial-gradient(circle_at_35%_30%,rgba(124,60,255,0.22),rgba(8,7,22,0.96))] sm:h-28 sm:w-28">
+                <AudienceIcon icon={item.icon} className="h-9 w-9 text-violet-200" />
               </div>
-              <h3 className="mt-6 text-[1.55rem] font-semibold leading-tight text-white">
+              <h3 className="mt-4 text-[1.18rem] font-semibold leading-tight text-white">
                 {item.title}
               </h3>
-              <div className="mx-auto mt-5 h-px w-12 bg-violet-400/70" />
-              <p className="mt-5 text-[17px] leading-8 text-white/66">{item.description}</p>
+              <div className="mx-auto mt-3 h-px w-12 bg-violet-400/70" />
+              <p className="mt-3 text-[14px] leading-5 text-white/66">{item.description}</p>
             </article>
           ))}
         </div>
