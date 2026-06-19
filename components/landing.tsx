@@ -111,6 +111,8 @@ function HeroStatIcon({ index }: { index: number }) {
   }
 }
 
+const speakerImagePositions = ["50% 24%", "58% 24%", "76% 24%"] as const;
+
 function HeroMetaCard({
   icon,
   title,
@@ -181,7 +183,8 @@ function SpeakerCard({ speaker, index }: { speaker: Speaker; index: number }) {
             src={`/speaker-${index + 1}-face.png`}
             alt={speaker.name}
             fill
-            className="object-cover object-center"
+            style={{ objectPosition: speakerImagePositions[index] ?? "50% 24%" }}
+            className="object-cover"
           />
         </div>
       </div>
