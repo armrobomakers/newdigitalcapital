@@ -454,11 +454,7 @@ export function LandingPage() {
 
           <div id="top" className="mt-5 grid gap-5 lg:mt-6 lg:grid-cols-[1.08fr_0.92fr] lg:items-center">
             <div className="max-w-3xl">
-              <div className="chip gap-2">
-                <SparkIcon className="h-4 w-4 text-violet-300" />
-                <span>{eventData.badge}</span>
-              </div>
-              <h1 className="mt-5 max-w-2xl font-display text-5xl leading-[0.88] text-white sm:text-7xl lg:text-[8.15rem]">
+              <h1 className="mt-0 max-w-2xl font-display text-5xl leading-[0.88] text-white sm:text-7xl lg:text-[8.15rem]">
                 <span className="block">Цифровой</span>
                 <span className="block">капитал</span>
               </h1>
