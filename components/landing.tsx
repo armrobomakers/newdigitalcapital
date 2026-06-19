@@ -38,7 +38,7 @@ export function LandingPage() {
       {screens.map(({ image, alt, priority, compact }) => (
         <section key={alt} className="bg-black">
           {compact ? (
-            <div className="aspect-[1586/940] w-full overflow-hidden bg-black">
+            <div className="aspect-[1586/820] w-full overflow-hidden bg-black">
               <img
                 src={image.src}
                 alt={alt}
