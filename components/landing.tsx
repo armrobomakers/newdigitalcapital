@@ -111,7 +111,7 @@ function HeroStatIcon({ index }: { index: number }) {
   }
 }
 
-const speakerImagePositions = ["50% 18%", "58% 18%", "76% 18%"] as const;
+const speakerImagePositions = ["50% 28%", "56% 26%", "72% 26%"] as const;
 
 function HeroMetaCard({
   icon,
@@ -175,10 +175,10 @@ function HeroVisual() {
 
 function SpeakerCard({ speaker, index }: { speaker: Speaker; index: number }) {
   return (
-    <article className="group flex h-full min-h-[570px] flex-col overflow-hidden rounded-[32px] border border-white/10 bg-white/[0.045] shadow-soft backdrop-blur-2xl transition duration-300 hover:-translate-y-1 hover:border-violet-300/30 hover:bg-white/[0.06]">
-      <div className="relative px-4 pb-2 pt-4">
+    <article className="group flex h-full min-h-[640px] flex-col overflow-hidden rounded-[32px] border border-white/10 bg-white/[0.045] shadow-soft backdrop-blur-2xl transition duration-300 hover:-translate-y-1 hover:border-violet-300/30 hover:bg-white/[0.06]">
+      <div className="relative px-4 pb-2 pt-5">
         <div className="absolute inset-x-0 top-0 h-24 bg-[radial-gradient(circle_at_50%_0%,rgba(124,60,255,0.3),transparent_60%)]" />
-        <div className="relative mx-auto w-full max-w-[310px] aspect-[4/5] overflow-hidden rounded-[28px] border border-white/12 bg-[radial-gradient(circle_at_32%_28%,rgba(255,255,255,0.16),rgba(124,60,255,0.22)_45%,rgba(8,7,22,0.98))] p-2 shadow-[0_0_0_1px_rgba(124,60,255,0.06),0_0_60px_rgba(124,60,255,0.18)] lg:max-w-[330px]">
+        <div className="relative mx-auto h-64 w-64 overflow-hidden rounded-full border border-white/12 bg-[radial-gradient(circle_at_32%_28%,rgba(255,255,255,0.16),rgba(124,60,255,0.3)_45%,rgba(8,7,22,0.98))] p-2.5 shadow-[0_0_0_1px_rgba(124,60,255,0.06),0_0_60px_rgba(124,60,255,0.18)] lg:h-[286px] lg:w-[286px]">
           <Image
             src={`/speaker-${index + 1}-face.png`}
             alt={speaker.name}
@@ -189,14 +189,15 @@ function SpeakerCard({ speaker, index }: { speaker: Speaker; index: number }) {
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col px-5 pb-5 text-center">
-        <h3 className="mt-2 text-[1.8rem] font-semibold leading-tight text-white">{speaker.name}</h3>
-        <p className="mt-2 text-[13px] font-medium leading-5 text-violet-200/90">{speaker.company}</p>
-        <p className="mt-4 px-1 text-[14px] leading-6 text-white/68">{speaker.topic}</p>
-        <div className="mt-auto pt-5">
+      <div className="flex flex-1 flex-col px-6 pb-6 text-center">
+        <h3 className="mt-2 text-[1.95rem] font-semibold leading-tight text-white">{speaker.name}</h3>
+        <p className="mt-2 text-sm font-medium leading-6 text-violet-200/90">{speaker.company}</p>
+        <div className="mx-auto mt-3 h-px w-12 bg-violet-400/80" />
+        <p className="mt-4 px-2 text-[15px] leading-7 text-white/68">{speaker.topic}</p>
+        <div className="mt-auto pt-6">
           <Link
             href="#register"
-            className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-4 py-2 text-sm font-semibold text-white/85 transition group-hover:border-violet-300/30 group-hover:bg-violet-500/20"
+            className="inline-flex items-center gap-2 rounded-full border border-violet-400/35 bg-black/15 px-5 py-2.5 text-sm font-semibold text-white/90 transition group-hover:border-violet-300/40 group-hover:bg-violet-500/20"
           >
             Подробнее
             <ArrowUpRightIcon className="h-4 w-4" />
@@ -549,14 +550,14 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section id="speakers" className="section-shell relative overflow-hidden py-12 md:py-16">
+      <section id="speakers" className="section-shell relative overflow-hidden py-14 md:py-20">
         <div className="pointer-events-none absolute right-[-80px] top-[-20px] h-[320px] w-[680px] bg-[radial-gradient(circle_at_20%_50%,rgba(124,60,255,0.18),transparent_18%),radial-gradient(circle_at_45%_15%,rgba(124,60,255,0.22),transparent_18%),radial-gradient(circle_at_70%_45%,rgba(124,60,255,0.16),transparent_18%),linear-gradient(115deg,rgba(124,60,255,0.18),transparent_60%)] blur-2xl" />
         <SectionTitle
           title="Спикеры"
           description="Практики из бизнеса, инвестиций и цифровых технологий."
           titleClassName="lg:text-[4.7rem]"
         />
-        <div className="mt-6 grid gap-3 lg:grid-cols-3">
+        <div className="mt-8 grid gap-4 lg:grid-cols-3">
           {eventData.speakers.map((speaker, index) => (
             <SpeakerCard key={speaker.name} speaker={speaker} index={index} />
           ))}
