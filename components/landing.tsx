@@ -111,7 +111,11 @@ function HeroStatIcon({ index }: { index: number }) {
   }
 }
 
-const speakerImagePositions = ["50% 28%", "56% 26%", "72% 26%"] as const;
+const speakerImageTransforms = [
+  "translateX(0%) scale(1.03)",
+  "translateX(-4%) scale(1.04)",
+  "translateX(-20%) scale(1.04)",
+] as const;
 
 function HeroMetaCard({
   icon,
@@ -183,7 +187,10 @@ function SpeakerCard({ speaker, index }: { speaker: Speaker; index: number }) {
             src={`/speaker-${index + 1}-face.png`}
             alt={speaker.name}
             fill
-            style={{ objectPosition: speakerImagePositions[index] ?? "50% 24%" }}
+            style={{
+              transform: speakerImageTransforms[index] ?? "translateX(0%) scale(1.05)",
+              transformOrigin: "center",
+            }}
             className="object-cover"
           />
         </div>
