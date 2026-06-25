@@ -203,7 +203,7 @@ function SpeakerCard({ speaker, index }: { speaker: Speaker; index: number }) {
         <div className="mt-auto pt-4">
           <Link
             href="#register"
-            className="inline-flex items-center gap-2 rounded-full border border-violet-400/35 bg-black/15 px-4.5 py-2 text-sm font-semibold text-white/90 transition group-hover:border-violet-300/40 group-hover:bg-violet-500/20"
+            className="inline-flex min-w-[136px] items-center justify-center gap-2 rounded-full border border-violet-400/35 bg-black/15 px-5 py-2.5 text-sm font-semibold text-white/90 transition group-hover:border-violet-300/40 group-hover:bg-violet-500/20"
           >
             Подробнее
             <ArrowUpRightIcon className="h-4 w-4" />
