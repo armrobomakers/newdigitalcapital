@@ -111,12 +111,6 @@ function HeroStatIcon({ index }: { index: number }) {
   }
 }
 
-const speakerImageTransforms = [
-  "translateX(0%) scale(1.03)",
-  "translateX(-4%) scale(1.04)",
-  "translateX(-20%) scale(1.04)",
-] as const;
-
 function HeroMetaCard({
   icon,
   title,
@@ -178,19 +172,18 @@ function HeroVisual() {
 }
 
 function SpeakerCard({ speaker, index }: { speaker: Speaker; index: number }) {
+  const speakerImageSrc = `/speaker-${index + 1}-face.png`;
+
   return (
     <article className="group flex h-full min-h-[640px] flex-col overflow-hidden rounded-[32px] border border-white/10 bg-white/[0.045] shadow-soft backdrop-blur-2xl transition duration-300 hover:-translate-y-1 hover:border-violet-300/30 hover:bg-white/[0.06]">
       <div className="relative px-4 pb-2 pt-5">
         <div className="absolute inset-x-0 top-0 h-24 bg-[radial-gradient(circle_at_50%_0%,rgba(124,60,255,0.3),transparent_60%)]" />
-        <div className="relative mx-auto h-64 w-64 overflow-hidden rounded-full border border-white/12 bg-[radial-gradient(circle_at_32%_28%,rgba(255,255,255,0.16),rgba(124,60,255,0.3)_45%,rgba(8,7,22,0.98))] p-2.5 shadow-[0_0_0_1px_rgba(124,60,255,0.06),0_0_60px_rgba(124,60,255,0.18)] lg:h-[286px] lg:w-[286px]">
+        <div className="relative mx-auto aspect-square w-full max-w-[320px] overflow-hidden rounded-[30px] border border-white/12 bg-[radial-gradient(circle_at_32%_28%,rgba(255,255,255,0.16),rgba(124,60,255,0.24)_45%,rgba(8,7,22,0.98))] p-2.5 shadow-[0_0_0_1px_rgba(124,60,255,0.06),0_0_60px_rgba(124,60,255,0.18)] lg:max-w-[330px]">
           <Image
-            src={`/speaker-${index + 1}-face.png`}
+            src={speakerImageSrc}
             alt={speaker.name}
             fill
-            style={{
-              transform: speakerImageTransforms[index] ?? "translateX(0%) scale(1.05)",
-              transformOrigin: "center",
-            }}
+            unoptimized
             className="object-cover"
           />
         </div>
