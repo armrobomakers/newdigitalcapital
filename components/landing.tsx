@@ -226,7 +226,7 @@ function ProgramRow({
 
   return (
     <li
-      className={`relative overflow-hidden rounded-[22px] border px-4 py-4 transition ${
+      className={`relative overflow-hidden rounded-[18px] border px-3 py-2.5 transition ${
         isFinal
           ? "border-violet-400/50 bg-[linear-gradient(180deg,rgba(124,60,255,0.24),rgba(255,255,255,0.05))] shadow-[0_0_0_1px_rgba(124,60,255,0.14)] lg:pr-16"
           : isFeatured
@@ -234,11 +234,11 @@ function ProgramRow({
             : "border-white/10 bg-white/[0.04] hover:border-violet-300/25 hover:bg-white/[0.06]"
       }`}
     >
-      <div className="grid gap-3 lg:grid-cols-[96px_18px_1fr] lg:items-start">
+      <div className="grid gap-2 lg:grid-cols-[68px_12px_1fr] lg:items-start">
         <div
           className={`text-[2.3rem] font-medium leading-none ${
             isFinal ? "text-white" : "text-violet-300"
-          } lg:justify-self-start lg:pt-0.5`}
+          } lg:justify-self-start lg:pt-0.5 lg:text-[1.28rem]`}
         >
           {item.time}
         </div>
@@ -253,7 +253,7 @@ function ProgramRow({
         </div>
         <div className="flex items-start gap-3">
           <div
-            className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border bg-[linear-gradient(180deg,rgba(124,60,255,0.24),rgba(255,255,255,0.03))] ${
+            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border bg-[linear-gradient(180deg,rgba(124,60,255,0.24),rgba(255,255,255,0.03))] ${
               isFinal ? "border-violet-300/45" : isFeatured ? "border-violet-300/35" : "border-white/10"
             }`}
           >
@@ -261,28 +261,28 @@ function ProgramRow({
           </div>
           <div className="min-w-0">
             <p
-              className={`text-lg font-semibold text-white ${
-                isFinal ? "lg:text-[1.25rem]" : isFeatured ? "lg:text-[1.2rem]" : ""
+              className={`text-lg font-semibold leading-tight text-white ${
+                isFinal ? "lg:text-[0.84rem]" : isFeatured ? "lg:text-[0.82rem]" : "lg:text-[0.81rem]"
               }`}
             >
               {item.title}
             </p>
-            <p className="mt-1 text-sm text-white/58">{item.speaker}</p>
+            <p className="mt-0.5 text-[10px] leading-4 text-white/58">{item.speaker}</p>
             {item.note ? (
-              <p className={`mt-2 text-sm leading-6 ${isFinal ? "text-white/78" : "text-white/72"}`}>
+              <p className={`mt-0.5 text-[10px] leading-4 ${isFinal ? "text-white/78" : "text-white/72"}`}>
                 {item.note}
               </p>
             ) : null}
           </div>
         </div>
         {isFeatured ? (
-          <div className="absolute right-4 top-1/2 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-[18px] border border-violet-300/25 bg-black/20 text-violet-200 lg:flex">
-            <StarIcon className="h-5 w-5" />
+          <div className="absolute right-4 top-1/2 hidden h-8 w-8 -translate-y-1/2 items-center justify-center rounded-[14px] border border-violet-300/25 bg-black/20 text-violet-200 lg:flex">
+            <StarIcon className="h-3.5 w-3.5" />
           </div>
         ) : null}
         {isFinal ? (
-          <div className="absolute right-4 top-1/2 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-[18px] border border-amber-300/30 bg-black/20 text-amber-300 lg:flex">
-            <CrownIcon className="h-5 w-5" />
+          <div className="absolute right-4 top-1/2 hidden h-8 w-8 -translate-y-1/2 items-center justify-center rounded-[14px] border border-amber-300/30 bg-black/20 text-amber-300 lg:flex">
+            <CrownIcon className="h-3.5 w-3.5" />
           </div>
         ) : null}
       </div>
@@ -570,24 +570,23 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section id="program" className="section-shell relative py-16 md:py-24">
+      <section id="program" className="section-shell relative py-8 md:py-10">
         <div className="pointer-events-none absolute left-[-120px] top-[240px] hidden h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle_at_30%_70%,rgba(124,60,255,0.35),transparent_35%),radial-gradient(circle_at_0%_100%,rgba(124,60,255,0.18),transparent_45%)] blur-2xl lg:block" />
-        <div className="grid gap-8 lg:grid-cols-[0.84fr_1.16fr]">
-          <div className="lg:pt-2">
+        <div className="grid gap-4 lg:grid-cols-[0.52fr_1.48fr] lg:items-start">
+          <div className="lg:pt-0.5">
             <SectionTitle
-
               title="Программа мероприятия"
               description="Основная часть проходит с 12:00 до 17:00. После — ужин со спикерами в отдельном формате."
+              titleClassName="text-[2.55rem] lg:text-[2.95rem]"
             />
-            <Link href="#register" className="btn-primary mt-8 inline-flex">
+            <Link href="#register" className="btn-primary mt-3 inline-flex scale-90 origin-left">
               Смотреть программу
             </Link>
           </div>
 
-          <div className="rounded-[32px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.065),rgba(255,255,255,0.03))] p-4 shadow-soft backdrop-blur-2xl md:p-5">
-            <div className="relative rounded-[26px] border border-white/10 bg-black/18 p-4 md:p-5 lg:pl-[120px]">
-              <div className="pointer-events-none absolute left-[120px] top-8 bottom-8 hidden w-px bg-white/10 lg:block" />
-              <ul className="space-y-3">
+          <div className="rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.065),rgba(255,255,255,0.03))] p-2 shadow-soft backdrop-blur-2xl md:p-2.5">
+            <div className="relative rounded-[22px] border border-white/10 bg-black/18 p-2 md:p-2.5">
+              <ul className="grid gap-2 lg:grid-cols-2 lg:gap-2">
                 {eventData.program.map((item) => (
                   <ProgramRow
                     key={`${item.time}-${item.title}`}
