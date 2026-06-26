@@ -230,7 +230,7 @@ function ProgramRow({
 
   return (
     <li
-      className={`relative min-h-[70px] overflow-hidden rounded-[18px] border px-4 py-1.5 transition lg:min-h-[74px] ${
+      className={`relative min-h-[64px] overflow-hidden rounded-[18px] border px-4 py-1 transition lg:min-h-[68px] ${
         isFinal
           ? "border-violet-400/50 bg-[linear-gradient(180deg,rgba(124,60,255,0.24),rgba(255,255,255,0.05))] shadow-[0_0_0_1px_rgba(124,60,255,0.14)] lg:col-span-2 lg:pr-16"
           : isFeatured
@@ -238,7 +238,7 @@ function ProgramRow({
             : "border-white/10 bg-white/[0.04] hover:border-violet-300/25 hover:bg-white/[0.06]"
       }`}
     >
-      <div className="grid grid-cols-[1fr_auto] gap-x-3 gap-y-0.5">
+      <div className="grid grid-cols-[1fr_auto] gap-x-3 gap-y-0">
         <div
           className={`text-[28px] font-medium leading-none ${
             isFinal ? "text-white" : "text-violet-300"
@@ -255,13 +255,31 @@ function ProgramRow({
         </div>
 
         <div className="col-span-2 min-w-0">
-          <p className="text-[16px] font-semibold leading-[1.16] text-white">
+          <p
+            className="text-[15px] font-semibold leading-[1.12] text-white"
+            style={{
+              display: "-webkit-box",
+              WebkitBoxOrient: "vertical",
+              WebkitLineClamp: 2,
+              overflow: "hidden",
+            }}
+          >
             {item.title}
           </p>
-          <p className="mt-0.5 text-[12px] leading-[1.3] text-white/58">{item.speaker}</p>
+          <p
+            className="mt-0.5 text-[11px] leading-[1.25] text-white/58"
+            style={{
+              display: "-webkit-box",
+              WebkitBoxOrient: "vertical",
+              WebkitLineClamp: 1,
+              overflow: "hidden",
+            }}
+          >
+            {item.speaker}
+          </p>
           {item.note ? (
             <p
-              className={`mt-0.5 text-[12px] leading-[1.25] ${isFinal ? "text-white/78" : "text-white/72"}`}
+              className={`mt-0.5 text-[11px] leading-[1.2] ${isFinal ? "text-white/78" : "text-white/72"}`}
               style={{
                 display: "-webkit-box",
                 WebkitBoxOrient: "vertical",
@@ -581,8 +599,8 @@ export function LandingPage() {
             </Link>
           </div>
 
-          <div className="rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.065),rgba(255,255,255,0.03))] p-4 shadow-soft backdrop-blur-2xl md:p-5 lg:origin-top-right lg:scale-[0.96]">
-            <div className="relative rounded-[24px] border border-white/10 bg-black/18 p-4 md:p-5">
+          <div className="rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.065),rgba(255,255,255,0.03))] p-3 shadow-soft backdrop-blur-2xl md:p-4">
+            <div className="relative rounded-[24px] border border-white/10 bg-black/18 p-3 md:p-4">
               <ul className="grid gap-1 lg:grid-cols-2 lg:gap-1">
                 {eventData.program.map((item) => (
                   <ProgramRow
