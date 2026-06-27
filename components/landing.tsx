@@ -230,33 +230,35 @@ function ProgramRow({
 
   return (
     <li
-      className={`relative min-h-[64px] overflow-hidden rounded-[18px] border px-4 py-1 transition lg:min-h-[68px] ${
+      className={`relative min-h-[124px] overflow-hidden rounded-[22px] border px-[18px] py-[18px] transition lg:min-h-[132px] ${
         isFinal
-          ? "border-violet-400/50 bg-[linear-gradient(180deg,rgba(124,60,255,0.24),rgba(255,255,255,0.05))] shadow-[0_0_0_1px_rgba(124,60,255,0.14)] lg:col-span-2 lg:pr-16"
+          ? "border-violet-400/50 bg-[linear-gradient(180deg,rgba(124,60,255,0.24),rgba(255,255,255,0.05))] shadow-[0_0_0_1px_rgba(124,60,255,0.14)] lg:col-span-2"
           : isFeatured
-            ? "border-violet-300/35 bg-white/[0.055] shadow-[0_0_34px_rgba(124,60,255,0.16)] lg:pr-16"
+            ? "border-violet-300/35 bg-white/[0.055] shadow-[0_0_34px_rgba(124,60,255,0.16)]"
             : "border-white/10 bg-white/[0.04] hover:border-violet-300/25 hover:bg-white/[0.06]"
       }`}
     >
-      <div className="grid grid-cols-[1fr_auto] gap-x-3 gap-y-0">
-        <div
-          className={`text-[28px] font-medium leading-none ${
-            isFinal ? "text-white" : "text-violet-300"
-          }`}
-        >
-          {item.time}
-        </div>
-        <div
-          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border bg-[linear-gradient(180deg,rgba(124,60,255,0.24),rgba(255,255,255,0.03))] ${
-            isFinal ? "border-violet-300/45" : isFeatured ? "border-violet-300/35" : "border-white/10"
-          }`}
-        >
-          <ProgramIcon icon={item.icon} />
+      <div className="flex h-full flex-col gap-2">
+        <div className="flex items-start justify-between gap-3">
+          <div
+            className={`text-[28px] font-medium leading-none ${
+              isFinal ? "text-white" : "text-violet-300"
+            }`}
+          >
+            {item.time}
+          </div>
+          <div
+            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border bg-[linear-gradient(180deg,rgba(124,60,255,0.24),rgba(255,255,255,0.03))] ${
+              isFinal ? "border-violet-300/45" : isFeatured ? "border-violet-300/35" : "border-white/10"
+            }`}
+          >
+            <ProgramIcon icon={item.icon} />
+          </div>
         </div>
 
-        <div className="col-span-2 min-w-0">
+        <div className="min-w-0">
           <p
-            className="text-[15px] font-semibold leading-[1.12] text-white"
+            className="text-[17px] font-semibold leading-[1.15] text-white lg:text-[18px]"
             style={{
               display: "-webkit-box",
               WebkitBoxOrient: "vertical",
@@ -267,7 +269,7 @@ function ProgramRow({
             {item.title}
           </p>
           <p
-            className="mt-0.5 text-[11px] leading-[1.25] text-white/58"
+            className="mt-1 text-[13px] leading-[1.3] text-white/58 lg:text-[14px]"
             style={{
               display: "-webkit-box",
               WebkitBoxOrient: "vertical",
@@ -279,11 +281,11 @@ function ProgramRow({
           </p>
           {item.note ? (
             <p
-              className={`mt-0.5 text-[11px] leading-[1.2] ${isFinal ? "text-white/78" : "text-white/72"}`}
+              className={`mt-1 text-[13px] leading-[1.35] ${isFinal ? "text-white/78" : "text-white/72"} lg:text-[14px]`}
               style={{
                 display: "-webkit-box",
                 WebkitBoxOrient: "vertical",
-                WebkitLineClamp: 2,
+                WebkitLineClamp: 3,
                 overflow: "hidden",
               }}
             >
@@ -578,9 +580,9 @@ export function LandingPage() {
 
       <section id="program" className="section-shell relative min-h-[100svh] py-0 md:py-2 lg:flex lg:items-center">
         <div className="pointer-events-none absolute left-[-120px] top-[240px] hidden h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle_at_30%_70%,rgba(124,60,255,0.35),transparent_35%),radial-gradient(circle_at_0%_100%,rgba(124,60,255,0.18),transparent_45%)] blur-2xl lg:block" />
-        <div className="grid gap-8 lg:grid-cols-[0.36fr_0.64fr] lg:gap-12">
-          <div className="max-w-[460px] lg:pt-0.5">
-            <h2 className="max-w-[460px] font-display text-[clamp(64px,5vw,112px)] leading-[0.9] tracking-[-0.03em] text-white">
+        <div className="grid items-center gap-8 lg:grid-cols-[0.4fr_0.6fr] lg:gap-14">
+          <div className="max-w-[520px] lg:pt-0.5">
+            <h2 className="max-w-[520px] font-display text-[clamp(72px,6.2vw,120px)] leading-[0.9] tracking-[-0.03em] text-white">
               Программа мероприятия
             </h2>
             <p
@@ -599,9 +601,9 @@ export function LandingPage() {
             </Link>
           </div>
 
-          <div className="rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.065),rgba(255,255,255,0.03))] p-3 shadow-soft backdrop-blur-2xl md:p-4">
-            <div className="relative rounded-[24px] border border-white/10 bg-black/18 p-3 md:p-4">
-              <ul className="grid gap-1 lg:grid-cols-2 lg:gap-1">
+          <div className="w-full rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.065),rgba(255,255,255,0.03))] p-4 shadow-soft backdrop-blur-2xl md:p-5">
+            <div className="relative rounded-[24px] border border-white/10 bg-black/18 p-4 md:p-5">
+              <ul className="grid gap-3 lg:grid-cols-2 lg:gap-[14px]">
                 {eventData.program.map((item) => (
                   <ProgramRow
                     key={`${item.time}-${item.title}`}
