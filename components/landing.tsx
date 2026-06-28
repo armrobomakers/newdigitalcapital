@@ -13,6 +13,7 @@ import {
   InvestIcon,
   HandshakeIcon,
   CloudIcon,
+  CrownIcon,
   HexNetworkIcon,
   LinkedInIcon,
   MailIcon,
@@ -24,6 +25,7 @@ import {
   PlaneIcon,
   ShieldIcon,
   SparkIcon,
+  StarIcon,
   TelegramIcon,
   TicketIcon,
   UsersIcon,
@@ -140,7 +142,7 @@ function HeroMetaCard({
 }
 
 function ProgramIcon({ icon }: { icon?: ProgramItem["icon"] }) {
-  const className = "h-4 w-4 text-violet-100";
+  const className = "h-5 w-5 text-violet-100 lg:h-6 lg:w-6";
 
   switch (icon) {
     case "business":
@@ -155,7 +157,7 @@ function ProgramIcon({ icon }: { icon?: ProgramItem["icon"] }) {
       return <CalendarIcon className={className} />;
     case "spark":
     default:
-      return <SparkIcon className={className} />;
+      return <StarIcon className={className} />;
   }
 }
 
@@ -227,49 +229,56 @@ function ProgramRow({
 }) {
   const isFeatured = accent === "featured";
   const isFinal = accent === "final";
+  const showSubtitle = item.time === "12:30" || item.time === "13:20" || item.time === "14:40";
+  const showNote = item.time === "15:30" || item.time === "16:30" || item.time === "17:00";
+  const trailingIcon = isFeatured ? (
+    <StarIcon className="h-10 w-10 text-violet-200" />
+  ) : isFinal ? (
+    <CrownIcon className="h-10 w-10 text-amber-300" />
+  ) : null;
 
   return (
     <li
-      className={`relative min-h-[94px] overflow-hidden rounded-[20px] border px-4 py-3.5 transition lg:min-h-[100px] lg:px-[16px] lg:py-[14px] ${
+      className={`grid items-start gap-3 py-3.5 transition lg:grid-cols-[120px_70px_minmax(0,1fr)_64px] lg:gap-4 lg:py-4 ${
         isFinal
-          ? "border-violet-400/50 bg-[linear-gradient(180deg,rgba(124,60,255,0.24),rgba(255,255,255,0.05))] shadow-[0_0_0_1px_rgba(124,60,255,0.14)] lg:col-span-2"
+          ? "rounded-[20px] border border-violet-400/45 bg-[linear-gradient(180deg,rgba(124,60,255,0.20),rgba(255,255,255,0.04))] px-4 shadow-[0_0_0_1px_rgba(124,60,255,0.16)] lg:px-4"
           : isFeatured
-            ? "border-violet-300/35 bg-white/[0.055] shadow-[0_0_34px_rgba(124,60,255,0.16)]"
-            : "border-white/10 bg-white/[0.04] hover:border-violet-300/25 hover:bg-white/[0.06]"
+            ? "rounded-[20px] border border-violet-300/25 bg-white/[0.04] px-4 shadow-[0_0_30px_rgba(124,60,255,0.12)] lg:px-4"
+            : "border-t border-white/10 px-0 lg:px-0"
       }`}
     >
-      <div className="flex h-full flex-col gap-2">
-        <div className="flex items-start justify-between gap-3">
-          <div
-            className={`text-[22px] font-medium leading-none lg:text-[24px] ${
-              isFinal ? "text-white" : "text-violet-300"
-            }`}
-          >
-            {item.time}
-          </div>
-          <div
-            className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border bg-[linear-gradient(180deg,rgba(124,60,255,0.24),rgba(255,255,255,0.03))] ${
-              isFinal ? "border-violet-300/45" : isFeatured ? "border-violet-300/35" : "border-white/10"
-            }`}
-          >
-            <ProgramIcon icon={item.icon} />
-          </div>
+      <div className="relative flex items-start">
+        <div className={`text-[24px] leading-none lg:text-[28px] ${isFinal ? "text-violet-200" : "text-violet-300"}`}>
+          {item.time}
         </div>
+        <span className="absolute right-[-10px] top-1/2 hidden h-4 w-4 -translate-y-1/2 rounded-full border border-violet-200/60 bg-violet-200/85 shadow-[0_0_14px_rgba(193,168,255,0.8)] lg:block" />
+      </div>
 
-        <div className="min-w-0">
+      <div className="flex justify-center pt-0.5 lg:justify-start">
+        <div
+          className={`flex h-9 w-9 items-center justify-center rounded-[14px] border bg-[linear-gradient(180deg,rgba(124,60,255,0.18),rgba(255,255,255,0.02))] lg:h-12 lg:w-12 ${
+            isFinal ? "border-violet-300/50" : isFeatured ? "border-violet-300/35" : "border-white/10"
+          }`}
+        >
+          <ProgramIcon icon={item.icon} />
+        </div>
+      </div>
+
+      <div className="min-w-0 pt-0.5">
+        <p
+          className={`text-[17px] leading-[1.12] text-white lg:text-[19px] ${isFinal ? "lg:text-[20px]" : ""}`}
+          style={{
+            display: "-webkit-box",
+            WebkitBoxOrient: "vertical",
+            WebkitLineClamp: 2,
+            overflow: "hidden",
+          }}
+        >
+          {item.title}
+        </p>
+        {showSubtitle ? (
           <p
-            className="text-[14px] font-semibold leading-[1.08] text-white lg:text-[15px]"
-            style={{
-              display: "-webkit-box",
-              WebkitBoxOrient: "vertical",
-              WebkitLineClamp: 2,
-              overflow: "hidden",
-            }}
-          >
-            {item.title}
-          </p>
-          <p
-            className="mt-0.5 text-[11px] leading-[1.2] text-white/58 lg:text-[12px]"
+            className="mt-0.5 text-[13px] leading-[1.25] text-violet-200/82 lg:text-[14px]"
             style={{
               display: "-webkit-box",
               WebkitBoxOrient: "vertical",
@@ -279,21 +288,23 @@ function ProgramRow({
           >
             {item.speaker}
           </p>
-          {item.note ? (
-            <p
-              className={`mt-0.5 text-[11px] leading-[1.2] ${isFinal ? "text-white/78" : "text-white/72"} lg:text-[12px]`}
-              style={{
-                display: "-webkit-box",
-                WebkitBoxOrient: "vertical",
-                WebkitLineClamp: 2,
-                overflow: "hidden",
-              }}
-            >
-              {item.note}
-            </p>
-          ) : null}
-        </div>
+        ) : null}
+        {showNote ? (
+          <p
+            className={`mt-0.5 text-[13px] leading-[1.3] ${isFinal ? "text-white/78" : "text-white/72"} lg:text-[14px]`}
+            style={{
+              display: "-webkit-box",
+              WebkitBoxOrient: "vertical",
+              WebkitLineClamp: 2,
+              overflow: "hidden",
+            }}
+          >
+            {item.note}
+          </p>
+        ) : null}
       </div>
+
+      <div className="hidden items-start justify-end lg:flex">{trailingIcon}</div>
     </li>
   );
 }
@@ -578,15 +589,15 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section id="program" className="section-shell relative min-h-[100svh] py-0 md:py-2 lg:flex lg:items-center">
+      <section id="program" className="section-shell relative min-h-[100svh] py-6 md:py-8 lg:py-10">
         <div className="pointer-events-none absolute left-[-120px] top-[240px] hidden h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle_at_30%_70%,rgba(124,60,255,0.35),transparent_35%),radial-gradient(circle_at_0%_100%,rgba(124,60,255,0.18),transparent_45%)] blur-2xl lg:block" />
-        <div className="grid items-center gap-7 lg:grid-cols-[0.37fr_0.63fr] lg:gap-12">
-          <div className="max-w-[470px] lg:pt-0.5">
-            <h2 className="max-w-[470px] font-display text-[clamp(54px,4.3vw,96px)] leading-[0.9] tracking-[-0.03em] text-white">
+        <div className="grid items-start gap-7 lg:grid-cols-[0.27fr_0.73fr] lg:gap-12">
+          <div className="max-w-[360px] pt-0 lg:pt-2">
+            <h2 className="max-w-[360px] font-display text-[clamp(56px,4.2vw,96px)] leading-[0.92] tracking-[-0.03em] text-white">
               Программа мероприятия
             </h2>
             <p
-              className="mt-3 max-w-[420px] text-[16px] leading-[1.3] text-white/65 lg:text-[18px]"
+              className="mt-4 max-w-[360px] text-[16px] leading-[1.4] text-white/68 lg:text-[17px]"
               style={{
                 display: "-webkit-box",
                 WebkitBoxOrient: "vertical",
@@ -596,14 +607,11 @@ export function LandingPage() {
             >
               Основная часть проходит с 12:00 до 17:00. После — ужин со спикерами в отдельном формате.
             </p>
-            <Link href="#register" className="btn-primary mt-4 inline-flex h-[50px] px-7 py-0">
-              Смотреть программу
-            </Link>
           </div>
 
-          <div className="w-full rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.065),rgba(255,255,255,0.03))] p-3.5 shadow-soft backdrop-blur-2xl md:p-4">
-            <div className="relative rounded-[24px] border border-white/10 bg-black/18 p-3.5 md:p-4">
-              <ul className="grid gap-2 lg:grid-cols-2 lg:gap-2.5">
+          <div className="w-full rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.025))] p-3.5 shadow-soft backdrop-blur-2xl md:p-4 lg:p-5">
+            <div className="relative rounded-[24px] border border-white/10 bg-black/14 px-4 py-2 md:px-4 md:py-2.5 lg:px-5 lg:py-3">
+              <ul className="divide-y divide-white/10">
                 {eventData.program.map((item) => (
                   <ProgramRow
                     key={`${item.time}-${item.title}`}
