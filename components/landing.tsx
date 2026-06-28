@@ -230,7 +230,7 @@ function ProgramRow({
 
   return (
     <li
-      className={`relative min-h-[124px] overflow-hidden rounded-[22px] border px-[18px] py-[18px] transition lg:min-h-[132px] ${
+      className={`relative min-h-[94px] overflow-hidden rounded-[20px] border px-4 py-3.5 transition lg:min-h-[100px] lg:px-[16px] lg:py-[14px] ${
         isFinal
           ? "border-violet-400/50 bg-[linear-gradient(180deg,rgba(124,60,255,0.24),rgba(255,255,255,0.05))] shadow-[0_0_0_1px_rgba(124,60,255,0.14)] lg:col-span-2"
           : isFeatured
@@ -241,14 +241,14 @@ function ProgramRow({
       <div className="flex h-full flex-col gap-2">
         <div className="flex items-start justify-between gap-3">
           <div
-            className={`text-[28px] font-medium leading-none ${
+            className={`text-[22px] font-medium leading-none lg:text-[24px] ${
               isFinal ? "text-white" : "text-violet-300"
             }`}
           >
             {item.time}
           </div>
           <div
-            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border bg-[linear-gradient(180deg,rgba(124,60,255,0.24),rgba(255,255,255,0.03))] ${
+            className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border bg-[linear-gradient(180deg,rgba(124,60,255,0.24),rgba(255,255,255,0.03))] ${
               isFinal ? "border-violet-300/45" : isFeatured ? "border-violet-300/35" : "border-white/10"
             }`}
           >
@@ -258,7 +258,7 @@ function ProgramRow({
 
         <div className="min-w-0">
           <p
-            className="text-[17px] font-semibold leading-[1.15] text-white lg:text-[18px]"
+            className="text-[14px] font-semibold leading-[1.08] text-white lg:text-[15px]"
             style={{
               display: "-webkit-box",
               WebkitBoxOrient: "vertical",
@@ -269,7 +269,7 @@ function ProgramRow({
             {item.title}
           </p>
           <p
-            className="mt-1 text-[13px] leading-[1.3] text-white/58 lg:text-[14px]"
+            className="mt-0.5 text-[11px] leading-[1.2] text-white/58 lg:text-[12px]"
             style={{
               display: "-webkit-box",
               WebkitBoxOrient: "vertical",
@@ -281,11 +281,11 @@ function ProgramRow({
           </p>
           {item.note ? (
             <p
-              className={`mt-1 text-[13px] leading-[1.35] ${isFinal ? "text-white/78" : "text-white/72"} lg:text-[14px]`}
+              className={`mt-0.5 text-[11px] leading-[1.2] ${isFinal ? "text-white/78" : "text-white/72"} lg:text-[12px]`}
               style={{
                 display: "-webkit-box",
                 WebkitBoxOrient: "vertical",
-                WebkitLineClamp: 3,
+                WebkitLineClamp: 2,
                 overflow: "hidden",
               }}
             >
@@ -580,13 +580,13 @@ export function LandingPage() {
 
       <section id="program" className="section-shell relative min-h-[100svh] py-0 md:py-2 lg:flex lg:items-center">
         <div className="pointer-events-none absolute left-[-120px] top-[240px] hidden h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle_at_30%_70%,rgba(124,60,255,0.35),transparent_35%),radial-gradient(circle_at_0%_100%,rgba(124,60,255,0.18),transparent_45%)] blur-2xl lg:block" />
-        <div className="grid items-center gap-8 lg:grid-cols-[0.34fr_0.66fr] lg:gap-14">
-          <div className="max-w-[480px] lg:pt-0.5">
-            <h2 className="max-w-[480px] font-display text-[clamp(60px,4.8vw,104px)] leading-[0.9] tracking-[-0.03em] text-white">
+        <div className="grid items-center gap-7 lg:grid-cols-[0.37fr_0.63fr] lg:gap-12">
+          <div className="max-w-[470px] lg:pt-0.5">
+            <h2 className="max-w-[470px] font-display text-[clamp(54px,4.3vw,96px)] leading-[0.9] tracking-[-0.03em] text-white">
               Программа мероприятия
             </h2>
             <p
-              className="mt-4 max-w-[420px] text-[18px] leading-[1.35] text-white/65 lg:text-[20px]"
+              className="mt-3 max-w-[420px] text-[16px] leading-[1.3] text-white/65 lg:text-[18px]"
               style={{
                 display: "-webkit-box",
                 WebkitBoxOrient: "vertical",
@@ -596,14 +596,14 @@ export function LandingPage() {
             >
               Основная часть проходит с 12:00 до 17:00. После — ужин со спикерами в отдельном формате.
             </p>
-            <Link href="#register" className="btn-primary mt-4 inline-flex h-[52px] px-7 py-0">
+            <Link href="#register" className="btn-primary mt-4 inline-flex h-[50px] px-7 py-0">
               Смотреть программу
             </Link>
           </div>
 
-          <div className="w-full rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.065),rgba(255,255,255,0.03))] p-5 shadow-soft backdrop-blur-2xl md:p-6">
-            <div className="relative rounded-[24px] border border-white/10 bg-black/18 p-5 md:p-6">
-              <ul className="grid gap-3 lg:grid-cols-2 lg:gap-[14px]">
+          <div className="w-full rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.065),rgba(255,255,255,0.03))] p-3.5 shadow-soft backdrop-blur-2xl md:p-4">
+            <div className="relative rounded-[24px] border border-white/10 bg-black/18 p-3.5 md:p-4">
+              <ul className="grid gap-2 lg:grid-cols-2 lg:gap-2.5">
                 {eventData.program.map((item) => (
                   <ProgramRow
                     key={`${item.time}-${item.title}`}
