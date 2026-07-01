@@ -229,25 +229,28 @@ function ProgramCard({
 }) {
   const isFeatured = accent === "featured";
   const isFinal = accent === "final";
-  const trailingIcon = isFinal ? <CrownIcon className="h-9 w-9 text-amber-300 lg:h-10 lg:w-10" /> : null;
+  const trailingIcon = isFeatured ? (
+    <StarIcon className="h-8 w-8 text-violet-200 lg:h-9 lg:w-9" />
+  ) : isFinal ? (
+    <CrownIcon className="h-8 w-8 text-amber-300 lg:h-10 lg:w-10" />
+  ) : null;
 
   return (
     <li
-      className={`rounded-[22px] border px-4 py-4 shadow-[0_0_0_1px_rgba(124,60,255,0.08)] transition lg:px-5 lg:py-5 ${
+      className={`relative overflow-hidden rounded-[22px] border px-4 py-4 shadow-[0_0_0_1px_rgba(124,60,255,0.08)] transition lg:px-5 lg:py-5 ${
         isFinal
-          ? "min-h-[140px] border-violet-400/45 bg-[linear-gradient(180deg,rgba(124,60,255,0.18),rgba(255,255,255,0.035))] lg:col-span-2"
+          ? "min-h-[148px] border-violet-400/45 bg-[linear-gradient(180deg,rgba(124,60,255,0.18),rgba(255,255,255,0.035))] lg:col-span-2"
           : isFeatured
             ? "min-h-[138px] border-violet-300/35 bg-white/[0.05]"
             : "min-h-[138px] border-white/10 bg-white/[0.04]"
       }`}
     >
-      <div className="grid h-full grid-cols-[82px_18px_48px_minmax(0,1fr)] gap-x-3 gap-y-3 lg:grid-cols-[96px_20px_56px_minmax(0,1fr)_68px] lg:gap-x-5">
-        <div className={`text-[26px] leading-none lg:text-[30px] ${isFinal ? "text-violet-200" : "text-violet-300"}`}>
-          {item.time}
-        </div>
-
-        <div className="flex items-start justify-center pt-1.5 lg:pt-2.5">
-          <span className="h-4 w-4 rounded-full border border-violet-200/60 bg-violet-200/90 shadow-[0_0_12px_rgba(193,168,255,0.9)]" />
+      <div className="grid h-full grid-cols-[82px_44px_minmax(0,1fr)] gap-x-4 gap-y-3 lg:grid-cols-[104px_56px_minmax(0,1fr)_68px] lg:gap-x-5">
+        <div className="relative flex items-start">
+          <div className={`text-[26px] leading-none lg:text-[30px] ${isFinal ? "text-violet-200" : "text-violet-300"}`}>
+            {item.time}
+          </div>
+          <span className="absolute right-[-11px] top-3 hidden h-4 w-4 rounded-full border border-violet-200/60 bg-violet-200/90 shadow-[0_0_12px_rgba(193,168,255,0.9)] lg:block" />
         </div>
 
         <div
@@ -260,7 +263,7 @@ function ProgramCard({
 
         <div className="min-w-0">
           <p
-            className={`text-[17px] font-semibold leading-[1.12] text-white lg:text-[19px] ${isFinal ? "lg:text-[20px]" : ""}`}
+            className={`text-[16px] font-semibold leading-[1.12] text-white lg:text-[18px] ${isFinal ? "lg:text-[19px]" : ""}`}
             style={{
               display: "-webkit-box",
               WebkitBoxOrient: "vertical",
