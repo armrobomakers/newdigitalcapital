@@ -587,8 +587,8 @@ export function LandingPage() {
 
       <section id="program" className="section-shell relative min-h-[100svh] py-8 md:py-10 lg:flex lg:items-center">
         <div className="pointer-events-none absolute left-[-120px] top-[240px] hidden h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle_at_30%_70%,rgba(124,60,255,0.35),transparent_35%),radial-gradient(circle_at_0%_100%,rgba(124,60,255,0.18),transparent_45%)] blur-2xl lg:block" />
-        <div className="grid items-center gap-8 lg:grid-cols-[360px_minmax(0,1fr)] lg:gap-14 xl:grid-cols-[400px_minmax(0,1fr)]">
-          <div className="max-w-[460px] lg:pt-2">
+        <div className="grid items-center gap-8 lg:grid-cols-[420px_minmax(0,1fr)] lg:gap-14 xl:grid-cols-[440px_minmax(0,1fr)]">
+          <div className="max-w-[440px] lg:pt-2">
             <div className="inline-flex items-center gap-2 rounded-full border border-violet-400/45 bg-white/[0.03] px-4 py-2 text-[14px] text-white/90 shadow-[0_0_0_1px_rgba(124,60,255,0.08)]">
               <StarIcon className="h-4 w-4 text-violet-200" />
               <span>{eventData.dateLabel}, {eventData.cityLabel}</span>
