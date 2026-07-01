@@ -220,7 +220,7 @@ function SpeakerCard({ speaker, index }: { speaker: Speaker; index: number }) {
   );
 }
 
-function ProgramRow({
+function ProgramCard({
   item,
   accent,
 }: {
@@ -229,56 +229,49 @@ function ProgramRow({
 }) {
   const isFeatured = accent === "featured";
   const isFinal = accent === "final";
-  const showSubtitle = item.time === "12:30" || item.time === "13:20" || item.time === "14:40";
-  const showNote = item.time === "15:30" || item.time === "16:30" || item.time === "17:00";
-  const trailingIcon = isFeatured ? (
-    <StarIcon className="h-10 w-10 text-violet-200" />
-  ) : isFinal ? (
-    <CrownIcon className="h-10 w-10 text-amber-300" />
-  ) : null;
+  const trailingIcon = isFinal ? <CrownIcon className="h-9 w-9 text-amber-300 lg:h-10 lg:w-10" /> : null;
 
   return (
     <li
-      className={`grid items-start gap-3 py-3.5 transition lg:grid-cols-[120px_70px_minmax(0,1fr)_64px] lg:gap-4 lg:py-4 ${
+      className={`rounded-[22px] border px-4 py-4 shadow-[0_0_0_1px_rgba(124,60,255,0.08)] transition lg:px-5 lg:py-5 ${
         isFinal
-          ? "rounded-[20px] border border-violet-400/45 bg-[linear-gradient(180deg,rgba(124,60,255,0.20),rgba(255,255,255,0.04))] px-4 shadow-[0_0_0_1px_rgba(124,60,255,0.16)] lg:px-4"
+          ? "min-h-[140px] border-violet-400/45 bg-[linear-gradient(180deg,rgba(124,60,255,0.18),rgba(255,255,255,0.035))] lg:col-span-2"
           : isFeatured
-            ? "rounded-[20px] border border-violet-300/25 bg-white/[0.04] px-4 shadow-[0_0_30px_rgba(124,60,255,0.12)] lg:px-4"
-            : "border-t border-white/10 px-0 lg:px-0"
+            ? "min-h-[138px] border-violet-300/35 bg-white/[0.05]"
+            : "min-h-[138px] border-white/10 bg-white/[0.04]"
       }`}
     >
-      <div className="relative flex items-start">
-        <div className={`text-[24px] leading-none lg:text-[28px] ${isFinal ? "text-violet-200" : "text-violet-300"}`}>
+      <div className="grid h-full grid-cols-[82px_18px_48px_minmax(0,1fr)] gap-x-3 gap-y-3 lg:grid-cols-[96px_20px_56px_minmax(0,1fr)_68px] lg:gap-x-5">
+        <div className={`text-[26px] leading-none lg:text-[30px] ${isFinal ? "text-violet-200" : "text-violet-300"}`}>
           {item.time}
         </div>
-        <span className="absolute right-[-10px] top-1/2 hidden h-4 w-4 -translate-y-1/2 rounded-full border border-violet-200/60 bg-violet-200/85 shadow-[0_0_14px_rgba(193,168,255,0.8)] lg:block" />
-      </div>
 
-      <div className="flex justify-center pt-0.5 lg:justify-start">
+        <div className="flex items-start justify-center pt-1.5 lg:pt-2.5">
+          <span className="h-4 w-4 rounded-full border border-violet-200/60 bg-violet-200/90 shadow-[0_0_12px_rgba(193,168,255,0.9)]" />
+        </div>
+
         <div
-          className={`flex h-9 w-9 items-center justify-center rounded-[14px] border bg-[linear-gradient(180deg,rgba(124,60,255,0.18),rgba(255,255,255,0.02))] lg:h-12 lg:w-12 ${
-            isFinal ? "border-violet-300/50" : isFeatured ? "border-violet-300/35" : "border-white/10"
+          className={`flex h-10 w-10 items-center justify-center rounded-[14px] border bg-[linear-gradient(180deg,rgba(124,60,255,0.18),rgba(255,255,255,0.02))] lg:h-12 lg:w-12 ${
+            isFinal ? "border-violet-300/55" : isFeatured ? "border-violet-300/35" : "border-white/10"
           }`}
         >
           <ProgramIcon icon={item.icon} />
         </div>
-      </div>
 
-      <div className="min-w-0 pt-0.5">
-        <p
-          className={`text-[17px] leading-[1.12] text-white lg:text-[19px] ${isFinal ? "lg:text-[20px]" : ""}`}
-          style={{
-            display: "-webkit-box",
-            WebkitBoxOrient: "vertical",
-            WebkitLineClamp: 2,
-            overflow: "hidden",
-          }}
-        >
-          {item.title}
-        </p>
-        {showSubtitle ? (
+        <div className="min-w-0">
           <p
-            className="mt-0.5 text-[13px] leading-[1.25] text-violet-200/82 lg:text-[14px]"
+            className={`text-[17px] font-semibold leading-[1.12] text-white lg:text-[19px] ${isFinal ? "lg:text-[20px]" : ""}`}
+            style={{
+              display: "-webkit-box",
+              WebkitBoxOrient: "vertical",
+              WebkitLineClamp: 2,
+              overflow: "hidden",
+            }}
+          >
+            {item.title}
+          </p>
+          <p
+            className="mt-1.5 text-[13px] leading-[1.35] text-white/72 lg:text-[14px]"
             style={{
               display: "-webkit-box",
               WebkitBoxOrient: "vertical",
@@ -288,23 +281,23 @@ function ProgramRow({
           >
             {item.speaker}
           </p>
-        ) : null}
-        {showNote ? (
-          <p
-            className={`mt-0.5 text-[13px] leading-[1.3] ${isFinal ? "text-white/78" : "text-white/72"} lg:text-[14px]`}
-            style={{
-              display: "-webkit-box",
-              WebkitBoxOrient: "vertical",
-              WebkitLineClamp: 2,
-              overflow: "hidden",
-            }}
-          >
-            {item.note}
-          </p>
-        ) : null}
-      </div>
+          {item.note ? (
+            <p
+              className="mt-2 text-[13px] leading-[1.35] text-white/62 lg:text-[14px]"
+              style={{
+                display: "-webkit-box",
+                WebkitBoxOrient: "vertical",
+                WebkitLineClamp: 3,
+                overflow: "hidden",
+              }}
+            >
+              {item.note}
+            </p>
+          ) : null}
+        </div>
 
-      <div className="hidden items-start justify-end lg:flex">{trailingIcon}</div>
+        <div className="hidden items-start justify-end lg:flex">{trailingIcon}</div>
+      </div>
     </li>
   );
 }
@@ -589,31 +582,33 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section id="program" className="section-shell relative min-h-[100svh] py-6 md:py-8 lg:py-10">
+      <section id="program" className="section-shell relative min-h-[100svh] py-8 md:py-10 lg:flex lg:items-center">
         <div className="pointer-events-none absolute left-[-120px] top-[240px] hidden h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle_at_30%_70%,rgba(124,60,255,0.35),transparent_35%),radial-gradient(circle_at_0%_100%,rgba(124,60,255,0.18),transparent_45%)] blur-2xl lg:block" />
-        <div className="grid items-start gap-7 lg:grid-cols-[0.27fr_0.73fr] lg:gap-12">
-          <div className="max-w-[360px] pt-0 lg:pt-2">
-            <h2 className="max-w-[360px] font-display text-[clamp(56px,4.2vw,96px)] leading-[0.92] tracking-[-0.03em] text-white">
+        <div className="grid items-center gap-8 lg:grid-cols-[0.29fr_0.71fr] lg:gap-10">
+          <div className="max-w-[370px] lg:pt-2">
+            <div className="inline-flex items-center gap-2 rounded-full border border-violet-400/45 bg-white/[0.03] px-4 py-2 text-[14px] text-white/90 shadow-[0_0_0_1px_rgba(124,60,255,0.08)]">
+              <StarIcon className="h-4 w-4 text-violet-200" />
+              <span>{eventData.dateLabel}, {eventData.cityLabel}</span>
+            </div>
+            <h2 className="mt-6 max-w-[360px] font-display text-[clamp(56px,4.4vw,96px)] leading-[0.9] tracking-[-0.03em] text-white">
               Программа мероприятия
             </h2>
-            <p
-              className="mt-4 max-w-[360px] text-[16px] leading-[1.4] text-white/68 lg:text-[17px]"
-              style={{
-                display: "-webkit-box",
-                WebkitBoxOrient: "vertical",
-                WebkitLineClamp: 2,
-                overflow: "hidden",
-              }}
-            >
+            <p className="mt-6 max-w-[320px] text-[16px] leading-[1.45] text-white/68 lg:text-[17px]">
+              Один день полезного контента, нетворкинга и практических инсайтов от экспертов.
+            </p>
+            <p className="mt-6 max-w-[320px] text-[16px] leading-[1.45] text-white/68 lg:text-[17px]">
               Основная часть проходит с 12:00 до 17:00. После — ужин со спикерами в отдельном формате.
             </p>
+            <Link href="#register" className="btn-primary mt-8 inline-flex h-[52px] px-7 py-0">
+              Смотреть программу
+            </Link>
           </div>
 
-          <div className="w-full rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.025))] p-3.5 shadow-soft backdrop-blur-2xl md:p-4 lg:p-5">
-            <div className="relative rounded-[24px] border border-white/10 bg-black/14 px-4 py-2 md:px-4 md:py-2.5 lg:px-5 lg:py-3">
-              <ul className="divide-y divide-white/10">
+          <div className="w-full rounded-[32px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.024))] p-4 shadow-soft backdrop-blur-2xl lg:p-5">
+            <div className="rounded-[26px] border border-white/10 bg-black/14 p-4 lg:p-5">
+              <ul className="grid gap-4 lg:grid-cols-2">
                 {eventData.program.map((item) => (
-                  <ProgramRow
+                  <ProgramCard
                     key={`${item.time}-${item.title}`}
                     item={item}
                     accent={item.time === "15:30" ? "featured" : item.time === "17:00" ? "final" : undefined}
