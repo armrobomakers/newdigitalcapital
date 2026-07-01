@@ -237,24 +237,24 @@ function ProgramCard({
 
   return (
     <li
-      className={`relative overflow-hidden rounded-[22px] border px-4 py-4 shadow-[0_0_0_1px_rgba(124,60,255,0.08)] transition lg:px-4 lg:py-4 ${
+      className={`relative overflow-hidden rounded-[22px] border px-4 py-4 shadow-[0_0_0_1px_rgba(124,60,255,0.08)] transition lg:px-4 lg:py-3.5 ${
         isFinal
-          ? "min-h-[128px] border-violet-400/45 bg-[linear-gradient(180deg,rgba(124,60,255,0.18),rgba(255,255,255,0.035))] lg:col-span-2"
+          ? "min-h-[122px] border-violet-400/45 bg-[linear-gradient(180deg,rgba(124,60,255,0.18),rgba(255,255,255,0.035))] lg:col-span-2"
           : isFeatured
-            ? "min-h-[122px] border-violet-300/35 bg-white/[0.05]"
-            : "min-h-[122px] border-white/10 bg-white/[0.04]"
+            ? "min-h-[118px] border-violet-300/35 bg-white/[0.05]"
+            : "min-h-[118px] border-white/10 bg-white/[0.04]"
       }`}
     >
       <div className="flex h-full min-w-0 items-start gap-3 lg:gap-4">
         <div className="relative w-[82px] shrink-0 lg:w-[90px]">
-          <div className={`text-[26px] leading-none lg:text-[28px] ${isFinal ? "text-violet-200" : "text-violet-300"}`}>
+          <div className={`text-[26px] leading-none lg:text-[27px] ${isFinal ? "text-violet-200" : "text-violet-300"}`}>
             {item.time}
           </div>
           <span className="absolute right-[-3px] top-1.5 hidden h-4 w-4 rounded-full border border-violet-200/60 bg-violet-200/90 shadow-[0_0_12px_rgba(193,168,255,0.9)] lg:block" />
         </div>
 
         <div
-          className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] border bg-[linear-gradient(180deg,rgba(124,60,255,0.18),rgba(255,255,255,0.02))] lg:h-11 lg:w-11 ${
+          className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] border bg-[linear-gradient(180deg,rgba(124,60,255,0.18),rgba(255,255,255,0.02))] lg:h-10 lg:w-10 ${
             isFinal ? "border-violet-300/55" : isFeatured ? "border-violet-300/35" : "border-white/10"
           }`}
         >
@@ -263,7 +263,7 @@ function ProgramCard({
 
         <div className="min-w-0 flex-1">
           <p
-            className={`text-[16px] font-semibold leading-[1.15] text-white lg:text-[17px] ${isFinal ? "lg:text-[18px]" : ""}`}
+              className={`text-[16px] font-semibold leading-[1.15] text-white lg:text-[16px] ${isFinal ? "lg:text-[17px]" : ""}`}
             style={{
               display: "-webkit-box",
               WebkitBoxOrient: "vertical",
@@ -274,7 +274,7 @@ function ProgramCard({
             {item.title}
           </p>
           <p
-            className="mt-1 text-[12px] leading-[1.35] text-white/72 lg:text-[13px]"
+            className="mt-1 text-[12px] leading-[1.35] text-white/72 lg:text-[12px]"
             style={{
               display: "-webkit-box",
               WebkitBoxOrient: "vertical",
@@ -286,7 +286,7 @@ function ProgramCard({
           </p>
           {item.note ? (
             <p
-              className="mt-1.5 text-[12px] leading-[1.38] text-white/62 lg:text-[13px]"
+              className="mt-1.5 text-[12px] leading-[1.38] text-white/62 lg:text-[12px]"
               style={{
                 display: "-webkit-box",
                 WebkitBoxOrient: "vertical",
@@ -608,8 +608,8 @@ export function LandingPage() {
           </div>
 
           <div className="w-full rounded-[32px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.024))] p-4 shadow-soft backdrop-blur-2xl lg:p-5">
-            <div className="rounded-[28px] border border-white/10 bg-black/14 p-4 lg:p-5">
-              <ul className="grid gap-3 lg:grid-cols-2 lg:gap-4">
+            <div className="rounded-[28px] border border-white/10 bg-black/14 p-4 lg:p-4">
+              <ul className="grid gap-2.5 lg:grid-cols-2 lg:gap-3">
                 {eventData.program.map((item) => (
                   <ProgramCard
                     key={`${item.time}-${item.title}`}
