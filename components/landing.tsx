@@ -234,6 +234,7 @@ function ProgramCard({
   ) : isFinal ? (
     <CrownIcon className="h-8 w-8 text-amber-300 lg:h-10 lg:w-10" />
   ) : null;
+  const cardGridClass = isFeatured || isFinal ? "lg:grid-cols-[104px_56px_minmax(0,1fr)_68px]" : "lg:grid-cols-[104px_56px_minmax(0,1fr)]";
 
   return (
     <li
@@ -245,7 +246,7 @@ function ProgramCard({
             : "min-h-[138px] border-white/10 bg-white/[0.04]"
       }`}
     >
-      <div className="grid h-full grid-cols-[82px_44px_minmax(0,1fr)] gap-x-4 gap-y-3 lg:grid-cols-[104px_56px_minmax(0,1fr)_68px] lg:gap-x-5">
+      <div className={`grid h-full grid-cols-[82px_44px_minmax(0,1fr)] gap-x-4 gap-y-3 lg:gap-x-5 ${cardGridClass}`}>
         <div className="relative flex items-start">
           <div className={`text-[26px] leading-none lg:text-[30px] ${isFinal ? "text-violet-200" : "text-violet-300"}`}>
             {item.time}
@@ -299,7 +300,7 @@ function ProgramCard({
           ) : null}
         </div>
 
-        <div className="hidden items-start justify-end lg:flex">{trailingIcon}</div>
+        {trailingIcon ? <div className="hidden items-start justify-end lg:flex">{trailingIcon}</div> : null}
       </div>
     </li>
   );
