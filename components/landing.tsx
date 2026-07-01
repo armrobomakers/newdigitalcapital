@@ -230,41 +230,40 @@ function ProgramCard({
   const isFeatured = accent === "featured";
   const isFinal = accent === "final";
   const trailingIcon = isFeatured ? (
-    <StarIcon className="h-8 w-8 text-violet-200 lg:h-9 lg:w-9" />
+    <StarIcon className="h-7 w-7 text-violet-200 lg:h-8 lg:w-8" />
   ) : isFinal ? (
-    <CrownIcon className="h-8 w-8 text-amber-300 lg:h-10 lg:w-10" />
+    <CrownIcon className="h-7 w-7 text-amber-300 lg:h-8 lg:w-8" />
   ) : null;
-  const cardGridClass = isFeatured || isFinal ? "lg:grid-cols-[104px_56px_minmax(0,1fr)_68px]" : "lg:grid-cols-[104px_56px_minmax(0,1fr)]";
 
   return (
     <li
-      className={`relative overflow-hidden rounded-[22px] border px-4 py-4 shadow-[0_0_0_1px_rgba(124,60,255,0.08)] transition lg:px-5 lg:py-5 ${
+      className={`relative overflow-hidden rounded-[22px] border px-4 py-4 shadow-[0_0_0_1px_rgba(124,60,255,0.08)] transition lg:px-4 lg:py-4 ${
         isFinal
-          ? "min-h-[148px] border-violet-400/45 bg-[linear-gradient(180deg,rgba(124,60,255,0.18),rgba(255,255,255,0.035))] lg:col-span-2"
+          ? "min-h-[128px] border-violet-400/45 bg-[linear-gradient(180deg,rgba(124,60,255,0.18),rgba(255,255,255,0.035))] lg:col-span-2"
           : isFeatured
-            ? "min-h-[138px] border-violet-300/35 bg-white/[0.05]"
-            : "min-h-[138px] border-white/10 bg-white/[0.04]"
+            ? "min-h-[122px] border-violet-300/35 bg-white/[0.05]"
+            : "min-h-[122px] border-white/10 bg-white/[0.04]"
       }`}
     >
-      <div className={`grid h-full grid-cols-[82px_44px_minmax(0,1fr)] gap-x-4 gap-y-3 lg:gap-x-5 ${cardGridClass}`}>
-        <div className="relative flex items-start">
-          <div className={`text-[26px] leading-none lg:text-[30px] ${isFinal ? "text-violet-200" : "text-violet-300"}`}>
+      <div className="flex h-full min-w-0 items-start gap-3 lg:gap-4">
+        <div className="relative w-[82px] shrink-0 lg:w-[90px]">
+          <div className={`text-[26px] leading-none lg:text-[28px] ${isFinal ? "text-violet-200" : "text-violet-300"}`}>
             {item.time}
           </div>
-          <span className="absolute right-[-11px] top-3 hidden h-4 w-4 rounded-full border border-violet-200/60 bg-violet-200/90 shadow-[0_0_12px_rgba(193,168,255,0.9)] lg:block" />
+          <span className="absolute right-[-3px] top-1.5 hidden h-4 w-4 rounded-full border border-violet-200/60 bg-violet-200/90 shadow-[0_0_12px_rgba(193,168,255,0.9)] lg:block" />
         </div>
 
         <div
-          className={`flex h-10 w-10 items-center justify-center rounded-[14px] border bg-[linear-gradient(180deg,rgba(124,60,255,0.18),rgba(255,255,255,0.02))] lg:h-12 lg:w-12 ${
+          className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] border bg-[linear-gradient(180deg,rgba(124,60,255,0.18),rgba(255,255,255,0.02))] lg:h-11 lg:w-11 ${
             isFinal ? "border-violet-300/55" : isFeatured ? "border-violet-300/35" : "border-white/10"
           }`}
         >
           <ProgramIcon icon={item.icon} />
         </div>
 
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <p
-            className={`text-[16px] font-semibold leading-[1.12] text-white lg:text-[18px] ${isFinal ? "lg:text-[19px]" : ""}`}
+            className={`text-[16px] font-semibold leading-[1.15] text-white lg:text-[17px] ${isFinal ? "lg:text-[18px]" : ""}`}
             style={{
               display: "-webkit-box",
               WebkitBoxOrient: "vertical",
@@ -275,7 +274,7 @@ function ProgramCard({
             {item.title}
           </p>
           <p
-            className="mt-1.5 text-[13px] leading-[1.35] text-white/72 lg:text-[14px]"
+            className="mt-1 text-[12px] leading-[1.35] text-white/72 lg:text-[13px]"
             style={{
               display: "-webkit-box",
               WebkitBoxOrient: "vertical",
@@ -287,11 +286,11 @@ function ProgramCard({
           </p>
           {item.note ? (
             <p
-              className="mt-2 text-[13px] leading-[1.35] text-white/62 lg:text-[14px]"
+              className="mt-1.5 text-[12px] leading-[1.38] text-white/62 lg:text-[13px]"
               style={{
                 display: "-webkit-box",
                 WebkitBoxOrient: "vertical",
-                WebkitLineClamp: 3,
+                WebkitLineClamp: 2,
                 overflow: "hidden",
               }}
             >
@@ -300,7 +299,7 @@ function ProgramCard({
           ) : null}
         </div>
 
-        {trailingIcon ? <div className="hidden items-start justify-end lg:flex">{trailingIcon}</div> : null}
+        {trailingIcon ? <div className="ml-auto hidden shrink-0 items-start justify-end pt-0.5 lg:flex">{trailingIcon}</div> : null}
       </div>
     </li>
   );
@@ -588,19 +587,19 @@ export function LandingPage() {
 
       <section id="program" className="section-shell relative min-h-[100svh] py-8 md:py-10 lg:flex lg:items-center">
         <div className="pointer-events-none absolute left-[-120px] top-[240px] hidden h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle_at_30%_70%,rgba(124,60,255,0.35),transparent_35%),radial-gradient(circle_at_0%_100%,rgba(124,60,255,0.18),transparent_45%)] blur-2xl lg:block" />
-        <div className="grid items-center gap-8 lg:grid-cols-[0.29fr_0.71fr] lg:gap-10">
-          <div className="max-w-[370px] lg:pt-2">
+        <div className="grid items-center gap-8 lg:grid-cols-[360px_minmax(0,1fr)] lg:gap-14 xl:grid-cols-[400px_minmax(0,1fr)]">
+          <div className="max-w-[460px] lg:pt-2">
             <div className="inline-flex items-center gap-2 rounded-full border border-violet-400/45 bg-white/[0.03] px-4 py-2 text-[14px] text-white/90 shadow-[0_0_0_1px_rgba(124,60,255,0.08)]">
               <StarIcon className="h-4 w-4 text-violet-200" />
               <span>{eventData.dateLabel}, {eventData.cityLabel}</span>
             </div>
-            <h2 className="mt-6 max-w-[360px] font-display text-[clamp(56px,4.4vw,96px)] leading-[0.9] tracking-[-0.03em] text-white">
+            <h2 className="mt-6 max-w-[520px] font-display text-[clamp(72px,6.2vw,120px)] leading-[0.9] tracking-[-0.03em] text-white">
               Программа мероприятия
             </h2>
-            <p className="mt-6 max-w-[320px] text-[16px] leading-[1.45] text-white/68 lg:text-[17px]">
+            <p className="mt-6 max-w-[460px] text-[18px] leading-[1.35] text-white/68 lg:text-[19px]">
               Один день полезного контента, нетворкинга и практических инсайтов от экспертов.
             </p>
-            <p className="mt-6 max-w-[320px] text-[16px] leading-[1.45] text-white/68 lg:text-[17px]">
+            <p className="mt-5 max-w-[460px] text-[18px] leading-[1.35] text-white/68 lg:text-[19px]">
               Основная часть проходит с 12:00 до 17:00. После — ужин со спикерами в отдельном формате.
             </p>
             <Link href="#register" className="btn-primary mt-8 inline-flex h-[52px] px-7 py-0">
@@ -609,8 +608,8 @@ export function LandingPage() {
           </div>
 
           <div className="w-full rounded-[32px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.024))] p-4 shadow-soft backdrop-blur-2xl lg:p-5">
-            <div className="rounded-[26px] border border-white/10 bg-black/14 p-4 lg:p-5">
-              <ul className="grid gap-4 lg:grid-cols-2">
+            <div className="rounded-[28px] border border-white/10 bg-black/14 p-4 lg:p-5">
+              <ul className="grid gap-3 lg:grid-cols-2 lg:gap-4">
                 {eventData.program.map((item) => (
                   <ProgramCard
                     key={`${item.time}-${item.title}`}
