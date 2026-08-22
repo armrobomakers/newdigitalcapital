@@ -40,6 +40,12 @@ export type FaqItem = {
   answer: string;
 };
 
+export type SocialItem = {
+  label: "Telegram" | "LinkedIn" | "YouTube" | "VK";
+  href: string;
+  short: string;
+};
+
 export const eventData = {
   slug: "ekb",
   name: "Цифровой капитал",
@@ -271,12 +277,7 @@ export const eventData = {
     email: "",
     phone: "",
   },
-  socials: [
-    { label: "Telegram", href: "", short: "TG" },
-    { label: "LinkedIn", href: "", short: "IN" },
-    { label: "YouTube", href: "", short: "YT" },
-    { label: "VK", href: "", short: "VK" },
-  ],
+  socials: [] as SocialItem[],
 } as const;
 
 export type EventData = typeof eventData;
