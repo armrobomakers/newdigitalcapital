@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { LandingPage } from "@/components/landing";
+import { getEventLifecycleBySlug } from "@/data/event-registry";
 import { eventData } from "@/data/events";
 
 type ParamsValue = { slug: string } | Promise<{ slug: string }>;
@@ -21,9 +22,42 @@ export async function generateMetadata({
     return {};
   }
 
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://digitalcapital.vercel.app").replace(
+    /\/$/,
+    ""
+  );
+  const indexingEnabled = process.env.NEXT_PUBLIC_INDEXING_ENABLED === "true";
+  const lifecycle = getEventLifecycleBySlug(slug);
+  const indexPage = Boolean(indexingEnabled && lifecycle && lifecycle.status !== "draft");
+  const canonical = `${siteUrl}/${slug}`;
+  const title = `${eventData.name} — конференция о бизнесе, инвестициях и AI`;
+
   return {
-    title: eventData.name,
+    title,
     description: eventData.subtitle,
+    alternates: {
+      canonical,
+    },
+    robots: {
+      index: indexPage,
+      follow: indexPage,
+    },
+    openGraph: {
+      type: "website",
+      locale: "ru_RU",
+      url: canonical,
+      siteName: eventData.name,
+      title,
+      description: eventData.subtitle,
+      images: [
+        {
+          url: `${siteUrl}/hero-stage-3.png`,
+          width: 1200,
+          height: 630,
+          alt: eventData.name,
+        },
+      ],
+    },
   };
 }
 
