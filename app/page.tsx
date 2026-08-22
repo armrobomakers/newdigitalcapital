@@ -1,9 +1,9 @@
 import { notFound, redirect } from "next/navigation";
 
-import { eventRegistry } from "@/data/event-registry";
+import { listEventLifecycles } from "@/data/event-registry";
 
 function getPrimaryEvent() {
-  const events = Object.values(eventRegistry).filter((event) => event.pageReady);
+  const events = listEventLifecycles().filter((event) => event.pageReady);
   const priority = ["sales", "scheduled", "sold_out", "past"] as const;
 
   for (const status of priority) {
