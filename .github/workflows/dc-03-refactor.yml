@@ -1,0 +1,145 @@
+name: DC-03 event-driven refactor
+
+on:
+  push:
+    branches:
+      - stage/dc-03-conference-engine
+    paths:
+      - .github/workflows/dc-03-refactor.yml
+
+permissions:
+  contents: write
+
+jobs:
+  refactor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: stage/dc-03-conference-engine
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Apply exact event-driven refactor
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          def replace_once(text: str, old: str, new: str, label: str) -> str:
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"{label}: expected exactly 1 match, found {count}")
+              return text.replace(old, new, 1)
+
+          events_path = Path('data/events.ts')
+          events = events_path.read_text(encoding='utf-8-sig')
+          events = replace_once(
+              events,
+              '  formatLabel: string;\n  assets: {',
+              '  formatLabel: string;\n  formatDescription: string;\n  programLead: string;\n  programDetails: string;\n  assets: {',
+              'event content copy type',
+          )
+          events = replace_once(
+              events,
+              '  formatLabel: "Формат участия",\n  assets: {',
+              '  formatLabel: "Формат участия",\n  formatDescription: "для предпринимателей и инвесторов",\n  programLead: "Один день полезного контента, нетворкинга и практических инсайтов от экспертов.",\n  programDetails: "Основная часть проходит с 12:00 до 17:00. После — ужин со спикерами в отдельном формате.",\n  assets: {',
+              'archive content copy',
+          )
+          events = replace_once(
+              events,
+              '  location: {\n    verified: boolean;\n    venue: string;\n    address: string;\n    note: string;',
+              '  location: {\n    verified: boolean;\n    description: string;\n    venue: string;\n    address: string;\n    venueDescription: string;\n    note: string;',
+              'location type',
+          )
+          events = replace_once(
+              events,
+              '  location: {\n    verified: false,\n    venue: "Площадка архивного события",\n    address: "Адрес скрыт до верификации",\n    note: "Маршрут архивного события скрыт до подтверждения корректных данных.",',
+              '  location: {\n    verified: false,\n    description: "Архивные сведения о площадке временно скрыты до верификации адреса.",\n    venue: "Площадка архивного события",\n    address: "Адрес скрыт до верификации",\n    venueDescription: "Площадка будет опубликована после подтверждения адреса и схемы прохода.",\n    note: "Маршрут архивного события скрыт до подтверждения корректных данных.",',
+              'archive location content',
+          )
+          events_path.write_text(events, encoding='utf-8')
+
+          path = Path('components/landing.tsx')
+          text = path.read_text(encoding='utf-8-sig')
+          text = replace_once(
+              text,
+              'import { eventData, type AudienceItem, type ProgramItem, type Speaker } from "@/data/events";',
+              'import { type AudienceItem, type EventData, type ProgramItem, type Speaker } from "@/data/events";',
+              'landing event import',
+          )
+          text = replace_once(text, 'function HeroVisual() {', 'function HeroVisual({ eventData }: { eventData: EventData }) {', 'hero signature')
+          text = replace_once(text, '        src="/hero-stage-3.png"', '        src={eventData.assets.heroImage}', 'hero asset')
+          text = replace_once(text, '  const speakerImageSrc = `/speaker-${index + 1}-face.png`;', '  const speakerImageSrc = speaker.photo ?? `/speaker-${index + 1}-face.png`;', 'speaker asset')
+          text = replace_once(text, 'function MapCardExact() {', 'function MapCardExact({ eventData }: { eventData: EventData }) {', 'map signature')
+          text = replace_once(text, '<Image src="/location-map.png" alt="" fill className="object-cover object-center" />', '<Image src={eventData.assets.mapImage} alt="" fill className="object-cover object-center" />', 'map asset')
+          text = replace_once(text, 'function RegistrationTicket() {', 'function RegistrationTicket({ eventData }: { eventData: EventData }) {', 'ticket signature')
+          text = replace_once(text, 'function ClosedEventCard() {', 'function ClosedEventCard({ eventData }: { eventData: EventData }) {', 'closed card signature')
+          text = replace_once(text, '<p className="text-sm uppercase tracking-[0.18em] text-violet-200/80">Архив события</p>', '<p className="text-sm uppercase tracking-[0.18em] text-violet-200/80">Статус события</p>', 'closed label')
+          text = replace_once(text, '<h3 className="mt-5 font-display text-5xl leading-[0.95] text-white">Продажи завершены</h3>', '<h3 className="mt-5 font-display text-5xl leading-[0.95] text-white">{eventData.registration.title}</h3>', 'closed title')
+          text = re.sub(
+              r'<p className="mt-5 max-w-md text-base leading-7 text-white/68">\s*Июньская конференция закрыта для регистрации\. Следующая дата и условия участия будут\s*опубликованы отдельным событием после подтверждения площадки и программы\.\s*</p>',
+              '<p className="mt-5 max-w-md text-base leading-7 text-white/68">\n            {eventData.registration.lead}\n          </p>',
+              text,
+              count=1,
+          )
+          text = replace_once(text, 'function PartnerVisualExact() {', 'function PartnerVisualExact({ eventData }: { eventData: EventData }) {', 'partner visual signature')
+          text = replace_once(text, '      style={{ backgroundImage: "url(\'/partner-handshake.png\')" }}', '      style={{ backgroundImage: `url(\'${eventData.assets.partnerImage}\')` }}', 'partner asset')
+          old_state = '''const footerCtaTitleParts = eventData.footer.ctaTitle.match(/^(.*конференции)\\s+(«.*»)$/);\nconst lifecycle = getEventLifecycleBySlug(eventData.slug);\nconst registrationOpen = Boolean(lifecycle?.registrationOpen && lifecycle.status === "sales");\nconst locationVerified = false;\nconst legalReady = isLegalConfigReady();\nconst activeSocials = eventData.socials.filter((social) => social.href && social.href !== "#");\n\nexport function LandingPage() {'''
+          new_state = '''export function LandingPage({ eventData }: { eventData: EventData }) {\n  const footerCtaTitleParts = eventData.footer.ctaTitle.match(/^(.*конференции)\\s+(«.*»)$/);\n  const lifecycle = getEventLifecycleBySlug(eventData.slug);\n  const registrationOpen = Boolean(lifecycle?.registrationOpen && lifecycle.status === "sales");\n  const locationVerified = eventData.location.verified;\n  const legalReady = isLegalConfigReady();\n  const activeSocials = eventData.socials.filter((social) => social.href && social.href !== "#");'''
+          text = replace_once(text, old_state, new_state, 'landing local state')
+          text = replace_once(text, '<StickyCTA />', '<StickyCTA eventData={eventData} />', 'sticky call')
+          text = replace_once(text, '            <HeroVisual />', '            <HeroVisual eventData={eventData} />', 'hero call')
+          text = replace_once(text, '                  copy="для предпринимателей и инвесторов"', '                  copy={eventData.formatDescription}', 'format copy')
+          text = replace_once(text, '              Один день полезного контента, нетворкинга и практических инсайтов от экспертов.', '              {eventData.programLead}', 'program lead')
+          text = replace_once(text, '              Основная часть проходит с 12:00 до 17:00. После — ужин со спикерами в отдельном формате.', '              {eventData.programDetails}', 'program details')
+          text = replace_once(text, '                    accent={item.time === "15:30" ? "featured" : item.time === "17:00" ? "final" : undefined}', '                    accent={item.accent}', 'program accent')
+          text = replace_once(text, '                title={registrationOpen ? "Забронируйте место на конференции" : "Архив конференции"}', '                title={eventData.registration.title}', 'registration title')
+          text = re.sub(
+              r'description=\{\s*registrationOpen\s*\? eventData\.registration\.lead\s*:\s*"Регистрация на июньское событие завершена\. Новая дата будет опубликована отдельной страницей после подтверждения площадки\."\s*\}',
+              'description={eventData.registration.lead}',
+              text,
+              count=1,
+          )
+          text = replace_once(text, '<RegistrationForm />', '<RegistrationForm eventId={eventData.eventId} />', 'registration form event id')
+          text = replace_once(text, '{registrationOpen ? <RegistrationTicket /> : <ClosedEventCard />}', '{registrationOpen ? <RegistrationTicket eventData={eventData} /> : <ClosedEventCard eventData={eventData} />}', 'ticket call')
+          text = replace_once(text, '{registrationOpen ? eventData.registration.note : "Продажи и прием новых заявок на это событие отключены."}', '{eventData.registration.note}', 'registration note')
+          text = replace_once(text, '<Link href="#footer-contacts" className="btn-primary inline-flex w-fit">', '<Link href={`/apply/partner/${eventData.slug}`} className="btn-primary inline-flex w-fit">', 'partner lead route')
+          text = replace_once(text, '<PartnerVisualExact />', '<PartnerVisualExact eventData={eventData} />', 'partner visual call')
+          text = re.sub(
+              r'description=\{\s*locationVerified\s*\? "Конференция пройдет в центре Екатеринбурга\."\s*:\s*"Архивные сведения о площадке временно скрыты до верификации адреса\."\s*\}',
+              'description={eventData.location.description}',
+              text,
+              count=1,
+          )
+          text = replace_once(text, '                  Современная площадка в центре города с удобной транспортной доступностью и комфортной инфраструктурой.', '                  {eventData.location.venueDescription}', 'venue description')
+          text = replace_once(text, '<MapCardExact />', '<MapCardExact eventData={eventData} />', 'map call')
+          text = replace_once(text, '<p className="text-lg font-semibold text-white">Площадка архивного события на проверке</p>', '<p className="text-lg font-semibold text-white">Площадка пока не опубликована</p>', 'unverified venue title')
+          text = re.sub(
+              r'<p className="mx-auto mt-3 max-w-2xl text-sm leading-7 text-white/65">\s*В предыдущей версии сайта название бизнес-центра и адрес противоречили друг другу\.\s*Маршрут и адрес скрыты, чтобы не направлять посетителей в неверную локацию\. Для\s*следующей конференции адрес будет опубликован только после подтверждения площадки\.\s*</p>',
+              '<p className="mx-auto mt-3 max-w-2xl text-sm leading-7 text-white/65">\n              {eventData.location.note}\n            </p>',
+              text,
+              count=1,
+          )
+          path.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Clean install
+        run: npm ci
+
+      - name: Quality gate
+        run: npm run check
+
+      - name: Commit refactor
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/events.ts components/landing.tsx
+          git commit -m 'refactor: drive landing from conference content'
+          git push origin HEAD:stage/dc-03-conference-engine
