@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 
-import { eventRegistry } from "@/data/event-registry";
+import { listEventLifecycles } from "@/data/event-registry";
 import { isLegalConfigReady } from "@/lib/legal";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const events = Object.values(eventRegistry).map((event) => ({
+  const events = listEventLifecycles().map((event) => ({
     id: event.id,
     slug: event.slug,
     status: event.status,
@@ -19,7 +19,9 @@ export async function GET() {
   const leadStorageReady = Boolean(process.env.LEAD_STORAGE_WEBHOOK_URL);
   const analyticsReady = Boolean(process.env.ANALYTICS_WEBHOOK_URL);
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "";
-  const brandedSiteUrl = Boolean(siteUrl && !siteUrl.includes("localhost") && !siteUrl.includes("vercel.app"));
+  const brandedSiteUrl = Boolean(
+    siteUrl && !siteUrl.includes("localhost") && !siteUrl.includes("vercel.app")
+  );
   const indexingEnabled = process.env.NEXT_PUBLIC_INDEXING_ENABLED === "true";
   const salesEventAvailable = events.some(
     (event) => event.page_ready && event.status === "sales" && event.lead_capture.attendee
