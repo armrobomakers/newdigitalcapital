@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { getEventLifecycle, isRegistrationOpen } from "@/data/event-registry";
+import { isLegalConfigReady } from "@/lib/legal";
 
 type RegistrationPayload = {
   event_id?: string;
@@ -230,6 +231,13 @@ export async function POST(request: Request) {
 
   if (!isRegistrationOpen(payload.event_id)) {
     return NextResponse.json({ ok: false, error: "registration_closed" }, { status: 409 });
+  }
+
+  if (!isLegalConfigReady()) {
+    return NextResponse.json(
+      { ok: false, error: "legal_configuration_incomplete" },
+      { status: 503 }
+    );
   }
 
   const sheetsConfigured = Boolean(process.env.GOOGLE_SHEETS_WEBHOOK_URL);
