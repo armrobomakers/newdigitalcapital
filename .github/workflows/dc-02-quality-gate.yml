@@ -1,0 +1,40 @@
+name: DC-02 quality gate
+
+on:
+  push:
+    branches:
+      - stage/dc-02-conversion-foundation
+    paths:
+      - .github/workflows/dc-02-quality-gate.yml
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: stage/dc-02-conversion-foundation
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Clean install
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
