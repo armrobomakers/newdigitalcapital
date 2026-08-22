@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+import { getEventLifecycle, isRegistrationOpen } from "@/data/event-registry";
+
 type RegistrationPayload = {
   event_id?: string;
   lead_type?: string;
@@ -221,6 +223,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "invalid_required_fields" }, { status: 400 });
   }
 
+  const lifecycle = getEventLifecycle(payload.event_id);
+  if (!lifecycle) {
+    return NextResponse.json({ ok: false, error: "unknown_event" }, { status: 404 });
+  }
+
+  if (!isRegistrationOpen(payload.event_id)) {
+    return NextResponse.json({ ok: false, error: "registration_closed" }, { status: 409 });
+  }
+
   const sheetsConfigured = Boolean(process.env.GOOGLE_SHEETS_WEBHOOK_URL);
   const telegramConfigured = Boolean(process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_CHAT_ID);
 
@@ -240,7 +251,7 @@ export async function POST(request: Request) {
     payload.email ? `Email: ${safe(payload.email)}` : null,
     payload.phone ? `Телефон: ${safe(payload.phone)}` : null,
     payload.company ? `Компания: ${safe(payload.company)}` : null,
-    `Согласие на ПД: да`,
+    "Согласие на ПД: да",
     `Инфосообщения: ${payload.marketing_consent ? "да" : "нет"}`,
     payload.utm_source ? `UTM Source: ${safe(payload.utm_source)}` : null,
     payload.utm_medium ? `UTM Medium: ${safe(payload.utm_medium)}` : null,
