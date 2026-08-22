@@ -1,11 +1,14 @@
 export type EventLifecycleStatus = "draft" | "scheduled" | "sales" | "sold_out" | "past";
+export type LeadType = "attendee" | "partner" | "speaker" | "media";
+
+export type LeadCaptureRules = Record<LeadType, boolean>;
 
 export type EventLifecycle = {
   id: string;
   slug: string;
   status: EventLifecycleStatus;
   startsAt: string;
-  registrationOpen: boolean;
+  leadCapture: LeadCaptureRules;
 };
 
 export const eventRegistry = {
@@ -14,7 +17,12 @@ export const eventRegistry = {
     slug: "ekb",
     status: "past",
     startsAt: "2026-06-13T12:00:00+05:00",
-    registrationOpen: false,
+    leadCapture: {
+      attendee: false,
+      partner: false,
+      speaker: false,
+      media: false,
+    },
   },
 } as const satisfies Record<string, EventLifecycle>;
 
@@ -28,7 +36,19 @@ export function getEventLifecycleBySlug(slug: string): EventLifecycle | null {
   return Object.values(eventRegistry).find((event) => event.slug === slug) ?? null;
 }
 
-export function isRegistrationOpen(eventId: string) {
+export function isLeadCaptureOpen(eventId: string, leadType: LeadType) {
   const event = getEventLifecycle(eventId);
-  return Boolean(event?.registrationOpen && event.status === "sales");
+  if (!event) {
+    return false;
+  }
+
+  if (leadType === "attendee") {
+    return Boolean(event.leadCapture.attendee && event.status === "sales");
+  }
+
+  return Boolean(event.leadCapture[leadType] && event.status !== "past");
+}
+
+export function isRegistrationOpen(eventId: string) {
+  return isLeadCaptureOpen(eventId, "attendee");
 }
