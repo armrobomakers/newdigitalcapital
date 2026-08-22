@@ -3,8 +3,8 @@ import { notFound, redirect } from "next/navigation";
 import { eventRegistry } from "@/data/event-registry";
 
 function getPrimaryEvent() {
-  const events = Object.values(eventRegistry);
-  const priority = ["sales", "scheduled", "sold_out", "past", "draft"] as const;
+  const events = Object.values(eventRegistry).filter((event) => event.pageReady);
+  const priority = ["sales", "scheduled", "sold_out", "past"] as const;
 
   for (const status of priority) {
     const matches = events
