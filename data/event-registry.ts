@@ -3,13 +3,17 @@ export type LeadType = "attendee" | "partner" | "speaker" | "media";
 
 export type LeadCaptureRules = Record<LeadType, boolean>;
 
-export type EventLifecycle = {
+type StoredEventLifecycle = {
   id: string;
   slug: string;
   status: EventLifecycleStatus;
   startsAt: string;
   pageReady: boolean;
   leadCapture: LeadCaptureRules;
+};
+
+export type EventLifecycle = StoredEventLifecycle & {
+  registrationOpen: boolean;
 };
 
 export const eventRegistry = {
@@ -26,16 +30,33 @@ export const eventRegistry = {
       media: false,
     },
   },
-} as const satisfies Record<string, EventLifecycle>;
+} as const satisfies Record<string, StoredEventLifecycle>;
 
 export type EventId = keyof typeof eventRegistry;
 
+function enrichLifecycle(event: StoredEventLifecycle): EventLifecycle {
+  return {
+    ...event,
+    registrationOpen: Boolean(
+      event.pageReady && event.leadCapture.attendee && event.status === "sales"
+    ),
+  };
+}
+
+export function listEventLifecycles(): EventLifecycle[] {
+  return (Object.values(eventRegistry) as StoredEventLifecycle[]).map(enrichLifecycle);
+}
+
 export function getEventLifecycle(eventId: string): EventLifecycle | null {
-  return eventRegistry[eventId as EventId] ?? null;
+  const event = eventRegistry[eventId as EventId] as StoredEventLifecycle | undefined;
+  return event ? enrichLifecycle(event) : null;
 }
 
 export function getEventLifecycleBySlug(slug: string): EventLifecycle | null {
-  return Object.values(eventRegistry).find((event) => event.slug === slug) ?? null;
+  const event = (Object.values(eventRegistry) as StoredEventLifecycle[]).find(
+    (candidate) => candidate.slug === slug
+  );
+  return event ? enrichLifecycle(event) : null;
 }
 
 export function isLeadCaptureOpen(eventId: string, leadType: LeadType) {
@@ -45,7 +66,7 @@ export function isLeadCaptureOpen(eventId: string, leadType: LeadType) {
   }
 
   if (leadType === "attendee") {
-    return Boolean(event.leadCapture.attendee && event.status === "sales");
+    return event.registrationOpen;
   }
 
   return Boolean(event.leadCapture[leadType] && event.status !== "past");
