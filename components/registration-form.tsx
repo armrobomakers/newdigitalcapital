@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { BriefcaseIcon, MailIcon, PhoneIcon, UserIcon } from "@/components/icons";
-import { isRegistrationOpen } from "@/data/event-registry";
+import { isLeadCaptureOpen, type LeadType } from "@/data/event-registry";
 import { trackConversionEvent } from "@/lib/analytics-client";
 
 const utmKeys = [
@@ -21,13 +21,33 @@ type Status = "idle" | "loading" | "success" | "error";
 
 type RegistrationFormProps = {
   eventId?: string;
-  leadType?: "attendee" | "partner" | "speaker" | "media";
+  leadType?: LeadType;
 };
 
 type RegistrationResult = {
   ok?: boolean;
   error?: string;
   request_id?: string;
+};
+
+const closedLeadCopy: Record<LeadType, { title: string; description: string }> = {
+  attendee: {
+    title: "Регистрация на эту конференцию завершена",
+    description:
+      "Страница сохранена как архив события. Новая дата и площадка будут опубликованы после подтверждения следующей конференции.",
+  },
+  partner: {
+    title: "Прием партнерских заявок закрыт",
+    description: "Партнерские форматы будут открыты отдельно для следующего подтвержденного события.",
+  },
+  speaker: {
+    title: "Прием заявок от спикеров закрыт",
+    description: "Новый call for speakers будет открыт вместе с программой следующей конференции.",
+  },
+  media: {
+    title: "Медиа-аккредитация закрыта",
+    description: "Аккредитация будет открыта для следующего подтвержденного события.",
+  },
 };
 
 export function RegistrationForm({
@@ -39,7 +59,7 @@ export function RegistrationForm({
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState("");
   const formStarted = useRef(false);
-  const registrationOpen = isRegistrationOpen(eventId);
+  const leadCaptureOpen = isLeadCaptureOpen(eventId, leadType);
 
   function handleFormFocus() {
     if (formStarted.current) {
@@ -91,6 +111,7 @@ export function RegistrationForm({
       const params = new URLSearchParams({
         event_id: eventId,
         request_id: result.request_id,
+        lead_type: leadType,
       });
       router.push(`/thanks?${params.toString()}`);
     } catch (error) {
@@ -108,17 +129,17 @@ export function RegistrationForm({
     }
   }
 
-  if (!registrationOpen) {
+  if (!leadCaptureOpen) {
+    const copy = closedLeadCopy[leadType];
     return (
       <div className="rounded-[24px] border border-violet-300/20 bg-white/[0.035] p-5">
-        <p className="text-lg font-semibold text-white">Регистрация на эту конференцию завершена</p>
-        <p className="mt-2 text-sm leading-7 text-white/65">
-          Страница сохранена как архив события. Новая дата и площадка будут опубликованы после
-          подтверждения следующей конференции.
-        </p>
-        <Link href="#program" className="btn-secondary mt-4 inline-flex" data-analytics-cta="archive_program">
-          Смотреть программу прошедшего события
-        </Link>
+        <p className="text-lg font-semibold text-white">{copy.title}</p>
+        <p className="mt-2 text-sm leading-7 text-white/65">{copy.description}</p>
+        {leadType === "attendee" ? (
+          <Link href="#program" className="btn-secondary mt-4 inline-flex" data-analytics-cta="archive_program">
+            Смотреть программу прошедшего события
+          </Link>
+        ) : null}
       </div>
     );
   }
