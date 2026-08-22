@@ -60,6 +60,9 @@ export type EventData = {
   cityLabel: string;
   venueLabel: string;
   formatLabel: string;
+  formatDescription: string;
+  programLead: string;
+  programDetails: string;
   assets: {
     heroImage: string;
     mapImage: string;
@@ -88,8 +91,10 @@ export type EventData = {
   faq: FaqItem[];
   location: {
     verified: boolean;
+    description: string;
     venue: string;
     address: string;
+    venueDescription: string;
     note: string;
     advantages: string[];
     routeUrl: string;
@@ -128,6 +133,9 @@ const ekbArchiveEvent: EventData = {
   cityLabel: "Екатеринбург",
   venueLabel: "площадка требует верификации",
   formatLabel: "Формат участия",
+  formatDescription: "для предпринимателей и инвесторов",
+  programLead: "Один день полезного контента, нетворкинга и практических инсайтов от экспертов.",
+  programDetails: "Основная часть проходит с 12:00 до 17:00. После — ужин со спикерами в отдельном формате.",
   assets: {
     heroImage: "/hero-stage-3.png",
     mapImage: "/location-map.png",
@@ -328,8 +336,10 @@ const ekbArchiveEvent: EventData = {
   ],
   location: {
     verified: false,
+    description: "Архивные сведения о площадке временно скрыты до верификации адреса.",
     venue: "Площадка архивного события",
     address: "Адрес скрыт до верификации",
+    venueDescription: "Площадка будет опубликована после подтверждения адреса и схемы прохода.",
     note: "Маршрут архивного события скрыт до подтверждения корректных данных.",
     advantages: [],
     routeUrl: "#location",

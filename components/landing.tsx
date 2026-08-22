@@ -1,4 +1,4 @@
-﻿import { Suspense, type ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -34,7 +34,7 @@ import {
 import { RegistrationForm } from "@/components/registration-form";
 import { StickyCTA } from "@/components/sticky-cta";
 import { getEventLifecycleBySlug } from "@/data/event-registry";
-import { eventData, type AudienceItem, type ProgramItem, type Speaker } from "@/data/events";
+import { type AudienceItem, type EventData, type ProgramItem, type Speaker } from "@/data/events";
 import { isLegalConfigReady, legalConfig } from "@/lib/legal";
 
 function SectionTitle({
@@ -162,11 +162,11 @@ function ProgramIcon({ icon }: { icon?: ProgramItem["icon"] }) {
   }
 }
 
-function HeroVisual() {
+function HeroVisual({ eventData }: { eventData: EventData }) {
   return (
     <div className="relative min-h-[480px] overflow-hidden rounded-[38px] bg-[#050411] lg:min-h-[460px]">
       <Image
-        src="/hero-stage-3.png"
+        src={eventData.assets.heroImage}
         alt=""
         fill
         priority
@@ -179,7 +179,7 @@ function HeroVisual() {
 }
 
 function SpeakerCard({ speaker, index }: { speaker: Speaker; index: number }) {
-  const speakerImageSrc = `/speaker-${index + 1}-face.png`;
+  const speakerImageSrc = speaker.photo ?? `/speaker-${index + 1}-face.png`;
 
   return (
     <article className="group flex h-full min-h-[520px] flex-col overflow-hidden rounded-[30px] border border-white/10 bg-white/[0.045] shadow-soft backdrop-blur-2xl transition duration-300 hover:-translate-y-1 hover:border-violet-300/30 hover:bg-white/[0.06]">
@@ -360,10 +360,10 @@ function FAQItem({ item, index }: { item: { question: string; answer: string }; 
   );
 }
 
-function MapCardExact() {
+function MapCardExact({ eventData }: { eventData: EventData }) {
   return (
     <div className="relative min-h-[360px] overflow-hidden rounded-[32px] border border-white/10 bg-[#07061a] shadow-soft">
-      <Image src="/location-map.png" alt="" fill className="object-cover object-center" />
+      <Image src={eventData.assets.mapImage} alt="" fill className="object-cover object-center" />
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,3,13,0.08)_0%,rgba(4,3,13,0.06)_22%,rgba(4,3,13,0.15)_58%,rgba(4,3,13,0.42)_100%)]" />
       <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#050411] to-transparent" />
       <div className="absolute left-5 bottom-5 rounded-[22px] border border-white/10 bg-black/40 px-4 py-3 backdrop-blur-xl">
@@ -374,7 +374,7 @@ function MapCardExact() {
   );
 }
 
-function RegistrationTicket() {
+function RegistrationTicket({ eventData }: { eventData: EventData }) {
   return (
     <div className="relative min-h-[520px] overflow-hidden rounded-[32px] border border-violet-400/60 bg-[linear-gradient(180deg,rgba(255,255,255,0.09),rgba(255,255,255,0.035))] p-6 shadow-[0_0_48px_rgba(124,60,255,0.16)]">
       <span className="pointer-events-none absolute left-0 top-1/2 h-16 w-8 -translate-x-1/2 -translate-y-1/2 rounded-full border border-violet-400/60 bg-[#050411]" />
@@ -433,17 +433,16 @@ function RegistrationTicket() {
   );
 }
 
-function ClosedEventCard() {
+function ClosedEventCard({ eventData }: { eventData: EventData }) {
   return (
     <div className="relative min-h-[420px] overflow-hidden rounded-[32px] border border-violet-400/35 bg-[linear-gradient(180deg,rgba(124,60,255,0.13),rgba(255,255,255,0.035))] p-6 shadow-soft">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_28%_20%,rgba(124,60,255,0.28),transparent_34%)]" />
       <div className="relative flex h-full flex-col justify-between">
         <div>
-          <p className="text-sm uppercase tracking-[0.18em] text-violet-200/80">Архив события</p>
-          <h3 className="mt-5 font-display text-5xl leading-[0.95] text-white">Продажи завершены</h3>
+          <p className="text-sm uppercase tracking-[0.18em] text-violet-200/80">Статус события</p>
+          <h3 className="mt-5 font-display text-5xl leading-[0.95] text-white">{eventData.registration.title}</h3>
           <p className="mt-5 max-w-md text-base leading-7 text-white/68">
-            Июньская конференция закрыта для регистрации. Следующая дата и условия участия будут
-            опубликованы отдельным событием после подтверждения площадки и программы.
+            {eventData.registration.lead}
           </p>
         </div>
         <Link href="#program" className="btn-secondary mt-8 inline-flex w-fit">
@@ -454,28 +453,27 @@ function ClosedEventCard() {
   );
 }
 
-function PartnerVisualExact() {
+function PartnerVisualExact({ eventData }: { eventData: EventData }) {
   return (
     <div
       className="relative min-h-[260px] overflow-hidden rounded-[32px] border border-white/10 bg-[#07061a] bg-cover bg-center shadow-soft"
-      style={{ backgroundImage: "url('/partner-handshake.png')" }}
+      style={{ backgroundImage: `url('${eventData.assets.partnerImage}')` }}
     >
       <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(4,3,13,0.14)_0%,rgba(4,3,13,0.04)_40%,rgba(4,3,13,0.18)_100%)]" />
     </div>
   );
 }
 
-const footerCtaTitleParts = eventData.footer.ctaTitle.match(/^(.*конференции)\s+(«.*»)$/);
-const lifecycle = getEventLifecycleBySlug(eventData.slug);
-const registrationOpen = Boolean(lifecycle?.registrationOpen && lifecycle.status === "sales");
-const locationVerified = false;
-const legalReady = isLegalConfigReady();
-const activeSocials = eventData.socials.filter((social) => social.href && social.href !== "#");
-
-export function LandingPage() {
+export function LandingPage({ eventData }: { eventData: EventData }) {
+  const footerCtaTitleParts = eventData.footer.ctaTitle.match(/^(.*конференции)\s+(«.*»)$/);
+  const lifecycle = getEventLifecycleBySlug(eventData.slug);
+  const registrationOpen = Boolean(lifecycle?.registrationOpen && lifecycle.status === "sales");
+  const locationVerified = eventData.location.verified;
+  const legalReady = isLegalConfigReady();
+  const activeSocials = eventData.socials.filter((social) => social.href && social.href !== "#");
   return (
     <main className="relative pb-24 md:pb-0">
-      <StickyCTA />
+      <StickyCTA eventData={eventData} />
 
       <section className="section-shell pt-1 md:pt-3">
         <div className="relative p-0 md:pt-1">
@@ -531,7 +529,7 @@ export function LandingPage() {
                 <HeroMetaCard
                   icon={<UsersIcon className="h-5 w-5" />}
                   title={eventData.formatLabel}
-                  copy="для предпринимателей и инвесторов"
+                  copy={eventData.formatDescription}
                 />
               </div>
 
@@ -550,7 +548,7 @@ export function LandingPage() {
               </div>
             </div>
 
-            <HeroVisual />
+            <HeroVisual eventData={eventData} />
           </div>
 
           <div className="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -630,10 +628,10 @@ export function LandingPage() {
               Программа мероприятия
             </h2>
             <p className="mt-6 max-w-[460px] text-[18px] leading-[1.35] text-white/68 lg:text-[19px]">
-              Один день полезного контента, нетворкинга и практических инсайтов от экспертов.
+              {eventData.programLead}
             </p>
             <p className="mt-5 max-w-[460px] text-[18px] leading-[1.35] text-white/68 lg:text-[19px]">
-              Основная часть проходит с 12:00 до 17:00. После — ужин со спикерами в отдельном формате.
+              {eventData.programDetails}
             </p>
             <Link href="#speakers" className="btn-primary mt-8 inline-flex h-[52px] px-7 py-0">
               Спикеры события
@@ -647,7 +645,7 @@ export function LandingPage() {
                   <ProgramCard
                     key={`${item.time}-${item.title}`}
                     item={item}
-                    accent={item.time === "15:30" ? "featured" : item.time === "17:00" ? "final" : undefined}
+                    accent={item.accent}
                   />
                 ))}
               </ul>
@@ -661,12 +659,8 @@ export function LandingPage() {
           <div className="grid gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:items-start">
             <div className="space-y-6">
               <SectionTitle
-                title={registrationOpen ? "Забронируйте место на конференции" : "Архив конференции"}
-                description={
-                  registrationOpen
-                    ? eventData.registration.lead
-                    : "Регистрация на июньское событие завершена. Новая дата будет опубликована отдельной страницей после подтверждения площадки."
-                }
+                title={eventData.registration.title}
+                description={eventData.registration.lead}
                 maxWidthClass="max-w-[860px]"
                 titleClassName="lg:text-[4.75rem]"
               />
@@ -682,12 +676,12 @@ export function LandingPage() {
                     </div>
                   }
                 >
-                  <RegistrationForm />
+                  <RegistrationForm eventId={eventData.eventId} />
                 </Suspense>
               </div>
             </div>
 
-            {registrationOpen ? <RegistrationTicket /> : <ClosedEventCard />}
+            {registrationOpen ? <RegistrationTicket eventData={eventData} /> : <ClosedEventCard eventData={eventData} />}
           </div>
 
           <div className="mt-5 flex items-center gap-4">
@@ -698,7 +692,7 @@ export function LandingPage() {
             <div className="h-px flex-1 bg-white/10" />
           </div>
           <p className="mt-3 text-center text-sm leading-7 text-white/58">
-            {registrationOpen ? eventData.registration.note : "Продажи и прием новых заявок на это событие отключены."}
+            {eventData.registration.note}
           </p>
         </div>
       </section>
@@ -735,11 +729,11 @@ export function LandingPage() {
                 {eventData.partnersLead}
               </h3>
             </div>
-            <Link href="#footer-contacts" className="btn-primary inline-flex w-fit">
+            <Link href={`/apply/partner/${eventData.slug}`} className="btn-primary inline-flex w-fit">
               {eventData.partnersCta}
             </Link>
           </div>
-          <PartnerVisualExact />
+          <PartnerVisualExact eventData={eventData} />
         </div>
       </section>
 
@@ -761,11 +755,7 @@ export function LandingPage() {
       <section id="location" className="section-shell py-16 md:py-24">
         <SectionTitle
           title="Локация"
-          description={
-            locationVerified
-              ? "Конференция пройдет в центре Екатеринбурга."
-              : "Архивные сведения о площадке временно скрыты до верификации адреса."
-          }
+          description={eventData.location.description}
           center
         />
 
@@ -783,7 +773,7 @@ export function LandingPage() {
                   </div>
                 </div>
                 <p className="mt-6 text-lg leading-8 text-white/72">
-                  Современная площадка в центре города с удобной транспортной доступностью и комфортной инфраструктурой.
+                  {eventData.location.venueDescription}
                 </p>
                 <ul className="mt-6 space-y-3">
                   {eventData.location.advantages.map((item) => (
@@ -804,7 +794,7 @@ export function LandingPage() {
                 </Link>
               </div>
 
-              <MapCardExact />
+              <MapCardExact eventData={eventData} />
             </div>
             <div className="mt-6 flex items-center gap-4">
               <div className="h-px flex-1 bg-white/10" />
@@ -819,11 +809,9 @@ export function LandingPage() {
           </>
         ) : (
           <div className="mx-auto mt-8 max-w-3xl rounded-[32px] border border-amber-300/20 bg-amber-200/[0.05] p-6 text-center shadow-soft">
-            <p className="text-lg font-semibold text-white">Площадка архивного события на проверке</p>
+            <p className="text-lg font-semibold text-white">Площадка пока не опубликована</p>
             <p className="mx-auto mt-3 max-w-2xl text-sm leading-7 text-white/65">
-              В предыдущей версии сайта название бизнес-центра и адрес противоречили друг другу.
-              Маршрут и адрес скрыты, чтобы не направлять посетителей в неверную локацию. Для
-              следующей конференции адрес будет опубликован только после подтверждения площадки.
+              {eventData.location.note}
             </p>
           </div>
         )}
