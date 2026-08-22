@@ -10,6 +10,7 @@ export async function GET() {
     id: event.id,
     slug: event.slug,
     status: event.status,
+    page_ready: event.pageReady,
     lead_capture: event.leadCapture,
     starts_at: event.startsAt,
   }));
@@ -21,10 +22,10 @@ export async function GET() {
   const brandedSiteUrl = Boolean(siteUrl && !siteUrl.includes("localhost") && !siteUrl.includes("vercel.app"));
   const indexingEnabled = process.env.NEXT_PUBLIC_INDEXING_ENABLED === "true";
   const salesEventAvailable = events.some(
-    (event) => event.status === "sales" && event.lead_capture.attendee
+    (event) => event.page_ready && event.status === "sales" && event.lead_capture.attendee
   );
   const partnerLeadAvailable = events.some(
-    (event) => event.status !== "past" && event.lead_capture.partner
+    (event) => event.page_ready && event.status !== "past" && event.lead_capture.partner
   );
 
   const readiness = {
