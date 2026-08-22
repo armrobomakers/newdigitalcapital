@@ -2,13 +2,13 @@ import { NextResponse } from "next/server";
 
 import { getConferenceIntegrity, listConferences } from "@/data/conferences";
 import { getEventSeoConfig } from "@/data/event-seo";
-import { isLegalConfigReady } from "@/lib/legal";
+import { getLaunchReadinessSnapshot } from "@/lib/launch-readiness";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   const integrity = getConferenceIntegrity();
-  const catalogReady = integrity.length > 0 && integrity.every((record) => record.consistent);
+  const launch = getLaunchReadinessSnapshot();
   const events = listConferences().map(({ lifecycle, content }) => ({
     id: lifecycle.id,
     slug: lifecycle.slug,
@@ -16,61 +16,27 @@ export async function GET() {
     city: content.cityLabel,
     status: lifecycle.status,
     page_ready: lifecycle.pageReady,
+    location_verified: content.location.verified,
+    contacts_ready: Boolean(content.contacts.email.trim() && content.contacts.phone.trim()),
     structured_data_ready: getEventSeoConfig(lifecycle.id).structuredDataReady,
     lead_capture: lifecycle.leadCapture,
     starts_at: lifecycle.startsAt,
   }));
 
-  const legalReady = isLegalConfigReady();
-  const leadStorageReady = Boolean(process.env.LEAD_STORAGE_WEBHOOK_URL);
-  const analyticsReady = Boolean(process.env.ANALYTICS_WEBHOOK_URL);
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "";
-  const brandedSiteUrl = Boolean(
-    siteUrl && !siteUrl.includes("localhost") && !siteUrl.includes("vercel.app")
-  );
-  const indexingEnabled = process.env.NEXT_PUBLIC_INDEXING_ENABLED === "true";
-  const salesEventAvailable = events.some(
-    (event) => event.page_ready && event.status === "sales" && event.lead_capture.attendee
-  );
-  const salesEventStructuredDataReady = events.some(
-    (event) =>
-      event.page_ready &&
-      event.status === "sales" &&
-      event.lead_capture.attendee &&
-      event.structured_data_ready
-  );
-  const partnerLeadAvailable = events.some(
-    (event) => event.page_ready && event.status !== "past" && event.lead_capture.partner
-  );
-
-  const readiness = {
-    conference_catalog_ready: catalogReady,
-    legal_ready: legalReady,
-    lead_storage_ready: leadStorageReady,
-    analytics_ready: analyticsReady,
-    branded_site_url: brandedSiteUrl,
-    indexing_enabled: indexingEnabled,
-    sales_event_available: salesEventAvailable,
-    sales_event_structured_data_ready: salesEventStructuredDataReady,
-    partner_lead_available: partnerLeadAvailable,
-    ready_for_registration:
-      catalogReady && legalReady && leadStorageReady && salesEventAvailable,
-    ready_for_paid_traffic:
-      catalogReady &&
-      legalReady &&
-      leadStorageReady &&
-      analyticsReady &&
-      brandedSiteUrl &&
-      indexingEnabled &&
-      salesEventAvailable &&
-      salesEventStructuredDataReady,
-  };
-
   return NextResponse.json(
     {
       service: "digitalcapital",
-      status: readiness.ready_for_registration ? "ready" : "gated",
-      readiness,
+      status: launch.registration_ready ? "ready" : "gated",
+      readiness: {
+        ready_for_registration: launch.registration_ready,
+        ready_for_paid_traffic: launch.paid_traffic_ready,
+      },
+      blockers: {
+        registration: launch.registration_blockers,
+        paid_traffic: launch.paid_traffic_blockers,
+      },
+      warnings: launch.warnings,
+      active_sales_event: launch.active_sales_event,
       conference_catalog: integrity,
       events,
       checked_at: new Date().toISOString(),
