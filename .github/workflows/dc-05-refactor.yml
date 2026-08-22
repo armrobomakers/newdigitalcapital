@@ -4,6 +4,9 @@ on:
   push:
     branches: [stage/dc-05-performance-accessibility]
     paths: [.github/workflows/dc-05-refactor.yml]
+  pull_request:
+    branches: [stage/dc-04-launch-infrastructure-security]
+    paths: [.github/workflows/dc-05-refactor.yml]
 
 permissions:
   contents: write
