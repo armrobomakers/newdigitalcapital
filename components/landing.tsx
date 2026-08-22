@@ -21,7 +21,6 @@ import {
   NetworkIcon,
   PinIcon,
   PieChartIcon,
-  PhoneIcon,
   PlaneIcon,
   ShieldIcon,
   SparkIcon,
@@ -34,7 +33,9 @@ import {
 } from "@/components/icons";
 import { RegistrationForm } from "@/components/registration-form";
 import { StickyCTA } from "@/components/sticky-cta";
+import { getEventLifecycleBySlug } from "@/data/event-registry";
 import { eventData, type AudienceItem, type ProgramItem, type Speaker } from "@/data/events";
+import { isLegalConfigReady, legalConfig } from "@/lib/legal";
 
 function SectionTitle({
   kicker,
@@ -208,10 +209,10 @@ function SpeakerCard({ speaker, index }: { speaker: Speaker; index: number }) {
         </p>
         <div className="mt-auto pt-4">
           <Link
-            href="#register"
+            href="#program"
             className="inline-flex min-w-[160px] items-center justify-between gap-3 rounded-full border border-violet-400/35 bg-black/15 px-6 py-3 text-[14px] font-semibold text-white/90 transition group-hover:border-violet-300/40 group-hover:bg-violet-500/20"
           >
-            Подробнее
+            В программе
             <ArrowUpRightIcon className="h-4 w-4" />
           </Link>
         </div>
@@ -263,7 +264,7 @@ function ProgramCard({
 
         <div className="min-w-0 flex-1">
           <p
-              className={`text-[16px] font-semibold leading-[1.15] text-white lg:text-[16px] ${isFinal ? "lg:text-[17px]" : ""}`}
+            className={`text-[16px] font-semibold leading-[1.15] text-white lg:text-[16px] ${isFinal ? "lg:text-[17px]" : ""}`}
             style={{
               display: "-webkit-box",
               WebkitBoxOrient: "vertical",
@@ -432,6 +433,27 @@ function RegistrationTicket() {
   );
 }
 
+function ClosedEventCard() {
+  return (
+    <div className="relative min-h-[420px] overflow-hidden rounded-[32px] border border-violet-400/35 bg-[linear-gradient(180deg,rgba(124,60,255,0.13),rgba(255,255,255,0.035))] p-6 shadow-soft">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_28%_20%,rgba(124,60,255,0.28),transparent_34%)]" />
+      <div className="relative flex h-full flex-col justify-between">
+        <div>
+          <p className="text-sm uppercase tracking-[0.18em] text-violet-200/80">Архив события</p>
+          <h3 className="mt-5 font-display text-5xl leading-[0.95] text-white">Продажи завершены</h3>
+          <p className="mt-5 max-w-md text-base leading-7 text-white/68">
+            Июньская конференция закрыта для регистрации. Следующая дата и условия участия будут
+            опубликованы отдельным событием после подтверждения площадки и программы.
+          </p>
+        </div>
+        <Link href="#program" className="btn-secondary mt-8 inline-flex w-fit">
+          Смотреть архив программы
+        </Link>
+      </div>
+    </div>
+  );
+}
+
 function PartnerVisualExact() {
   return (
     <div
@@ -444,6 +466,11 @@ function PartnerVisualExact() {
 }
 
 const footerCtaTitleParts = eventData.footer.ctaTitle.match(/^(.*конференции)\s+(«.*»)$/);
+const lifecycle = getEventLifecycleBySlug(eventData.slug);
+const registrationOpen = Boolean(lifecycle?.registrationOpen && lifecycle.status === "sales");
+const locationVerified = false;
+const legalReady = isLegalConfigReady();
+const activeSocials = eventData.socials.filter((social) => social.href && social.href !== "#");
 
 export function LandingPage() {
   return (
@@ -472,8 +499,11 @@ export function LandingPage() {
               ))}
             </nav>
 
-            <Link href="#register" className="btn-primary hidden md:inline-flex">
-              {eventData.heroCta}
+            <Link
+              href={registrationOpen ? "#register" : "#program"}
+              className="btn-primary hidden md:inline-flex"
+            >
+              {registrationOpen ? eventData.heroCta : "Смотреть программу"}
             </Link>
           </header>
 
@@ -496,7 +526,7 @@ export function LandingPage() {
                 <HeroMetaCard
                   icon={<PinIcon className="h-5 w-5" />}
                   title={eventData.cityLabel}
-                  copy={eventData.venueLabel}
+                  copy={locationVerified ? eventData.venueLabel : "архив: площадка на проверке"}
                 />
                 <HeroMetaCard
                   icon={<UsersIcon className="h-5 w-5" />}
@@ -506,12 +536,15 @@ export function LandingPage() {
               </div>
 
               <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-                <Link href="#register" className="btn-primary min-w-[270px] justify-between">
-                  <span>{eventData.heroCta}</span>
+                <Link
+                  href={registrationOpen ? "#register" : "#program"}
+                  className="btn-primary min-w-[270px] justify-between"
+                >
+                  <span>{registrationOpen ? eventData.heroCta : "Смотреть программу"}</span>
                   <ArrowRightIcon className="h-5 w-5" />
                 </Link>
-                <Link href="#program" className="btn-secondary min-w-[270px] justify-between">
-                  <span>{eventData.programCta}</span>
+                <Link href="#speakers" className="btn-secondary min-w-[270px] justify-between">
+                  <span>Спикеры события</span>
                   <CalendarIcon className="h-5 w-5 text-violet-200" />
                 </Link>
               </div>
@@ -602,8 +635,8 @@ export function LandingPage() {
             <p className="mt-5 max-w-[460px] text-[18px] leading-[1.35] text-white/68 lg:text-[19px]">
               Основная часть проходит с 12:00 до 17:00. После — ужин со спикерами в отдельном формате.
             </p>
-            <Link href="#register" className="btn-primary mt-8 inline-flex h-[52px] px-7 py-0">
-              Смотреть программу
+            <Link href="#speakers" className="btn-primary mt-8 inline-flex h-[52px] px-7 py-0">
+              Спикеры события
             </Link>
           </div>
 
@@ -628,8 +661,12 @@ export function LandingPage() {
           <div className="grid gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:items-start">
             <div className="space-y-6">
               <SectionTitle
-                title="Забронируйте место на конференции"
-                description={eventData.registration.lead}
+                title={registrationOpen ? "Забронируйте место на конференции" : "Архив конференции"}
+                description={
+                  registrationOpen
+                    ? eventData.registration.lead
+                    : "Регистрация на июньское событие завершена. Новая дата будет опубликована отдельной страницей после подтверждения площадки."
+                }
                 maxWidthClass="max-w-[860px]"
                 titleClassName="lg:text-[4.75rem]"
               />
@@ -650,7 +687,7 @@ export function LandingPage() {
               </div>
             </div>
 
-            <RegistrationTicket />
+            {registrationOpen ? <RegistrationTicket /> : <ClosedEventCard />}
           </div>
 
           <div className="mt-5 flex items-center gap-4">
@@ -660,7 +697,9 @@ export function LandingPage() {
             </div>
             <div className="h-px flex-1 bg-white/10" />
           </div>
-          <p className="mt-3 text-center text-sm leading-7 text-white/58">{eventData.registration.note}</p>
+          <p className="mt-3 text-center text-sm leading-7 text-white/58">
+            {registrationOpen ? eventData.registration.note : "Продажи и прием новых заявок на это событие отключены."}
+          </p>
         </div>
       </section>
 
@@ -668,7 +707,6 @@ export function LandingPage() {
         <div className="pointer-events-none absolute right-[-100px] top-[10px] h-[360px] w-[360px] rounded-full bg-[radial-gradient(circle_at_center,rgba(124,60,255,0.12),transparent_60%)] blur-2xl" />
         <div className="pointer-events-none absolute left-[-120px] bottom-[120px] h-[260px] w-[520px] bg-[radial-gradient(circle_at_0%_100%,rgba(124,60,255,0.18),transparent_35%),radial-gradient(circle_at_100%_0%,rgba(124,60,255,0.08),transparent_35%)] blur-2xl" />
         <SectionTitle
-
           title="Партнеры мероприятия"
           description="Компании и команды, которые развивают бизнес, технологии, капитал и сильное окружение."
           center
@@ -697,7 +735,7 @@ export function LandingPage() {
                 {eventData.partnersLead}
               </h3>
             </div>
-            <Link href="#register" className="btn-primary inline-flex w-fit">
+            <Link href="#footer-contacts" className="btn-primary inline-flex w-fit">
               {eventData.partnersCta}
             </Link>
           </div>
@@ -709,7 +747,6 @@ export function LandingPage() {
         <div className="pointer-events-none absolute left-[-160px] top-[20px] h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle_at_35%_30%,rgba(124,60,255,0.18),transparent_28%),radial-gradient(circle_at_50%_70%,rgba(124,60,255,0.12),transparent_30%)] blur-2xl" />
         <div className="pointer-events-none absolute right-[-120px] bottom-[-40px] h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle_at_55%_45%,rgba(124,60,255,0.16),transparent_28%),radial-gradient(circle_at_10%_90%,rgba(124,60,255,0.09),transparent_34%)] blur-2xl" />
         <SectionTitle
-
           title="FAQ"
           description="Ответы на частые вопросы об участии в мероприятии."
           center
@@ -723,56 +760,73 @@ export function LandingPage() {
 
       <section id="location" className="section-shell py-16 md:py-24">
         <SectionTitle
-
           title="Локация"
-          description="Конференция пройдет в центре Екатеринбурга."
+          description={
+            locationVerified
+              ? "Конференция пройдет в центре Екатеринбурга."
+              : "Архивные сведения о площадке временно скрыты до верификации адреса."
+          }
           center
         />
-        <div className="mt-8 grid gap-5 lg:grid-cols-[0.96fr_1.04fr]">
-          <div className="rounded-[32px] border border-white/10 bg-white/[0.05] p-6 shadow-soft backdrop-blur-2xl">
-            <div className="flex items-start gap-4">
-              <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-[24px] border border-violet-400/30 bg-[radial-gradient(circle_at_35%_35%,rgba(124,60,255,0.22),rgba(8,7,22,0.96))]">
-                <BusinessIcon className="h-10 w-10 text-violet-200" />
-              </div>
-              <div>
-                <h3 className="font-display text-4xl text-white">{eventData.location.venue}</h3>
-                <p className="mt-2 text-sm text-white/60">{eventData.location.address}</p>
-              </div>
-            </div>
-            <p className="mt-6 text-lg leading-8 text-white/72">
-              Современная площадка в центре города с удобной транспортной доступностью и комфортной инфраструктурой.
-            </p>
-            <ul className="mt-6 space-y-3">
-              {eventData.location.advantages.map((item) => (
-                <li
-                  key={item}
-                  className="flex items-center gap-3 rounded-[18px] border border-white/10 bg-black/18 px-4 py-3 text-white/82"
-                >
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full border border-violet-400/30 bg-black/20 text-violet-200">
-                    <PinIcon className="h-4 w-4" />
-                  </span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-            <Link href={eventData.location.routeUrl} className="btn-primary mt-6 inline-flex" target="_blank" rel="noreferrer">
-              <PlaneIcon className="h-4 w-4" />
-              Построить маршрут
-            </Link>
-          </div>
 
-          <MapCardExact />
-        </div>
-        <div className="mt-6 flex items-center gap-4">
-          <div className="h-px flex-1 bg-white/10" />
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-violet-400/50 bg-black/20 text-lg font-medium text-violet-200">
-            i
+        {locationVerified ? (
+          <>
+            <div className="mt-8 grid gap-5 lg:grid-cols-[0.96fr_1.04fr]">
+              <div className="rounded-[32px] border border-white/10 bg-white/[0.05] p-6 shadow-soft backdrop-blur-2xl">
+                <div className="flex items-start gap-4">
+                  <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-[24px] border border-violet-400/30 bg-[radial-gradient(circle_at_35%_35%,rgba(124,60,255,0.22),rgba(8,7,22,0.96))]">
+                    <BusinessIcon className="h-10 w-10 text-violet-200" />
+                  </div>
+                  <div>
+                    <h3 className="font-display text-4xl text-white">{eventData.location.venue}</h3>
+                    <p className="mt-2 text-sm text-white/60">{eventData.location.address}</p>
+                  </div>
+                </div>
+                <p className="mt-6 text-lg leading-8 text-white/72">
+                  Современная площадка в центре города с удобной транспортной доступностью и комфортной инфраструктурой.
+                </p>
+                <ul className="mt-6 space-y-3">
+                  {eventData.location.advantages.map((item) => (
+                    <li
+                      key={item}
+                      className="flex items-center gap-3 rounded-[18px] border border-white/10 bg-black/18 px-4 py-3 text-white/82"
+                    >
+                      <span className="flex h-10 w-10 items-center justify-center rounded-full border border-violet-400/30 bg-black/20 text-violet-200">
+                        <PinIcon className="h-4 w-4" />
+                      </span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Link href={eventData.location.routeUrl} className="btn-primary mt-6 inline-flex" target="_blank" rel="noreferrer">
+                  <PlaneIcon className="h-4 w-4" />
+                  Построить маршрут
+                </Link>
+              </div>
+
+              <MapCardExact />
+            </div>
+            <div className="mt-6 flex items-center gap-4">
+              <div className="h-px flex-1 bg-white/10" />
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-violet-400/50 bg-black/20 text-lg font-medium text-violet-200">
+                i
+              </div>
+              <div className="h-px flex-1 bg-white/10" />
+            </div>
+            <p className="mt-3 text-center text-sm leading-7 text-white/58">
+              {eventData.location.note}
+            </p>
+          </>
+        ) : (
+          <div className="mx-auto mt-8 max-w-3xl rounded-[32px] border border-amber-300/20 bg-amber-200/[0.05] p-6 text-center shadow-soft">
+            <p className="text-lg font-semibold text-white">Площадка архивного события на проверке</p>
+            <p className="mx-auto mt-3 max-w-2xl text-sm leading-7 text-white/65">
+              В предыдущей версии сайта название бизнес-центра и адрес противоречили друг другу.
+              Маршрут и адрес скрыты, чтобы не направлять посетителей в неверную локацию. Для
+              следующей конференции адрес будет опубликован только после подтверждения площадки.
+            </p>
           </div>
-          <div className="h-px flex-1 bg-white/10" />
-        </div>
-        <p className="mt-3 text-center text-sm leading-7 text-white/58">
-          {eventData.location.note}
-        </p>
+        )}
       </section>
 
       <footer className="section-shell pb-10 pt-16 md:pb-16">
@@ -792,11 +846,14 @@ export function LandingPage() {
               </div>
 
               <div className="flex flex-col items-start gap-4 lg:absolute lg:left-[68%] lg:top-[81%] lg:z-20 lg:flex-row lg:-translate-x-1/2 lg:-translate-y-1/2 lg:items-center">
-                <Link href="#register" className="btn-primary min-w-[286px]">
-                  {eventData.footer.ctaButton}
+                <Link
+                  href={registrationOpen ? "#register" : "#program"}
+                  className="btn-primary min-w-[286px]"
+                >
+                  {registrationOpen ? eventData.footer.ctaButton : "Смотреть программу"}
                 </Link>
-                <Link href="#program" className="btn-secondary min-w-[286px]">
-                  {eventData.programCta}
+                <Link href="#speakers" className="btn-secondary min-w-[286px]">
+                  Спикеры события
                 </Link>
               </div>
 
@@ -823,26 +880,28 @@ export function LandingPage() {
                 </div>
               </Link>
               <p className="mt-4 max-w-md text-sm leading-7 text-white/62">{eventData.footer.about}</p>
-              <div className="mt-5 flex items-center gap-5">
-                {eventData.socials.map((social) => (
-                  <Link
-                    key={social.label}
-                    href={social.href}
-                    className="flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-white/[0.05] text-white/82 transition hover:border-violet-300/30 hover:bg-violet-500/20"
-                    aria-label={social.label}
-                  >
-                    {social.label === "Telegram" ? (
-                      <TelegramIcon className="h-5 w-5" />
-                    ) : social.label === "VK" ? (
-                      <VkIcon className="h-5 w-5" />
-                    ) : social.label === "YouTube" ? (
-                      <YouTubeIcon className="h-5 w-5" />
-                    ) : (
-                      <LinkedInIcon className="h-5 w-5" />
-                    )}
-                  </Link>
-                ))}
-              </div>
+              {activeSocials.length ? (
+                <div className="mt-5 flex items-center gap-5">
+                  {activeSocials.map((social) => (
+                    <Link
+                      key={social.label}
+                      href={social.href}
+                      className="flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-white/[0.05] text-white/82 transition hover:border-violet-300/30 hover:bg-violet-500/20"
+                      aria-label={social.label}
+                    >
+                      {social.label === "Telegram" ? (
+                        <TelegramIcon className="h-5 w-5" />
+                      ) : social.label === "VK" ? (
+                        <VkIcon className="h-5 w-5" />
+                      ) : social.label === "YouTube" ? (
+                        <YouTubeIcon className="h-5 w-5" />
+                      ) : (
+                        <LinkedInIcon className="h-5 w-5" />
+                      )}
+                    </Link>
+                  ))}
+                </div>
+              ) : null}
             </div>
 
             <div className="lg:border-l lg:border-white/10 lg:pl-6">
@@ -873,46 +932,39 @@ export function LandingPage() {
 
             <div id="footer-contacts" className="lg:border-l lg:border-white/10 lg:pl-6">
               <p className="text-sm font-medium text-violet-300">Контакты</p>
-              <ul className="mt-4 space-y-3 text-sm text-white/72">
-                <li className="flex items-center gap-2">
-                  <MailIcon className="h-4 w-4 text-violet-200" />
-                  <span>{eventData.contacts.email}</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <PhoneIcon className="h-4 w-4 text-violet-200" />
-                  <span>{eventData.contacts.phone}</span>
-                </li>
-              </ul>
+              {legalReady ? (
+                <ul className="mt-4 space-y-3 text-sm text-white/72">
+                  <li className="flex items-center gap-2">
+                    <MailIcon className="h-4 w-4 text-violet-200" />
+                    <a href={`mailto:${legalConfig.privacyEmail}`} className="transition hover:text-white">
+                      {legalConfig.privacyEmail}
+                    </a>
+                  </li>
+                </ul>
+              ) : (
+                <p className="mt-4 text-sm leading-7 text-white/62">
+                  Контакты организатора будут опубликованы до открытия регистрации следующего события.
+                </p>
+              )}
             </div>
 
             <div className="rounded-[28px] border border-white/10 bg-black/18 p-5 lg:border-l lg:border-white/10 lg:pl-6">
-              <p className="text-sm font-medium text-violet-300">
-                {eventData.footer.newsletterTitle}
-              </p>
+              <p className="text-sm font-medium text-violet-300">Следующее событие</p>
               <p className="mt-4 text-sm leading-7 text-white/68">
-                {eventData.footer.newsletterCopy}
+                Подписка на анонсы будет подключена вместе с новой датой. До этого момента мы не
+                показываем неработающую форму и не собираем email без готового контура согласий.
               </p>
-              <div className="mt-4 flex gap-2">
-                <input
-                  type="email"
-                  placeholder="Ваш email"
-                  className="field-input min-w-0 flex-1"
-                />
-                <button type="button" className="btn-primary px-5">
-                  <ArrowRightIcon className="h-4 w-4" />
-                </button>
-              </div>
             </div>
           </div>
 
           <div className="mt-8 flex flex-col gap-3 border-t border-white/8 pt-5 text-xs text-white/42 sm:flex-row sm:items-center sm:justify-between">
             <p>{eventData.footer.copyright}</p>
             <div className="flex flex-wrap gap-4">
-              <Link href="#" className="transition hover:text-white">
+              <Link href="/legal/privacy" className="transition hover:text-white">
                 {eventData.footer.policy}
               </Link>
               <span className="hidden h-4 w-px bg-white/14 sm:block" aria-hidden="true" />
-              <Link href="#" className="transition hover:text-white">
+              <Link href="/legal/offer" className="transition hover:text-white">
                 {eventData.footer.offer}
               </Link>
             </div>
@@ -922,4 +974,3 @@ export function LandingPage() {
     </main>
   );
 }
-
