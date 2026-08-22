@@ -30,13 +30,12 @@
 - [x] `package-lock.json` регенерирован штатным npm на GitHub-hosted runner.
 - [x] Dependency runner выполнил `npm ci`, lint, typecheck и build перед commit dependency-файлов.
 - [x] Одноразовый workflow с write-permission удален после выполнения задачи.
-- [x] Draft PR #1 создан; production не изменен.
+- [x] Vercel Preview на кодовом head прошел полный quality gate и получил статус `READY`.
+- [x] Draft PR #1 mergeable; production не изменен.
+- [x] Для дальнейшей технической реализации Codex/local runner не требуется: GitHub + Vercel используются как основной execution path.
 
-## Обязательные блокеры до merge / запуска
+## Что еще нужно перед публикацией следующего события
 
-- [ ] Получить зеленый Vercel Preview для текущего head PR #1 после dependency update.
-- [ ] Выполнить HTTP smoke-test архивного API и основных маршрутов на актуальном Preview.
-- [ ] Провести mobile/desktop visual regression актуального Preview.
 - [ ] Подтвердить новую дату, город, площадку, полный адрес и маршрут следующего события.
 - [ ] Создать новое событие с отдельным `event_id` и lifecycle `sales` только после подтверждения данных.
 - [ ] Заполнить реальные реквизиты оператора ПД и утвердить финальные юридические тексты.
@@ -44,8 +43,14 @@
 - [ ] Выполнить тестовую регистрацию будущего события end-to-end и проверить запись именно в primary storage.
 - [ ] Подключить брендовый production domain и установить `NEXT_PUBLIC_SITE_URL`.
 - [ ] Включать `NEXT_PUBLIC_INDEXING_ENABLED=true` только после проверки production domain/canonical.
-- [ ] Включить branch protection / required review для `main` в настройках GitHub, если это требуется политикой репозитория.
+- [ ] Провести mobile/desktop visual regression финального события.
+- [ ] Включить branch protection / required review для `main`, если это требуется политикой репозитория.
 
-## Merge policy
+## Решение по текущему production
 
-PR DC-01 остается Draft, пока технический preview gate не зеленый и пока не принято отдельное решение о том, какие launch-блокеры должны войти именно в этот PR, а какие относятся к созданию следующего события.
+Технически PR можно использовать в двух режимах:
+
+1. **Safe archive now** — смержить hardening и заменить устаревший продающий лендинг прошедшего события на безопасный архив.
+2. **Hold until next event** — оставить PR Draft и дополнить его данными следующей конференции перед публикацией.
+
+Ни один из этих вариантов не требует Codex. Выбор относится не к технической возможности, а к продуктовой стратегии публикации.
