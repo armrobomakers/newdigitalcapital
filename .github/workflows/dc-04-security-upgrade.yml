@@ -1,0 +1,121 @@
+name: DC-04 security remediation
+
+on:
+  push:
+    branches:
+      - stage/dc-04-launch-infrastructure-security
+    paths:
+      - .github/workflows/dc-04-security-upgrade.yml
+
+permissions:
+  contents: write
+
+jobs:
+  remediate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: stage/dc-04-launch-infrastructure-security
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Baseline install
+        run: npm ci
+      - name: Upgrade security-sensitive direct dependencies
+        run: |
+          npm install --save-exact next@16.3.2 eslint-config-next@16.3.2 postcss@8.5.26
+          npm audit fix
+      - name: Verify production audit
+        id: audit_prod
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          npm audit --omit=dev --audit-level=high 2>&1 | tee /tmp/audit-prod.txt
+      - name: Verify full audit
+        id: audit_all
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          npm audit --audit-level=high 2>&1 | tee /tmp/audit-all.txt
+      - name: Lint
+        id: lint
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run lint 2>&1 | tee /tmp/lint.txt
+      - name: Typecheck
+        id: typecheck
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run typecheck 2>&1 | tee /tmp/typecheck.txt
+      - name: Build
+        id: build
+        if: steps.lint.outcome == 'success' && steps.typecheck.outcome == 'success'
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run build 2>&1 | tee /tmp/build.txt
+      - name: Write remediation report
+        if: always()
+        env:
+          PROD_AUDIT: ${{ steps.audit_prod.outcome }}
+          FULL_AUDIT: ${{ steps.audit_all.outcome }}
+          LINT: ${{ steps.lint.outcome }}
+          TYPECHECK: ${{ steps.typecheck.outcome }}
+          BUILD: ${{ steps.build.outcome }}
+        run: |
+          mkdir -p docs
+          {
+            echo "# DC-04 Security Remediation Result"
+            echo
+            echo "- Source commit: \`$GITHUB_SHA\`"
+            echo "- next: \`$(node -p \"require('./node_modules/next/package.json').version\")\`"
+            echo "- postcss: \`$(node -p \"require('./node_modules/postcss/package.json').version\")\`"
+            echo "- production audit: **$PROD_AUDIT**"
+            echo "- full audit: **$FULL_AUDIT**"
+            echo "- lint: **$LINT**"
+            echo "- typecheck: **$TYPECHECK**"
+            echo "- build: **$BUILD**"
+            echo
+            echo "## Production audit"
+            echo '```text'
+            cat /tmp/audit-prod.txt 2>/dev/null || true
+            echo '```'
+            echo
+            echo "## Full audit"
+            echo '```text'
+            cat /tmp/audit-all.txt 2>/dev/null || true
+            echo '```'
+          } > docs/DC-04-SECURITY-RESULT.md
+      - name: Commit remediation
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json docs/DC-04-SECURITY-RESULT.md
+          git commit -m "security: remediate dependency advisories" || exit 0
+          git push origin HEAD:stage/dc-04-launch-infrastructure-security
+      - name: Enforce remediation
+        if: always()
+        env:
+          PROD_AUDIT: ${{ steps.audit_prod.outcome }}
+          FULL_AUDIT: ${{ steps.audit_all.outcome }}
+          LINT: ${{ steps.lint.outcome }}
+          TYPECHECK: ${{ steps.typecheck.outcome }}
+          BUILD: ${{ steps.build.outcome }}
+        run: |
+          test "$PROD_AUDIT" = "success"
+          test "$FULL_AUDIT" = "success"
+          test "$LINT" = "success"
+          test "$TYPECHECK" = "success"
+          test "$BUILD" = "success"
