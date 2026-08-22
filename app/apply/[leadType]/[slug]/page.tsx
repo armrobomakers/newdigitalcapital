@@ -4,7 +4,8 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 import { RegistrationForm } from "@/components/registration-form";
-import { getEventLifecycleBySlug, type LeadType } from "@/data/event-registry";
+import { getConferenceBySlug } from "@/data/conferences";
+import type { LeadType } from "@/data/event-registry";
 
 type ParamsValue =
   | { leadType: string; slug: string }
@@ -47,24 +48,26 @@ export default async function ApplyPage({ params }: { params: ParamsValue }) {
     notFound();
   }
 
-  const lifecycle = getEventLifecycleBySlug(slug);
-  if (!lifecycle || !lifecycle.pageReady) {
+  const conference = getConferenceBySlug(slug);
+  if (!conference || !conference.lifecycle.pageReady) {
     notFound();
   }
 
+  const { lifecycle, content } = conference;
   const copy = leadPageCopy[leadType];
 
   return (
     <main className="section-shell flex min-h-screen items-center py-16">
       <section className="mx-auto grid w-full max-w-5xl gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
         <div className="rounded-[32px] border border-white/10 bg-white/[0.04] p-6 shadow-soft backdrop-blur-2xl md:p-8">
-          <p className="text-sm uppercase tracking-[0.22em] text-violet-300">Цифровой капитал</p>
+          <p className="text-sm uppercase tracking-[0.22em] text-violet-300">{content.name}</p>
           <h1 className="mt-4 font-display text-5xl leading-[0.94] text-white md:text-7xl">
             {copy.title}
           </h1>
           <p className="mt-5 text-base leading-8 text-white/65">{copy.description}</p>
           <div className="mt-6 rounded-[22px] border border-white/10 bg-black/20 p-4 text-sm leading-7 text-white/60">
-            <p>Event ID: {lifecycle.id}</p>
+            <p>{content.dateLabel}</p>
+            <p>{content.cityLabel}</p>
             <p>Статус: {lifecycle.status}</p>
           </div>
           <Link href={`/${lifecycle.slug}`} className="btn-secondary mt-6 inline-flex">
