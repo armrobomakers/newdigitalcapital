@@ -4,6 +4,9 @@ on:
   push:
     branches: [stage/dc-04-launch-infrastructure-security]
     paths: [.github/workflows/dc-04-remediate.yml]
+  pull_request:
+    branches: [stage/dc-03-conference-engine]
+    paths: [.github/workflows/dc-04-remediate.yml]
 
 permissions:
   contents: write
