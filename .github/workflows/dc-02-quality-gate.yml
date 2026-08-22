@@ -1,4 +1,4 @@
-# Diagnostic DC-02 gate: captures command output into the branch report.
+# Diagnostic DC-02 gate rerun after lifecycle type fixes.
 name: DC-02 quality gate
 
 on:
