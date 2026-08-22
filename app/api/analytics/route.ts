@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { getEventLifecycle } from "@/data/event-registry";
 import { isConversionEventName } from "@/lib/conversion-events";
 
 type AnalyticsPayload = {
@@ -14,39 +15,94 @@ type AnalyticsPayload = {
 const MAX_BODY_BYTES = 8_192;
 const MAX_PROPERTIES = 20;
 const MAX_PROPERTY_LENGTH = 240;
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const RATE_LIMIT_MAX = 120;
+const RATE_LIMIT_MAX_KEYS = 5000;
+const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
 
 function clipString(value: unknown, maxLength: number) {
   return typeof value === "string" ? value.trim().slice(0, maxLength) : "";
 }
 
 function sanitizeProperties(value: unknown) {
+  const output: Record<string, string | number | boolean> = {};
   if (!value || typeof value !== "object" || Array.isArray(value)) {
-    return {};
+    return output;
   }
 
-  return Object.fromEntries(
-    Object.entries(value as Record<string, unknown>)
-      .slice(0, MAX_PROPERTIES)
-      .map(([key, propertyValue]) => {
-        const safeKey = key.replace(/[^a-z0-9_\-]/gi, "").slice(0, 64);
-        if (!safeKey) {
-          return null;
-        }
+  for (const [key, propertyValue] of Object.entries(value as Record<string, unknown>).slice(
+    0,
+    MAX_PROPERTIES
+  )) {
+    const safeKey = key.replace(/[^a-z0-9_\-]/gi, "").slice(0, 64);
+    if (!safeKey) {
+      continue;
+    }
 
-        if (typeof propertyValue === "boolean" || typeof propertyValue === "number") {
-          return [safeKey, propertyValue] as const;
-        }
+    if (typeof propertyValue === "boolean" || typeof propertyValue === "number") {
+      output[safeKey] = propertyValue;
+      continue;
+    }
 
-        return [safeKey, clipString(propertyValue, MAX_PROPERTY_LENGTH)] as const;
-      })
-      .filter((entry): entry is readonly [string, string | number | boolean] => Boolean(entry))
+    output[safeKey] = clipString(propertyValue, MAX_PROPERTY_LENGTH);
+  }
+
+  return output;
+}
+
+function getClientIp(request: Request) {
+  return (
+    request.headers.get("x-real-ip") ??
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    "unknown"
   );
+}
+
+function pruneRateLimitStore(now: number) {
+  if (rateLimitStore.size < RATE_LIMIT_MAX_KEYS) {
+    return;
+  }
+
+  for (const [key, value] of rateLimitStore) {
+    if (value.resetAt <= now) {
+      rateLimitStore.delete(key);
+    }
+  }
+
+  if (rateLimitStore.size >= RATE_LIMIT_MAX_KEYS) {
+    const oldestKey = rateLimitStore.keys().next().value as string | undefined;
+    if (oldestKey) {
+      rateLimitStore.delete(oldestKey);
+    }
+  }
+}
+
+function isRateLimited(ip: string) {
+  const now = Date.now();
+  pruneRateLimitStore(now);
+  const current = rateLimitStore.get(ip);
+
+  if (!current || current.resetAt <= now) {
+    rateLimitStore.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return false;
+  }
+
+  if (current.count >= RATE_LIMIT_MAX) {
+    return true;
+  }
+
+  current.count += 1;
+  return false;
 }
 
 export async function POST(request: Request) {
   const contentLength = Number(request.headers.get("content-length") ?? "0");
   if (Number.isFinite(contentLength) && contentLength > MAX_BODY_BYTES) {
     return NextResponse.json({ accepted: false, error: "payload_too_large" }, { status: 413 });
+  }
+
+  if (isRateLimited(getClientIp(request))) {
+    return NextResponse.json({ accepted: false, error: "rate_limited" }, { status: 429 });
   }
 
   let data: AnalyticsPayload;
@@ -64,6 +120,10 @@ export async function POST(request: Request) {
   const sessionId = clipString(data.session_id, 80);
   if (!eventId || !sessionId) {
     return NextResponse.json({ accepted: false, error: "missing_event_context" }, { status: 400 });
+  }
+
+  if (!getEventLifecycle(eventId)) {
+    return NextResponse.json({ accepted: false, error: "unknown_event" }, { status: 404 });
   }
 
   const event = {
