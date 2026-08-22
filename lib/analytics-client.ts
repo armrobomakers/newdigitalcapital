@@ -44,7 +44,7 @@ export function trackConversionEvent(
     event_name: eventName,
     event_id: eventId,
     session_id: getSessionId(),
-    path: `${window.location.pathname}${window.location.search}`,
+    path: window.location.pathname,
     occurred_at: new Date().toISOString(),
     properties: {
       ...getUtm(),
