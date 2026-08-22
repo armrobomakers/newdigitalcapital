@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 
-import { getEventLifecycle, isRegistrationOpen } from "@/data/event-registry";
+import {
+  getEventLifecycle,
+  isLeadCaptureOpen,
+  type LeadType,
+} from "@/data/event-registry";
 import { isLegalConfigReady } from "@/lib/legal";
 
 type RegistrationPayload = {
@@ -26,6 +30,7 @@ type NormalizedPayload = ReturnType<typeof normalizePayload>;
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_MAX = 5;
 const RATE_LIMIT_MAX_KEYS = 5000;
+const leadTypes = new Set<LeadType>(["attendee", "partner", "speaker", "media"]);
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
 
 function toStringValue(value: FormDataEntryValue | undefined) {
@@ -100,10 +105,13 @@ function escapeHtml(value: string) {
     .replaceAll("'", "&#039;");
 }
 
+function isLeadType(value: string): value is LeadType {
+  return leadTypes.has(value as LeadType);
+}
+
 function isPayloadValid(payload: NormalizedPayload) {
   const phoneDigits = payload.phone.replace(/\D/g, "");
   const eventIdValid = /^[a-z0-9][a-z0-9-]{2,79}$/i.test(payload.event_id);
-  const leadTypeValid = ["attendee", "partner", "speaker", "media"].includes(payload.lead_type);
 
   return (
     payload.name.length >= 2 &&
@@ -111,7 +119,7 @@ function isPayloadValid(payload: NormalizedPayload) {
     phoneDigits.length >= 7 &&
     payload.privacy_consent &&
     eventIdValid &&
-    leadTypeValid
+    isLeadType(payload.lead_type)
   );
 }
 
@@ -264,7 +272,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true, message: "registration_received" });
   }
 
-  if (!isPayloadValid(payload)) {
+  if (!isPayloadValid(payload) || !isLeadType(payload.lead_type)) {
     return NextResponse.json({ ok: false, error: "invalid_required_fields" }, { status: 400 });
   }
 
@@ -273,8 +281,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "unknown_event" }, { status: 404 });
   }
 
-  if (!isRegistrationOpen(payload.event_id)) {
-    return NextResponse.json({ ok: false, error: "registration_closed" }, { status: 409 });
+  if (!isLeadCaptureOpen(payload.event_id, payload.lead_type)) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: payload.lead_type === "attendee" ? "registration_closed" : "lead_capture_closed",
+      },
+      { status: 409 }
+    );
   }
 
   if (!isLegalConfigReady()) {
