@@ -6,7 +6,9 @@
     "dev": "next dev -p 7485 -H 0.0.0.0",
     "build": "next build",
     "start": "next start -p 7485 -H 0.0.0.0",
-    "lint": "next lint"
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run lint && npm run typecheck && npm run build"
   },
   "dependencies": {
     "next": "^16.2.9",
