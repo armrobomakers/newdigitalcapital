@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 import { BriefcaseIcon, MailIcon, PhoneIcon, UserIcon } from "@/components/icons";
+import { isRegistrationOpen } from "@/data/event-registry";
 
 const utmKeys = [
   "utm_source",
@@ -29,6 +30,7 @@ export function RegistrationForm({
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState("");
+  const registrationOpen = isRegistrationOpen(eventId);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -65,6 +67,21 @@ export function RegistrationForm({
         "Не удалось подтвердить сохранение заявки. Проверьте соединение и попробуйте еще раз."
       );
     }
+  }
+
+  if (!registrationOpen) {
+    return (
+      <div className="rounded-[24px] border border-violet-300/20 bg-white/[0.035] p-5">
+        <p className="text-lg font-semibold text-white">Регистрация на эту конференцию завершена</p>
+        <p className="mt-2 text-sm leading-7 text-white/65">
+          Страница сохранена как архив события. Новая дата и площадка будут опубликованы после
+          подтверждения следующей конференции.
+        </p>
+        <Link href="#program" className="btn-secondary mt-4 inline-flex">
+          Смотреть программу прошедшего события
+        </Link>
+      </div>
+    );
   }
 
   return (
