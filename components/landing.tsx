@@ -170,6 +170,7 @@ function HeroVisual({ eventData }: { eventData: EventData }) {
         alt=""
         fill
         priority
+        sizes="(min-width: 1024px) 46vw, 100vw"
         className="object-cover object-center"
       />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_22%,rgba(124,60,255,0.12),transparent_24%),radial-gradient(circle_at_82%_18%,rgba(178,133,255,0.08),transparent_22%),linear-gradient(90deg,rgba(4,3,13,0.28)_0%,rgba(4,3,13,0.18)_42%,rgba(4,3,13,0.08)_68%,rgba(4,3,13,0.18)_100%)]" />
@@ -190,7 +191,7 @@ function SpeakerCard({ speaker, index }: { speaker: Speaker; index: number }) {
             src={speakerImageSrc}
             alt={speaker.name}
             fill
-            unoptimized
+            sizes="(min-width: 1024px) 270px, (min-width: 640px) 45vw, 90vw"
             className="object-cover"
           />
         </div>
@@ -363,7 +364,13 @@ function FAQItem({ item, index }: { item: { question: string; answer: string }; 
 function MapCardExact({ eventData }: { eventData: EventData }) {
   return (
     <div className="relative min-h-[360px] overflow-hidden rounded-[32px] border border-white/10 bg-[#07061a] shadow-soft">
-      <Image src={eventData.assets.mapImage} alt="" fill className="object-cover object-center" />
+      <Image
+        src={eventData.assets.mapImage}
+        alt=""
+        fill
+        sizes="(min-width: 1024px) 52vw, 100vw"
+        className="object-cover object-center"
+      />
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,3,13,0.08)_0%,rgba(4,3,13,0.06)_22%,rgba(4,3,13,0.15)_58%,rgba(4,3,13,0.42)_100%)]" />
       <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#050411] to-transparent" />
       <div className="absolute left-5 bottom-5 rounded-[22px] border border-white/10 bg-black/40 px-4 py-3 backdrop-blur-xl">
@@ -455,10 +462,14 @@ function ClosedEventCard({ eventData }: { eventData: EventData }) {
 
 function PartnerVisualExact({ eventData }: { eventData: EventData }) {
   return (
-    <div
-      className="relative min-h-[260px] overflow-hidden rounded-[32px] border border-white/10 bg-[#07061a] bg-cover bg-center shadow-soft"
-      style={{ backgroundImage: `url('${eventData.assets.partnerImage}')` }}
-    >
+    <div className="relative min-h-[260px] overflow-hidden rounded-[32px] border border-white/10 bg-[#07061a] shadow-soft">
+      <Image
+        src={eventData.assets.partnerImage}
+        alt=""
+        fill
+        sizes="(min-width: 1024px) 50vw, 100vw"
+        className="object-cover object-center"
+      />
       <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(4,3,13,0.14)_0%,rgba(4,3,13,0.04)_40%,rgba(4,3,13,0.18)_100%)]" />
     </div>
   );
@@ -472,20 +483,30 @@ export function LandingPage({ eventData }: { eventData: EventData }) {
   const legalReady = isLegalConfigReady();
   const activeSocials = eventData.socials.filter((social) => social.href && social.href !== "#");
   return (
-    <main className="relative pb-24 md:pb-0">
+    <main id="main-content" className="relative pb-24 md:pb-0">
+      <Link
+        href="#content-start"
+        className="fixed left-4 top-4 z-[100] -translate-y-24 rounded-full bg-white px-4 py-2 text-sm font-semibold text-black transition focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-violet-300"
+      >
+        Перейти к содержанию
+      </Link>
       <StickyCTA eventData={eventData} />
 
-      <section className="section-shell pt-1 md:pt-3">
+      <section id="content-start" className="section-shell pt-1 md:pt-3">
         <div className="relative p-0 md:pt-1">
           <header className="flex items-center justify-between gap-4">
-            <Link href="#top" className="inline-flex items-center gap-3">
+            <Link
+              href="#top"
+              aria-label="Цифровой капитал — начало страницы"
+              className="inline-flex items-center gap-3"
+            >
               <div>
                 <span className="block font-display text-[22px] leading-none text-white">Цифровой</span>
                 <span className="block font-display text-[22px] leading-none text-white">капитал</span>
               </div>
             </Link>
 
-            <nav className="hidden items-center gap-1 lg:flex">
+            <nav aria-label="Основная навигация" className="hidden items-center gap-1 lg:flex">
               {eventData.navItems.map((item) => (
                 <Link
                   key={item.href}
@@ -496,6 +517,25 @@ export function LandingPage({ eventData }: { eventData: EventData }) {
                 </Link>
               ))}
             </nav>
+
+            <details className="relative lg:hidden">
+              <summary className="cursor-pointer list-none rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-semibold text-white/90 outline-none transition hover:bg-white/[0.07] focus-visible:ring-2 focus-visible:ring-violet-200">
+                Меню
+              </summary>
+              <div className="absolute right-0 top-[calc(100%+0.75rem)] z-50 min-w-[230px] rounded-[22px] border border-white/10 bg-[#0a081b]/95 p-2 shadow-soft backdrop-blur-2xl">
+                <nav aria-label="Мобильная навигация" className="flex flex-col">
+                  {eventData.navItems.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="rounded-[16px] px-4 py-3 text-sm text-white/78 transition hover:bg-white/[0.07] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-200"
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </nav>
+              </div>
+            </details>
 
             <Link
               href={registrationOpen ? "#register" : "#program"}
