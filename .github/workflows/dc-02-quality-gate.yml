@@ -1,3 +1,4 @@
+# Final DC-02 gate trigger after conversion foundation changes.
 name: DC-02 quality gate
 
 on:
