@@ -1,12 +1,13 @@
 "use client";
 
 import type { FormEvent } from "react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { BriefcaseIcon, MailIcon, PhoneIcon, UserIcon } from "@/components/icons";
 import { isRegistrationOpen } from "@/data/event-registry";
+import { trackConversionEvent } from "@/lib/analytics-client";
 
 const utmKeys = [
   "utm_source",
@@ -23,14 +24,31 @@ type RegistrationFormProps = {
   leadType?: "attendee" | "partner" | "speaker" | "media";
 };
 
+type RegistrationResult = {
+  ok?: boolean;
+  error?: string;
+  request_id?: string;
+};
+
 export function RegistrationForm({
   eventId = "ekb-2026-06-13",
   leadType = "attendee",
 }: RegistrationFormProps) {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState("");
+  const formStarted = useRef(false);
   const registrationOpen = isRegistrationOpen(eventId);
+
+  function handleFormFocus() {
+    if (formStarted.current) {
+      return;
+    }
+
+    formStarted.current = true;
+    trackConversionEvent("form_start", eventId, { lead_type: leadType });
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -41,6 +59,8 @@ export function RegistrationForm({
     const formData = new FormData(form);
     const payload = Object.fromEntries(formData.entries());
 
+    trackConversionEvent("lead_submit", eventId, { lead_type: leadType });
+
     try {
       const response = await fetch("/api/register", {
         method: "POST",
@@ -50,22 +70,41 @@ export function RegistrationForm({
         body: JSON.stringify(payload),
       });
 
-      const result = (await response.json().catch(() => null)) as
-        | { ok?: boolean; error?: string }
-        | null;
+      const result = (await response.json().catch(() => null)) as RegistrationResult | null;
 
-      if (!response.ok || !result?.ok) {
-        throw new Error(result?.error ?? "registration_failed");
+      if (!response.ok || !result?.ok || !result.request_id) {
+        const errorCode = result?.error ?? "registration_failed";
+        trackConversionEvent("form_error", eventId, {
+          lead_type: leadType,
+          error_code: errorCode,
+          http_status: response.status,
+        });
+        throw new Error(errorCode);
       }
 
       setStatus("success");
-      setMessage("Заявка принята. Мы свяжемся с вами по указанному контакту.");
-      form.reset();
-    } catch {
+      trackConversionEvent("lead_saved", eventId, {
+        lead_type: leadType,
+        request_id: result.request_id,
+      });
+
+      const params = new URLSearchParams({
+        event_id: eventId,
+        request_id: result.request_id,
+      });
+      router.push(`/thanks?${params.toString()}`);
+    } catch (error) {
       setStatus("error");
       setMessage(
         "Не удалось подтвердить сохранение заявки. Проверьте соединение и попробуйте еще раз."
       );
+
+      if (error instanceof TypeError) {
+        trackConversionEvent("form_error", eventId, {
+          lead_type: leadType,
+          error_code: "network_error",
+        });
+      }
     }
   }
 
@@ -77,7 +116,7 @@ export function RegistrationForm({
           Страница сохранена как архив события. Новая дата и площадка будут опубликованы после
           подтверждения следующей конференции.
         </p>
-        <Link href="#program" className="btn-secondary mt-4 inline-flex">
+        <Link href="#program" className="btn-secondary mt-4 inline-flex" data-analytics-cta="archive_program">
           Смотреть программу прошедшего события
         </Link>
       </div>
@@ -85,7 +124,7 @@ export function RegistrationForm({
   }
 
   return (
-    <form className="space-y-4" onSubmit={handleSubmit} noValidate={false}>
+    <form className="space-y-4" onSubmit={handleSubmit} onFocusCapture={handleFormFocus}>
       <input type="hidden" name="event_id" value={eventId} />
       <input type="hidden" name="lead_type" value={leadType} />
 
@@ -191,9 +230,9 @@ export function RegistrationForm({
       <button
         type="submit"
         className="btn-primary w-full justify-center disabled:cursor-not-allowed disabled:opacity-70"
-        disabled={status === "loading"}
+        disabled={status === "loading" || status === "success"}
       >
-        {status === "loading" ? "Отправляем..." : "Отправить заявку"}
+        {status === "loading" ? "Отправляем..." : status === "success" ? "Заявка сохранена" : "Отправить заявку"}
       </button>
 
       <p
