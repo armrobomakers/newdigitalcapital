@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { getConferenceIntegrity, listConferences } from "@/data/conferences";
+import { getEventSeoConfig } from "@/data/event-seo";
 import { isLegalConfigReady } from "@/lib/legal";
 
 export const dynamic = "force-dynamic";
@@ -15,6 +16,7 @@ export async function GET() {
     city: content.cityLabel,
     status: lifecycle.status,
     page_ready: lifecycle.pageReady,
+    structured_data_ready: getEventSeoConfig(lifecycle.id).structuredDataReady,
     lead_capture: lifecycle.leadCapture,
     starts_at: lifecycle.startsAt,
   }));
@@ -30,6 +32,13 @@ export async function GET() {
   const salesEventAvailable = events.some(
     (event) => event.page_ready && event.status === "sales" && event.lead_capture.attendee
   );
+  const salesEventStructuredDataReady = events.some(
+    (event) =>
+      event.page_ready &&
+      event.status === "sales" &&
+      event.lead_capture.attendee &&
+      event.structured_data_ready
+  );
   const partnerLeadAvailable = events.some(
     (event) => event.page_ready && event.status !== "past" && event.lead_capture.partner
   );
@@ -42,6 +51,7 @@ export async function GET() {
     branded_site_url: brandedSiteUrl,
     indexing_enabled: indexingEnabled,
     sales_event_available: salesEventAvailable,
+    sales_event_structured_data_ready: salesEventStructuredDataReady,
     partner_lead_available: partnerLeadAvailable,
     ready_for_registration:
       catalogReady && legalReady && leadStorageReady && salesEventAvailable,
@@ -52,7 +62,8 @@ export async function GET() {
       analyticsReady &&
       brandedSiteUrl &&
       indexingEnabled &&
-      salesEventAvailable,
+      salesEventAvailable &&
+      salesEventStructuredDataReady,
   };
 
   return NextResponse.json(
