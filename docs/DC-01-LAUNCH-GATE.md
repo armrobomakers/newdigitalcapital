@@ -20,48 +20,32 @@
 - [x] Canonical и OpenGraph metadata подготовлены.
 - [x] Favicon добавлен через `app/icon.svg`.
 - [x] Security headers добавлены; `X-Powered-By` отключен.
-- [x] `next lint` заменен на ESLint 9 flat config; добавлены `typecheck` и `check`.
+- [x] ESLint 9 flat config, `typecheck` и общий `check` добавлены.
+- [x] Vercel quality gate выполняет `npm ci` и `npm run check`.
 - [x] Неверифицированная площадка и маршрут скрыты.
 - [x] Неподтвержденные `500+ / 40+ / 20+` и placeholder-партнеры удалены из архивных данных.
 - [x] Placeholder контакты, пустые соцсети и нерабочая newsletter-форма скрыты.
+- [x] Next.js обновлен с 16.2.9 до 16.2.12.
+- [x] `eslint-config-next` обновлен до 16.2.12.
+- [x] `package-lock.json` регенерирован штатным npm на GitHub-hosted runner.
+- [x] Dependency runner выполнил `npm ci`, lint, typecheck и build перед commit dependency-файлов.
+- [x] Одноразовый workflow с write-permission удален после выполнения задачи.
 - [x] Draft PR #1 создан; production не изменен.
-- [x] Первый актуальный Vercel preview дошел до TypeScript gate; найденный `never` для пустого partner list исправлен без отключения проверки.
 
 ## Обязательные блокеры до merge / запуска
 
-- [ ] Получить зеленый Vercel preview для текущего head PR #1.
-- [ ] Обновить `next` и `eslint-config-next` с 16.2.9 до 16.2.12 и регенерировать `package-lock.json` штатным npm.
-- [ ] Выполнить `npm ci` и `npm run check` на машине с доступом к npm registry.
-- [ ] Подтвердить новую дату, город, площадку, полный адрес и маршрут.
+- [ ] Получить зеленый Vercel Preview для текущего head PR #1 после dependency update.
+- [ ] Выполнить HTTP smoke-test архивного API и основных маршрутов на актуальном Preview.
+- [ ] Провести mobile/desktop visual regression актуального Preview.
+- [ ] Подтвердить новую дату, город, площадку, полный адрес и маршрут следующего события.
 - [ ] Создать новое событие с отдельным `event_id` и lifecycle `sales` только после подтверждения данных.
 - [ ] Заполнить реальные реквизиты оператора ПД и утвердить финальные юридические тексты.
 - [ ] Подключить утвержденный production backend к `LEAD_STORAGE_WEBHOOK_URL`.
-- [ ] Выполнить тестовую регистрацию end-to-end и проверить запись именно в primary storage.
+- [ ] Выполнить тестовую регистрацию будущего события end-to-end и проверить запись именно в primary storage.
 - [ ] Подключить брендовый production domain и установить `NEXT_PUBLIC_SITE_URL`.
 - [ ] Включать `NEXT_PUBLIC_INDEXING_ENABLED=true` только после проверки production domain/canonical.
-- [ ] Провести mobile/desktop visual regression и проверить все CTA/links.
-- [ ] Включить branch protection / required review для `main` в настройках GitHub (текущий коннектор не предоставляет mutation для branch protection).
-
-## Dependency/security gate
-
-Полное задание находится в `docs/DC-01-LOCAL-RUNNER-TASK.md`.
-
-Ключевые команды:
-
-```bash
-git checkout stage/dc-01-prelaunch-hardening
-git pull --ff-only origin stage/dc-01-prelaunch-hardening
-npm install --save-exact next@16.2.12
-npm install --save-dev --save-exact eslint-config-next@16.2.12
-rm -rf node_modules .next
-npm ci
-npm run lint
-npm run typecheck
-npm run build
-```
-
-Не редактировать integrity hashes в `package-lock.json` вручную.
+- [ ] Включить branch protection / required review для `main` в настройках GitHub, если это требуется политикой репозитория.
 
 ## Merge policy
 
-PR DC-01 остается Draft, пока каждый обязательный блокер выше не закрыт или не перенесен в отдельный явно утвержденный launch gate.
+PR DC-01 остается Draft, пока технический preview gate не зеленый и пока не принято отдельное решение о том, какие launch-блокеры должны войти именно в этот PR, а какие относятся к созданию следующего события.
