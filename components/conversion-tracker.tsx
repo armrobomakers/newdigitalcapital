@@ -57,7 +57,8 @@ export function ConversionTracker({ eventId }: { eventId: string }) {
         return;
       }
 
-      const cta = explicitCta ?? normalizeCtaLabel(target.textContent ?? "") || "unknown";
+      const inferredCta = normalizeCtaLabel(target.textContent ?? "");
+      const cta = explicitCta ?? (inferredCta || "unknown");
       trackConversionEvent("cta_click", eventId, {
         cta,
         destination: href || "button",
