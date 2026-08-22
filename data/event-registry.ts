@@ -8,6 +8,7 @@ export type EventLifecycle = {
   slug: string;
   status: EventLifecycleStatus;
   startsAt: string;
+  pageReady: boolean;
   leadCapture: LeadCaptureRules;
 };
 
@@ -17,6 +18,7 @@ export const eventRegistry = {
     slug: "ekb",
     status: "past",
     startsAt: "2026-06-13T12:00:00+05:00",
+    pageReady: true,
     leadCapture: {
       attendee: false,
       partner: false,
@@ -38,7 +40,7 @@ export function getEventLifecycleBySlug(slug: string): EventLifecycle | null {
 
 export function isLeadCaptureOpen(eventId: string, leadType: LeadType) {
   const event = getEventLifecycle(eventId);
-  if (!event) {
+  if (!event || !event.pageReady) {
     return false;
   }
 
