@@ -3,6 +3,7 @@ import {
   getEventLifecycleBySlug,
   listEventLifecycles,
   type EventLifecycle,
+  type EventLifecycleStatus,
 } from "@/data/event-registry";
 import {
   getEventContent,
@@ -58,6 +59,26 @@ export function listPageReadyConferences(): ConferenceRecord[] {
   return listConferences().filter((conference) => conference.lifecycle.pageReady);
 }
 
+export function getPrimaryConference(): ConferenceRecord | null {
+  const priority: EventLifecycleStatus[] = ["sales", "scheduled", "sold_out", "past", "draft"];
+  const conferences = listPageReadyConferences();
+
+  for (const status of priority) {
+    const match = conferences
+      .filter((conference) => conference.lifecycle.status === status)
+      .sort(
+        (left, right) =>
+          Date.parse(right.lifecycle.startsAt) - Date.parse(left.lifecycle.startsAt)
+      )[0];
+
+    if (match) {
+      return match;
+    }
+  }
+
+  return null;
+}
+
 export function getConferenceIntegrity(): ConferenceIntegrityRecord[] {
   const lifecycleById = new Map(listEventLifecycles().map((event) => [event.id, event]));
   const contentById = new Map(listEventContent().map((event) => [event.eventId, event]));
@@ -105,3 +126,6 @@ export function assertConferenceCatalog() {
     throw new Error(`conference_catalog_invalid:${errors.join(",")}`);
   }
 }
+
+// Fail fast in every environment, including previews with indexing disabled.
+assertConferenceCatalog();
