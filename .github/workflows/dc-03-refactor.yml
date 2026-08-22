@@ -1,3 +1,4 @@
+# Rerun after route and sticky CTA consumers moved to the catalog.
 name: DC-03 event-driven refactor
 
 on:
