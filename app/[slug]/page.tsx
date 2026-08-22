@@ -3,15 +3,17 @@ import { notFound } from "next/navigation";
 
 import { ConversionTracker } from "@/components/conversion-tracker";
 import { LandingPage } from "@/components/landing";
-import { getEventLifecycleBySlug, listEventLifecycles } from "@/data/event-registry";
-import { getEventContentBySlug } from "@/data/events";
+import {
+  assertConferenceCatalog,
+  getConferenceBySlug,
+  listPageReadyConferences,
+} from "@/data/conferences";
 
 type ParamsValue = { slug: string } | Promise<{ slug: string }>;
 
 export function generateStaticParams() {
-  return listEventLifecycles()
-    .filter((event) => event.pageReady && Boolean(getEventContentBySlug(event.slug)))
-    .map((event) => ({ slug: event.slug }));
+  assertConferenceCatalog();
+  return listPageReadyConferences().map(({ lifecycle }) => ({ slug: lifecycle.slug }));
 }
 
 export async function generateMetadata({
@@ -20,10 +22,9 @@ export async function generateMetadata({
   params: ParamsValue;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const lifecycle = getEventLifecycleBySlug(slug);
-  const eventData = getEventContentBySlug(slug);
+  const conference = getConferenceBySlug(slug);
 
-  if (!lifecycle || !lifecycle.pageReady || !eventData || eventData.eventId !== lifecycle.id) {
+  if (!conference || !conference.lifecycle.pageReady) {
     return {
       robots: {
         index: false,
@@ -32,6 +33,7 @@ export async function generateMetadata({
     };
   }
 
+  const { lifecycle, content: eventData } = conference;
   const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://digitalcapital.vercel.app").replace(
     /\/$/,
     ""
@@ -76,12 +78,13 @@ export default async function EventPage({
   params: ParamsValue;
 }) {
   const { slug } = await params;
-  const lifecycle = getEventLifecycleBySlug(slug);
-  const eventData = getEventContentBySlug(slug);
+  const conference = getConferenceBySlug(slug);
 
-  if (!lifecycle || !lifecycle.pageReady || !eventData || eventData.eventId !== lifecycle.id) {
+  if (!conference || !conference.lifecycle.pageReady) {
     notFound();
   }
+
+  const { lifecycle, content: eventData } = conference;
 
   return (
     <>
