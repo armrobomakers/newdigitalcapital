@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { ConversionTracker } from "@/components/conversion-tracker";
+import { EventStructuredData } from "@/components/event-structured-data";
 import { LandingPage } from "@/components/landing";
 import {
   assertConferenceCatalog,
@@ -42,6 +43,7 @@ export async function generateMetadata({
   const indexPage = Boolean(indexingEnabled && lifecycle.status !== "draft");
   const canonical = `${siteUrl}/${slug}`;
   const title = `${eventData.name} — конференция о бизнесе, инвестициях и AI`;
+  const socialImage = `${siteUrl}${eventData.assets.heroImage}`;
 
   return {
     title,
@@ -62,12 +64,18 @@ export async function generateMetadata({
       description: eventData.subtitle,
       images: [
         {
-          url: `${siteUrl}${eventData.assets.heroImage}`,
+          url: socialImage,
           width: 1200,
           height: 630,
           alt: eventData.name,
         },
       ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description: eventData.subtitle,
+      images: [socialImage],
     },
   };
 }
@@ -88,6 +96,7 @@ export default async function EventPage({
 
   return (
     <>
+      <EventStructuredData eventData={eventData} />
       <ConversionTracker eventId={lifecycle.id} />
       <LandingPage eventData={eventData} />
     </>
