@@ -22,11 +22,14 @@
 - [x] Security headers добавлены; `X-Powered-By` отключен.
 - [x] `next lint` заменен на ESLint 9 flat config; добавлены `typecheck` и `check`.
 - [x] Неверифицированная площадка и маршрут скрыты.
+- [x] Неподтвержденные `500+ / 40+ / 20+` и placeholder-партнеры удалены из архивных данных.
 - [x] Placeholder контакты, пустые соцсети и нерабочая newsletter-форма скрыты.
 - [x] Draft PR #1 создан; production не изменен.
+- [x] Первый актуальный Vercel preview дошел до TypeScript gate; найденный `never` для пустого partner list исправлен без отключения проверки.
 
 ## Обязательные блокеры до merge / запуска
 
+- [ ] Получить зеленый Vercel preview для текущего head PR #1.
 - [ ] Обновить `next` и `eslint-config-next` с 16.2.9 до 16.2.12 и регенерировать `package-lock.json` штатным npm.
 - [ ] Выполнить `npm ci` и `npm run check` на машине с доступом к npm registry.
 - [ ] Подтвердить новую дату, город, площадку, полный адрес и маршрут.
