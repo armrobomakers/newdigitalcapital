@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { ConversionTracker } from "@/components/conversion-tracker";
 import { LandingPage } from "@/components/landing";
 import { getEventLifecycleBySlug } from "@/data/event-registry";
 import { eventData } from "@/data/events";
@@ -72,5 +73,15 @@ export default async function EventPage({
     notFound();
   }
 
-  return <LandingPage />;
+  const lifecycle = getEventLifecycleBySlug(slug);
+  if (!lifecycle) {
+    notFound();
+  }
+
+  return (
+    <>
+      <ConversionTracker eventId={lifecycle.id} />
+      <LandingPage />
+    </>
+  );
 }
