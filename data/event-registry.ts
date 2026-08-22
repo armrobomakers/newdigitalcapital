@@ -24,6 +24,10 @@ export function getEventLifecycle(eventId: string): EventLifecycle | null {
   return eventRegistry[eventId as EventId] ?? null;
 }
 
+export function getEventLifecycleBySlug(slug: string): EventLifecycle | null {
+  return Object.values(eventRegistry).find((event) => event.slug === slug) ?? null;
+}
+
 export function isRegistrationOpen(eventId: string) {
   const event = getEventLifecycle(eventId);
   return Boolean(event?.registrationOpen && event.status === "sales");
