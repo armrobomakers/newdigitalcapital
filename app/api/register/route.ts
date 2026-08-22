@@ -25,6 +25,7 @@ type NormalizedPayload = ReturnType<typeof normalizePayload>;
 
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_MAX = 5;
+const RATE_LIMIT_MAX_KEYS = 5000;
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
 
 function toStringValue(value: FormDataEntryValue | undefined) {
@@ -122,8 +123,28 @@ function getClientIp(request: Request) {
   );
 }
 
+function pruneRateLimitStore(now: number) {
+  if (rateLimitStore.size < RATE_LIMIT_MAX_KEYS) {
+    return;
+  }
+
+  for (const [key, value] of rateLimitStore) {
+    if (value.resetAt <= now) {
+      rateLimitStore.delete(key);
+    }
+  }
+
+  if (rateLimitStore.size >= RATE_LIMIT_MAX_KEYS) {
+    const oldestKey = rateLimitStore.keys().next().value as string | undefined;
+    if (oldestKey) {
+      rateLimitStore.delete(oldestKey);
+    }
+  }
+}
+
 function isRateLimited(ip: string) {
   const now = Date.now();
+  pruneRateLimitStore(now);
   const current = rateLimitStore.get(ip);
 
   if (!current || current.resetAt <= now) {
@@ -139,12 +160,65 @@ function isRateLimited(ip: string) {
   return false;
 }
 
+function buildStoredPayload(payload: NormalizedPayload, requestId: string) {
+  return {
+    ...payload,
+    website: undefined,
+    request_id: requestId,
+    submitted_at: new Date().toISOString(),
+    source: "newdigitalcapital",
+  };
+}
+
+async function postJsonWebhook(url: string, body: unknown, errorPrefix: string) {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error(`${errorPrefix}:${response.status}`);
+  }
+}
+
+async function postToPrimaryStorage(payload: NormalizedPayload, requestId: string) {
+  const webhook = process.env.LEAD_STORAGE_WEBHOOK_URL;
+
+  if (!webhook) {
+    throw new Error("primary_storage_not_configured");
+  }
+
+  await postJsonWebhook(
+    webhook,
+    buildStoredPayload(payload, requestId),
+    "primary_storage_delivery_failed"
+  );
+}
+
+async function postToSheetsMirror(payload: NormalizedPayload, requestId: string) {
+  const webhook = process.env.GOOGLE_SHEETS_WEBHOOK_URL;
+
+  if (!webhook) {
+    return;
+  }
+
+  await postJsonWebhook(
+    webhook,
+    buildStoredPayload(payload, requestId),
+    "sheets_mirror_delivery_failed"
+  );
+}
+
 async function postToTelegram(message: string) {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
 
   if (!token || !chatId) {
-    return { configured: false, delivered: false };
+    return;
   }
 
   const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
@@ -164,36 +238,6 @@ async function postToTelegram(message: string) {
   if (!response.ok) {
     throw new Error(`telegram_delivery_failed:${response.status}`);
   }
-
-  return { configured: true, delivered: true };
-}
-
-async function postToSheets(payload: NormalizedPayload, requestId: string) {
-  const webhook = process.env.GOOGLE_SHEETS_WEBHOOK_URL;
-
-  if (!webhook) {
-    return { configured: false, delivered: false };
-  }
-
-  const response = await fetch(webhook, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      ...payload,
-      request_id: requestId,
-      submitted_at: new Date().toISOString(),
-      source: "newdigitalcapital",
-    }),
-    cache: "no-store",
-  });
-
-  if (!response.ok) {
-    throw new Error(`sheets_delivery_failed:${response.status}`);
-  }
-
-  return { configured: true, delivered: true };
 }
 
 export async function POST(request: Request) {
@@ -240,11 +284,11 @@ export async function POST(request: Request) {
     );
   }
 
-  const sheetsConfigured = Boolean(process.env.GOOGLE_SHEETS_WEBHOOK_URL);
-  const telegramConfigured = Boolean(process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_CHAT_ID);
-
-  if (!sheetsConfigured && !telegramConfigured) {
-    return NextResponse.json({ ok: false, error: "registration_storage_unavailable" }, { status: 503 });
+  if (!process.env.LEAD_STORAGE_WEBHOOK_URL) {
+    return NextResponse.json(
+      { ok: false, error: "primary_storage_unavailable" },
+      { status: 503 }
+    );
   }
 
   const requestId = crypto.randomUUID();
@@ -270,25 +314,14 @@ export async function POST(request: Request) {
     .filter(Boolean)
     .join("\n");
 
-  const [sheetsResult, telegramResult] = await Promise.allSettled([
-    postToSheets(payload, requestId),
-    postToTelegram(message),
-  ]);
-
-  const sheetsDelivered = sheetsResult.status === "fulfilled" && sheetsResult.value.delivered;
-  const telegramDelivered = telegramResult.status === "fulfilled" && telegramResult.value.delivered;
-
-  // Google Sheets is treated as primary storage when configured. Telegram is only an
-  // operational notification/fallback and must never mask a failed primary write.
-  const delivered = sheetsConfigured ? sheetsDelivered : telegramDelivered;
-
-  if (!delivered) {
-    console.error("registration_delivery_failed", {
+  try {
+    await postToPrimaryStorage(payload, requestId);
+  } catch (error) {
+    console.error("registration_primary_storage_failed", {
       requestId,
       eventId: payload.event_id,
       leadType: payload.lead_type,
-      sheets: sheetsResult.status,
-      telegram: telegramResult.status,
+      error: error instanceof Error ? error.message : "unknown_error",
     });
 
     return NextResponse.json(
@@ -297,10 +330,17 @@ export async function POST(request: Request) {
     );
   }
 
-  if (sheetsConfigured && telegramConfigured && !telegramDelivered) {
-    console.warn("registration_notification_failed", {
+  const [sheetsResult, telegramResult] = await Promise.allSettled([
+    postToSheetsMirror(payload, requestId),
+    postToTelegram(message),
+  ]);
+
+  if (sheetsResult.status === "rejected" || telegramResult.status === "rejected") {
+    console.warn("registration_auxiliary_delivery_failed", {
       requestId,
       eventId: payload.event_id,
+      sheets: sheetsResult.status,
+      telegram: telegramResult.status,
     });
   }
 
