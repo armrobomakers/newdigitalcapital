@@ -29,6 +29,7 @@ export type ProgramItem = {
   speaker: string;
   note?: string;
   icon?: "calendar" | "spark" | "business" | "invest" | "network" | "ticket";
+  accent?: "featured" | "final";
 };
 
 export type PartnerItem = {
@@ -46,7 +47,75 @@ export type SocialItem = {
   short: string;
 };
 
-export const eventData = {
+export type EventData = {
+  eventId: string;
+  slug: string;
+  name: string;
+  badge: string;
+  subtitle: string;
+  heroCta: string;
+  programCta: string;
+  dateLabel: string;
+  timeLabel: string;
+  cityLabel: string;
+  venueLabel: string;
+  formatLabel: string;
+  assets: {
+    heroImage: string;
+    mapImage: string;
+    partnerImage: string;
+  };
+  navItems: NavItem[];
+  stats: StatItem[];
+  audience: AudienceItem[];
+  speakers: Speaker[];
+  program: ProgramItem[];
+  registration: {
+    title: string;
+    lead: string;
+    ticketTitle: string;
+    price: string;
+    priceCaption: string;
+    note: string;
+    benefits: string[];
+    formTitle: string;
+    formLead: string;
+  };
+  partners: PartnerItem[];
+  partnersLead: string;
+  partnersCta: string;
+  partnersLabel: string;
+  faq: FaqItem[];
+  location: {
+    verified: boolean;
+    venue: string;
+    address: string;
+    note: string;
+    advantages: string[];
+    routeUrl: string;
+  };
+  footer: {
+    ctaTitle: string;
+    ctaCopy: string;
+    ctaButton: string;
+    about: string;
+    participantTitle: string;
+    participantLinks: NavItem[];
+    newsletterTitle: string;
+    newsletterCopy: string;
+    copyright: string;
+    policy: string;
+    offer: string;
+  };
+  contacts: {
+    email: string;
+    phone: string;
+  };
+  socials: SocialItem[];
+};
+
+const ekbArchiveEvent: EventData = {
+  eventId: "ekb-2026-06-13",
   slug: "ekb",
   name: "Цифровой капитал",
   badge: "Конференция о бизнесе, инвестициях и искусственном интеллекте",
@@ -59,6 +128,11 @@ export const eventData = {
   cityLabel: "Екатеринбург",
   venueLabel: "площадка требует верификации",
   formatLabel: "Формат участия",
+  assets: {
+    heroImage: "/hero-stage-3.png",
+    mapImage: "/location-map.png",
+    partnerImage: "/partner-handshake.png",
+  },
   navItems: [
     { label: "Программа", href: "#program" },
     { label: "Спикеры", href: "#speakers" },
@@ -66,13 +140,13 @@ export const eventData = {
     { label: "Партнеры", href: "#partners" },
     { label: "Локация", href: "#location" },
     { label: "FAQ", href: "#faq" },
-  ] satisfies NavItem[],
+  ],
   stats: [
     { value: "3", label: "спикера в опубликованной программе" },
     { value: "5", label: "часов основной программы" },
     { value: "1", label: "панельная дискуссия" },
     { value: "1", label: "город — Екатеринбург" },
-  ] satisfies StatItem[],
+  ],
   audience: [
     {
       title: "Предпринимателям",
@@ -104,7 +178,7 @@ export const eventData = {
         "Для партнеров, команд и компаний, которым важны нетворкинг, B2B-контакты, коллаборации и совместный рост в бизнес-среде.",
       icon: "partner",
     },
-  ] satisfies AudienceItem[],
+  ],
   speakers: [
     {
       name: "Василий Климов",
@@ -113,6 +187,7 @@ export const eventData = {
       topic:
         "Расскажет о развитии сообщества, возможностях клуба и применении искусственного интеллекта в новой цифровой экономике.",
       initials: "ВК",
+      photo: "/speaker-1-face.png",
     },
     {
       name: "Владислав Бычков",
@@ -121,6 +196,7 @@ export const eventData = {
       topic:
         "Покажет системный подход к алгоритмическому управлению капиталом, рискам и долгосрочным инвестиционным решениям.",
       initials: "ВБ",
+      photo: "/speaker-2-face.png",
     },
     {
       name: "Максим Бумарсков",
@@ -129,8 +205,9 @@ export const eventData = {
       topic:
         "Раскроет возможности бизнес-направления SoulMate, партнерской модели и роста через экосистему.",
       initials: "МБ",
+      photo: "/speaker-3-face.png",
     },
-  ] satisfies Speaker[],
+  ],
   program: [
     {
       time: "12:00",
@@ -177,6 +254,7 @@ export const eventData = {
       speaker: "Вопросы из зала",
       note: "Обсудим рынок, AI-подходы и инструменты для роста компаний.",
       icon: "spark",
+      accent: "featured",
     },
     {
       time: "16:30",
@@ -191,8 +269,9 @@ export const eventData = {
       speaker: "Закрытый формат",
       note: "Закрытое общение со спикерами в неформальной атмосфере.",
       icon: "network",
+      accent: "final",
     },
-  ] satisfies ProgramItem[],
+  ],
   registration: {
     title: "Архив конференции",
     lead: "Регистрация на событие 13 июня 2026 завершена.",
@@ -210,7 +289,7 @@ export const eventData = {
     formTitle: "Регистрация завершена",
     formLead: "Следующая дата будет опубликована отдельным событием.",
   },
-  partners: [] as PartnerItem[],
+  partners: [],
   partnersLead:
     "Список партнеров архивного события скрыт до верификации. Партнерские форматы следующей конференции будут опубликованы вместе с новой датой.",
   partnersCta: "Партнерские форматы",
@@ -246,12 +325,13 @@ export const eventData = {
       answer:
         "Партнерская форма и условия будут открыты вместе с новой датой мероприятия, чтобы заявки партнеров не смешивались с заявками участников.",
     },
-  ] satisfies FaqItem[],
+  ],
   location: {
+    verified: false,
     venue: "Площадка архивного события",
     address: "Адрес скрыт до верификации",
     note: "Маршрут архивного события скрыт до подтверждения корректных данных.",
-    advantages: [] as string[],
+    advantages: [],
     routeUrl: "#location",
   },
   footer: {
@@ -277,7 +357,21 @@ export const eventData = {
     email: "",
     phone: "",
   },
-  socials: [] as SocialItem[],
-} as const;
+  socials: [],
+};
 
-export type EventData = typeof eventData;
+export const eventContentCatalog: Record<string, EventData> = {
+  [ekbArchiveEvent.eventId]: ekbArchiveEvent,
+};
+
+export function getEventContent(eventId: string): EventData | null {
+  return eventContentCatalog[eventId] ?? null;
+}
+
+export function getEventContentBySlug(slug: string): EventData | null {
+  return Object.values(eventContentCatalog).find((event) => event.slug === slug) ?? null;
+}
+
+export function listEventContent(): EventData[] {
+  return Object.values(eventContentCatalog);
+}
