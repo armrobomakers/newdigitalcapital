@@ -1,9 +1,9 @@
 import Link from "next/link";
 
 import { getEventLifecycleBySlug } from "@/data/event-registry";
-import { eventData } from "@/data/events";
+import type { EventData } from "@/data/events";
 
-export function StickyCTA() {
+export function StickyCTA({ eventData }: { eventData: EventData }) {
   const lifecycle = getEventLifecycleBySlug(eventData.slug);
   const registrationOpen = Boolean(lifecycle?.registrationOpen && lifecycle.status === "sales");
 
