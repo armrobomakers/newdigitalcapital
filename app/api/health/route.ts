@@ -1,18 +1,22 @@
 import { NextResponse } from "next/server";
 
-import { listEventLifecycles } from "@/data/event-registry";
+import { getConferenceIntegrity, listConferences } from "@/data/conferences";
 import { isLegalConfigReady } from "@/lib/legal";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const events = listEventLifecycles().map((event) => ({
-    id: event.id,
-    slug: event.slug,
-    status: event.status,
-    page_ready: event.pageReady,
-    lead_capture: event.leadCapture,
-    starts_at: event.startsAt,
+  const integrity = getConferenceIntegrity();
+  const catalogReady = integrity.length > 0 && integrity.every((record) => record.consistent);
+  const events = listConferences().map(({ lifecycle, content }) => ({
+    id: lifecycle.id,
+    slug: lifecycle.slug,
+    name: content.name,
+    city: content.cityLabel,
+    status: lifecycle.status,
+    page_ready: lifecycle.pageReady,
+    lead_capture: lifecycle.leadCapture,
+    starts_at: lifecycle.startsAt,
   }));
 
   const legalReady = isLegalConfigReady();
@@ -31,6 +35,7 @@ export async function GET() {
   );
 
   const readiness = {
+    conference_catalog_ready: catalogReady,
     legal_ready: legalReady,
     lead_storage_ready: leadStorageReady,
     analytics_ready: analyticsReady,
@@ -38,8 +43,10 @@ export async function GET() {
     indexing_enabled: indexingEnabled,
     sales_event_available: salesEventAvailable,
     partner_lead_available: partnerLeadAvailable,
-    ready_for_registration: legalReady && leadStorageReady && salesEventAvailable,
+    ready_for_registration:
+      catalogReady && legalReady && leadStorageReady && salesEventAvailable,
     ready_for_paid_traffic:
+      catalogReady &&
       legalReady &&
       leadStorageReady &&
       analyticsReady &&
@@ -53,6 +60,7 @@ export async function GET() {
       service: "digitalcapital",
       status: readiness.ready_for_registration ? "ready" : "gated",
       readiness,
+      conference_catalog: integrity,
       events,
       checked_at: new Date().toISOString(),
     },
