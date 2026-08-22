@@ -1,15 +1,18 @@
 import { notFound, redirect } from "next/navigation";
 
-import { listEventLifecycles } from "@/data/event-registry";
+import { assertConferenceCatalog, listPageReadyConferences } from "@/data/conferences";
 
-function getPrimaryEvent() {
-  const events = listEventLifecycles().filter((event) => event.pageReady);
+function getPrimaryConference() {
+  const conferences = listPageReadyConferences();
   const priority = ["sales", "scheduled", "sold_out", "past"] as const;
 
   for (const status of priority) {
-    const matches = events
-      .filter((event) => event.status === status)
-      .sort((left, right) => Date.parse(right.startsAt) - Date.parse(left.startsAt));
+    const matches = conferences
+      .filter((conference) => conference.lifecycle.status === status)
+      .sort(
+        (left, right) =>
+          Date.parse(right.lifecycle.startsAt) - Date.parse(left.lifecycle.startsAt)
+      );
 
     if (matches[0]) {
       return matches[0];
@@ -20,10 +23,11 @@ function getPrimaryEvent() {
 }
 
 export default function HomePage() {
-  const event = getPrimaryEvent();
-  if (!event) {
+  assertConferenceCatalog();
+  const conference = getPrimaryConference();
+  if (!conference) {
     notFound();
   }
 
-  redirect(`/${event.slug}`);
+  redirect(`/${conference.lifecycle.slug}`);
 }
