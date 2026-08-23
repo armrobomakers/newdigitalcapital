@@ -1,0 +1,65 @@
+name: DC-10 one-time GitHub orchestrator
+
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/dc10-orchestrator-once.yml]
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: stage/dc-10-live-temporal-ux
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Apply patch encoded in stage workflow
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import textwrap
+
+          workflow = Path('.github/workflows/dc-10-apply.yml').read_text(encoding='utf-8')
+          marker = "          python - <<'PY'\n"
+          start = workflow.index(marker) + len(marker)
+          end = workflow.index("\n          PY", start)
+          patch = textwrap.dedent(workflow[start:end])
+          exec(compile(patch, 'dc10-patch', 'exec'))
+          PY
+
+      - name: Validate complete DC-10 batch
+        run: |
+          npm ci
+          npm approve-scripts --allow-scripts-pending | tee /tmp/pending.txt
+          grep -q 'No packages with unreviewed install scripts' /tmp/pending.txt
+          npm audit --omit=dev --audit-level=high
+          npm audit --audit-level=high
+          npm run check
+
+      - name: Commit validated batch to stage branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add hooks components .github/workflows/dc-10-apply.yml
+          git commit -m "feat: make registration UX live with temporal state"
+          git push origin HEAD:stage/dc-10-live-temporal-ux
+
+      - name: Remove one-time orchestrator from main
+        run: |
+          git fetch origin main
+          git checkout -B main origin/main
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/dc10-orchestrator-once.yml
+          git commit -m "chore: remove DC-10 one-time orchestrator"
+          git push origin HEAD:main
