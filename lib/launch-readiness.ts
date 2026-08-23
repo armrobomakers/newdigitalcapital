@@ -1,3 +1,4 @@
+import { getLeadCaptureAvailability } from "@/data/event-registry";
 import { listConferences, validateConferenceCatalog } from "@/data/conferences";
 import { getEventSeoConfig } from "@/data/event-seo";
 import { isValidLeadStorageSecret } from "@/lib/lead-delivery";
@@ -23,7 +24,7 @@ function isBrandedSiteUrl(siteUrl: string) {
   );
 }
 
-function getSalesConference() {
+function getConfiguredSalesConference() {
   return listConferences()
     .filter(
       ({ lifecycle }) =>
@@ -35,12 +36,53 @@ function getSalesConference() {
     )[0] ?? null;
 }
 
+function temporalRegistrationBlocker(eventId: string): LaunchBlocker | null {
+  const availability = getLeadCaptureAvailability(eventId, "attendee");
+  if (!availability || availability.open) {
+    return null;
+  }
+
+  switch (availability.reason) {
+    case "window_not_open":
+      return blocker(
+        "registration_window_not_open",
+        "Окно регистрации активного sales-события еще не открыто."
+      );
+    case "window_closed":
+      return blocker(
+        "registration_window_closed",
+        "Окно регистрации активного sales-события уже закрыто."
+      );
+    case "event_started":
+      return blocker(
+        "sales_event_started",
+        "Активное sales-событие уже началось; прием новых заявок автоматически закрыт."
+      );
+    case "invalid_event_time":
+    case "invalid_window":
+      return blocker(
+        "registration_window_invalid",
+        "Временная конфигурация регистрации активного sales-события невалидна."
+      );
+    case "page_not_ready":
+    case "lead_type_disabled":
+    case "status_closed":
+      return blocker(
+        "registration_configuration_closed",
+        "Конфигурация активного sales-события не разрешает регистрацию участников."
+      );
+    case "open":
+    default:
+      return null;
+  }
+}
+
 export function getLaunchReadinessSnapshot() {
   const registrationBlockers: LaunchBlocker[] = [];
   const paidTrafficBlockers: LaunchBlocker[] = [];
   const warnings: LaunchWarning[] = [];
   const catalogErrors = validateConferenceCatalog();
-  const salesConference = getSalesConference();
+  const salesConference = getConfiguredSalesConference();
 
   if (catalogErrors.length > 0) {
     const item = blocker(
@@ -54,7 +96,7 @@ export function getLaunchReadinessSnapshot() {
   if (!salesConference) {
     const item = blocker(
       "sales_event_missing",
-      "Нет page-ready события со статусом sales и открытой регистрацией участников."
+      "Нет page-ready события со статусом sales и включенным attendee lead capture."
     );
     registrationBlockers.push(item);
     paidTrafficBlockers.push(item);
@@ -63,6 +105,12 @@ export function getLaunchReadinessSnapshot() {
   if (salesConference) {
     const { content, lifecycle } = salesConference;
     const seo = getEventSeoConfig(lifecycle.id);
+    const temporalBlocker = temporalRegistrationBlocker(lifecycle.id);
+
+    if (temporalBlocker) {
+      registrationBlockers.push(temporalBlocker);
+      paidTrafficBlockers.push(temporalBlocker);
+    }
 
     if (!content.location.verified) {
       const item = blocker(
@@ -204,6 +252,7 @@ export function getLaunchReadinessSnapshot() {
           id: salesConference.lifecycle.id,
           slug: salesConference.lifecycle.slug,
           starts_at: salesConference.lifecycle.startsAt,
+          attendee_capture: getLeadCaptureAvailability(salesConference.lifecycle.id, "attendee"),
         }
       : null,
   };
