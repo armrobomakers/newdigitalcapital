@@ -40,6 +40,9 @@ jobs:
       - name: Lint, typecheck and production build
         run: npm run check
 
+      - name: Release regression invariants
+        run: node scripts/verify-release-invariants.mjs
+
       - name: Runtime and security smoke
         run: |
           set -euo pipefail
