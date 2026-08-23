@@ -10,6 +10,7 @@ import {
   buildLeadEnvelope,
   deliverPrimaryLead,
   isValidIdempotencyKey,
+  isValidLeadStorageSecret,
   type LeadEnvelope,
 } from "@/lib/lead-delivery";
 import { isLegalConfigReady } from "@/lib/legal";
@@ -223,7 +224,7 @@ async function postToPrimaryStorage(envelope: LeadEnvelope) {
     throw new Error("primary_storage_not_configured");
   }
 
-  if (!secret) {
+  if (!secret || !isValidLeadStorageSecret(secret)) {
     throw new Error("primary_storage_signature_not_configured");
   }
 
@@ -344,7 +345,8 @@ export async function POST(request: Request) {
     );
   }
 
-  if (!process.env.LEAD_STORAGE_WEBHOOK_SECRET?.trim()) {
+  const storageSecret = process.env.LEAD_STORAGE_WEBHOOK_SECRET?.trim() ?? "";
+  if (!isValidLeadStorageSecret(storageSecret)) {
     return NextResponse.json(
       { ok: false, error: "primary_storage_signature_unavailable" },
       { status: 503 }
