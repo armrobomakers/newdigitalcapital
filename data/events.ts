@@ -29,6 +29,7 @@ export type ProgramItem = {
   speaker: string;
   note?: string;
   icon?: "calendar" | "spark" | "business" | "invest" | "network" | "ticket";
+  accent?: "featured" | "final";
 };
 
 export type PartnerItem = {
@@ -40,7 +41,86 @@ export type FaqItem = {
   answer: string;
 };
 
-export const eventData = {
+export type SocialItem = {
+  label: "Telegram" | "LinkedIn" | "YouTube" | "VK";
+  href: string;
+  short: string;
+};
+
+export type EventData = {
+  eventId: string;
+  slug: string;
+  name: string;
+  badge: string;
+  subtitle: string;
+  heroCta: string;
+  programCta: string;
+  dateLabel: string;
+  timeLabel: string;
+  cityLabel: string;
+  venueLabel: string;
+  formatLabel: string;
+  formatDescription: string;
+  programLead: string;
+  programDetails: string;
+  assets: {
+    heroImage: string;
+    mapImage: string;
+    partnerImage: string;
+  };
+  navItems: NavItem[];
+  stats: StatItem[];
+  audience: AudienceItem[];
+  speakers: Speaker[];
+  program: ProgramItem[];
+  registration: {
+    title: string;
+    lead: string;
+    ticketTitle: string;
+    price: string;
+    priceCaption: string;
+    note: string;
+    benefits: string[];
+    formTitle: string;
+    formLead: string;
+  };
+  partners: PartnerItem[];
+  partnersLead: string;
+  partnersCta: string;
+  partnersLabel: string;
+  faq: FaqItem[];
+  location: {
+    verified: boolean;
+    description: string;
+    venue: string;
+    address: string;
+    venueDescription: string;
+    note: string;
+    advantages: string[];
+    routeUrl: string;
+  };
+  footer: {
+    ctaTitle: string;
+    ctaCopy: string;
+    ctaButton: string;
+    about: string;
+    participantTitle: string;
+    participantLinks: NavItem[];
+    newsletterTitle: string;
+    newsletterCopy: string;
+    copyright: string;
+    policy: string;
+    offer: string;
+  };
+  contacts: {
+    email: string;
+    phone: string;
+  };
+  socials: SocialItem[];
+};
+
+const ekbArchiveEvent: EventData = {
+  eventId: "ekb-2026-06-13",
   slug: "ekb",
   name: "Цифровой капитал",
   badge: "Конференция о бизнесе, инвестициях и искусственном интеллекте",
@@ -48,11 +128,19 @@ export const eventData = {
     "Бизнес, инвестиции и искусственный интеллект — для роста капитала, компаний и сильного окружения.",
   heroCta: "Зарегистрироваться",
   programCta: "Смотреть программу",
-  dateLabel: "13 июня 2026",
+  dateLabel: "13 июня 2026 · архив",
   timeLabel: "12:00 — 17:00",
   cityLabel: "Екатеринбург",
-  venueLabel: "БЦ «Саммит»",
+  venueLabel: "площадка требует верификации",
   formatLabel: "Формат участия",
+  formatDescription: "для предпринимателей и инвесторов",
+  programLead: "Один день полезного контента, нетворкинга и практических инсайтов от экспертов.",
+  programDetails: "Основная часть проходит с 12:00 до 17:00. После — ужин со спикерами в отдельном формате.",
+  assets: {
+    heroImage: "/hero-stage-3.png",
+    mapImage: "/location-map.png",
+    partnerImage: "/partner-handshake.png",
+  },
   navItems: [
     { label: "Программа", href: "#program" },
     { label: "Спикеры", href: "#speakers" },
@@ -60,18 +148,18 @@ export const eventData = {
     { label: "Партнеры", href: "#partners" },
     { label: "Локация", href: "#location" },
     { label: "FAQ", href: "#faq" },
-  ] satisfies NavItem[],
+  ],
   stats: [
-    { value: "500+", label: "участников офлайн и онлайн" },
-    { value: "40+", label: "спикеров-практиков и экспертов" },
-    { value: "8", label: "часов контента и нетворкинга" },
-    { value: "20+", label: "партнеров и инвесторов" },
-  ] satisfies StatItem[],
+    { value: "3", label: "спикера в опубликованной программе" },
+    { value: "5", label: "часов основной программы" },
+    { value: "1", label: "панельная дискуссия" },
+    { value: "1", label: "город — Екатеринбург" },
+  ],
   audience: [
     {
       title: "Предпринимателям",
       description:
-        "Конференция для предпринимателей, которым нужны идеи для роста бизнеса, масштабирования, партнерств и привлечения капитала в Екатеринбурге.",
+        "Конференция для предпринимателей, которым нужны идеи для роста бизнеса, масштабирования, партнерств и привлечения капитала.",
       icon: "founder",
     },
     {
@@ -98,7 +186,7 @@ export const eventData = {
         "Для партнеров, команд и компаний, которым важны нетворкинг, B2B-контакты, коллаборации и совместный рост в бизнес-среде.",
       icon: "partner",
     },
-  ] satisfies AudienceItem[],
+  ],
   speakers: [
     {
       name: "Василий Климов",
@@ -107,6 +195,7 @@ export const eventData = {
       topic:
         "Расскажет о развитии сообщества, возможностях клуба и применении искусственного интеллекта в новой цифровой экономике.",
       initials: "ВК",
+      photo: "/speaker-1-face.png",
     },
     {
       name: "Владислав Бычков",
@@ -115,6 +204,7 @@ export const eventData = {
       topic:
         "Покажет системный подход к алгоритмическому управлению капиталом, рискам и долгосрочным инвестиционным решениям.",
       initials: "ВБ",
+      photo: "/speaker-2-face.png",
     },
     {
       name: "Максим Бумарсков",
@@ -123,8 +213,9 @@ export const eventData = {
       topic:
         "Раскроет возможности бизнес-направления SoulMate, партнерской модели и роста через экосистему.",
       initials: "МБ",
+      photo: "/speaker-3-face.png",
     },
-  ] satisfies Speaker[],
+  ],
   program: [
     {
       time: "12:00",
@@ -171,6 +262,7 @@ export const eventData = {
       speaker: "Вопросы из зала",
       note: "Обсудим рынок, AI-подходы и инструменты для роста компаний.",
       icon: "spark",
+      accent: "featured",
     },
     {
       time: "16:30",
@@ -185,111 +277,105 @@ export const eventData = {
       speaker: "Закрытый формат",
       note: "Закрытое общение со спикерами в неформальной атмосфере.",
       icon: "network",
+      accent: "final",
     },
-  ] satisfies ProgramItem[],
+  ],
   registration: {
-    title: "Забронируйте место на конференции",
-    lead:
-      "Оставьте заявку, и мы свяжемся с вами для подтверждения участия.",
-    ticketTitle: "Стандартный билет",
-    price: "6 900 ₽",
-    priceCaption: "Количество мест ограничено",
-    note: "Количество мест ограничено. Регистрация обязательна.",
-    benefits: [
-      "Живой формат",
-      "Доступ ко всем выступлениям",
-      "Материалы мероприятия",
-      "Нетворкинг с участниками",
-      "Сертификат участника",
-    ],
-    formTitle: "Регистрация",
-    formLead: "Заполните форму и получите подтверждение на почту.",
+    title: "Архив конференции",
+    lead: "Регистрация на событие 13 июня 2026 завершена.",
+    ticketTitle: "Архив события",
+    price: "",
+    priceCaption: "Продажи завершены",
+    note: "Продажи и прием новых заявок на это событие отключены.",
+    benefits: [],
+    formTitle: "Регистрация завершена",
+    formLead: "Следующая дата будет опубликована отдельным событием.",
   },
-  partners: [
-    { name: "SoulMate" },
-    { name: "AI Robo Makers" },
-    { name: "Digital Capital" },
-    { name: "Tech Club" },
-    { name: "Future Bank" },
-    { name: "Cloudium" },
-  ] satisfies PartnerItem[],
+  partners: [],
   partnersLead:
-    "Представьте свой бренд на главной бизнес-площадке события, получите доступ к предпринимателям, инвесторам и экспертному окружению.",
-  partnersCta: "Стать партнером",
+    "Список партнеров архивного события скрыт до верификации. Партнерские форматы следующей конференции будут опубликованы вместе с новой датой.",
+  partnersCta: "Партнерские форматы",
   partnersLabel: "Партнерский пакет",
   faq: [
     {
-      question: "Как принять участие?",
+      question: "Можно ли зарегистрироваться на это событие?",
       answer:
-        "Оставьте заявку в форме регистрации. После отправки мы подтвердим участие и пришлем детали на указанный контакт.",
+        "Нет. Конференция состоялась 13 июня 2026 года, и регистрация на архивное событие закрыта.",
     },
     {
-      question: "Где пройдет конференция?",
+      question: "Где проходила конференция?",
       answer:
-        "В Екатеринбурге, в БЦ «Саммит». Точный маршрут и схема прохода доступны в блоке локации ниже.",
+        "Площадка архивного события сейчас не указана. Для следующего события адрес будет опубликован только после подтверждения площадки и схемы прохода.",
     },
     {
-      question: "Будет ли онлайн-трансляция?",
+      question: "Будет ли следующая конференция?",
       answer:
-        "Мы ориентируемся на очный формат, а доступ к материалам и деталям подтверждаем после регистрации.",
+        "Следующее событие будет опубликовано отдельной страницей после подтверждения даты, площадки, программы и условий участия.",
     },
     {
-      question: "Что входит в стоимость билета?",
+      question: "Можно ли посмотреть программу прошедшего события?",
       answer:
-        "Выступления, материалы спикеров, кофе-брейк, нетворкинг и вечерний формат общения после основной программы.",
+        "Да. Программа 13 июня сохранена на этой странице как архив мероприятия.",
     },
     {
-      question: "Можно ли прийти командой?",
+      question: "Как узнать о следующем событии?",
       answer:
-        "Да, можно. Для команды лучше оформить отдельную заявку на каждого участника, чтобы мы подготовили доступ и билеты.",
+        "Официальные контакты и подписка на анонсы будут опубликованы после готовности юридического и коммуникационного контура.",
     },
     {
-      question: "Будет ли ужин со спикерами?",
+      question: "Можно ли стать партнером следующей конференции?",
       answer:
-        "Да. После основной части предусмотрен закрытый ужин со спикерами в отдельном формате.",
+        "Партнерская форма и условия будут открыты вместе с новой датой мероприятия, чтобы заявки партнеров не смешивались с заявками участников.",
     },
-  ] satisfies FaqItem[],
+  ],
   location: {
-    venue: "БЦ «Саммит»",
-    address: "Екатеринбург, ул. Малышева, 51",
-    note:
-      "Точная информация по входу и встрече гостей будет отправлена участникам после регистрации.",
-    advantages: [
-      "5 минут от метро",
-      "Удобный подъезд",
-      "Комфортный зал для мероприятия",
-    ],
-    routeUrl: "https://yandex.ru/maps/",
+    verified: false,
+    description: "Архивные сведения о площадке временно скрыты до верификации адреса.",
+    venue: "Площадка архивного события",
+    address: "Адрес скрыт до верификации",
+    venueDescription: "Площадка будет опубликована после подтверждения адреса и схемы прохода.",
+    note: "Маршрут архивного события скрыт до подтверждения корректных данных.",
+    advantages: [],
+    routeUrl: "#location",
   },
   footer: {
-    ctaTitle: "Присоединяйтесь к конференции «Цифровой капитал»",
+    ctaTitle: "Следите за следующей конференцией «Цифровой капитал»",
     ctaCopy:
-      "Получите доступ к экспертам, новым идеям, деловым контактам и возможностям для роста.",
+      "Следующая дата будет опубликована после подтверждения площадки, программы и условий участия.",
     ctaButton: "Зарегистрироваться",
     about: "Конференция о бизнесе, инвестициях и искусственном интеллекте.",
     participantTitle: "Участнику",
     participantLinks: [
-      { label: "Регистрация", href: "#register" },
-      { label: "Материалы", href: "#program" },
-      { label: "Новости", href: "#faq" },
+      { label: "Архив", href: "#register" },
+      { label: "Программа", href: "#program" },
+      { label: "FAQ", href: "#faq" },
       { label: "Контакты", href: "#footer-contacts" },
     ],
     newsletterTitle: "Будьте в курсе",
-    newsletterCopy: "Оставьте email, чтобы получить материалы и новости мероприятия.",
+    newsletterCopy: "Подписка на анонсы будет подключена перед следующим событием.",
     copyright: "© 2026 Цифровой капитал. Все права защищены.",
     policy: "Политика конфиденциальности",
     offer: "Публичная оферта",
   },
   contacts: {
-    email: "info@digitalcapital.ru",
-    phone: "+7 (343) 123-45-67",
+    email: "",
+    phone: "",
   },
-  socials: [
-    { label: "Telegram", href: "#", short: "TG" },
-    { label: "LinkedIn", href: "#", short: "IN" },
-    { label: "YouTube", href: "#", short: "YT" },
-    { label: "VK", href: "#", short: "VK" },
-  ],
-} as const;
+  socials: [],
+};
 
-export type EventData = typeof eventData;
+export const eventContentCatalog: Record<string, EventData> = {
+  [ekbArchiveEvent.eventId]: ekbArchiveEvent,
+};
+
+export function getEventContent(eventId: string): EventData | null {
+  return eventContentCatalog[eventId] ?? null;
+}
+
+export function getEventContentBySlug(slug: string): EventData | null {
+  return Object.values(eventContentCatalog).find((event) => event.slug === slug) ?? null;
+}
+
+export function listEventContent(): EventData[] {
+  return Object.values(eventContentCatalog);
+}

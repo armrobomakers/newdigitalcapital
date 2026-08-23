@@ -2,14 +2,36 @@
   "name": "newdigitalcapital",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": "24.x",
+    "npm": ">=11.17.0 <12"
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "24.x",
+      "onFail": "error"
+    },
+    "packageManager": {
+      "name": "npm",
+      "version": ">=11.17.0 <12",
+      "onFail": "error"
+    }
+  },
+  "allowScripts": {
+    "unrs-resolver@1.12.2": true,
+    "fsevents": false
+  },
   "scripts": {
     "dev": "next dev -p 7485 -H 0.0.0.0",
     "build": "next build",
     "start": "next start -p 7485 -H 0.0.0.0",
-    "lint": "next lint"
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run lint && npm run typecheck && npm run build"
   },
   "dependencies": {
-    "next": "^16.2.9",
+    "next": "16.3.2",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
   },
@@ -19,8 +41,8 @@
     "@types/react-dom": "^19.2.3",
     "autoprefixer": "^10.4.22",
     "eslint": "^9.39.1",
-    "eslint-config-next": "^16.2.9",
-    "postcss": "^8.5.6",
+    "eslint-config-next": "16.3.2",
+    "postcss": "8.5.26",
     "tailwindcss": "^3.4.18",
     "typescript": "^5.9.3"
   }
