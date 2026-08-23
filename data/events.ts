@@ -47,6 +47,15 @@ export type SocialItem = {
   short: string;
 };
 
+export type TicketTier = {
+  id: string;
+  name: string;
+  price: string;
+  description: string;
+  benefits: string[];
+  highlighted?: boolean;
+};
+
 export type EventData = {
   eventId: string;
   slug: string;
@@ -83,6 +92,7 @@ export type EventData = {
     benefits: string[];
     formTitle: string;
     formLead: string;
+    tickets?: TicketTier[];
   };
   partners: PartnerItem[];
   partnersLead: string;
@@ -364,8 +374,133 @@ const ekbArchiveEvent: EventData = {
   socials: [],
 };
 
+const ekbSeptemberEvent: EventData = {
+  ...ekbArchiveEvent,
+  eventId: "ekb-2026-09-26",
+  slug: "ekb-2026-09-26",
+  badge: "26 сентября · конференция о бизнесе, инвестициях и искусственном интеллекте",
+  subtitle:
+    "Цифровой капитал возвращается в Екатеринбург: бизнес, инвестиции, AI и сильное профессиональное окружение в одном дне.",
+  dateLabel: "26 сентября 2026",
+  timeLabel: "12:00 — 17:00",
+  cityLabel: "Екатеринбург",
+  venueLabel: "БЦ «Саммит» · 8 Марта, 51",
+  formatLabel: "Билеты",
+  formatDescription: "3 тарифа · от 1 000 ₽",
+  programLead: "Предварительная программа с теми же тремя спикерами и основными темами конференции.",
+  programDetails: "Основная программа запланирована с 12:00 до 17:00. Тайминг отдельных блоков еще может корректироваться.",
+  program: ekbArchiveEvent.program.filter((item) => item.time !== "17:00"),
+  registration: {
+    title: "Регистрация открыта",
+    lead: "26 сентября · Екатеринбург · БЦ «Саммит», ул. 8 Марта, 51",
+    ticketTitle: "Билеты от",
+    price: "1 000 ₽",
+    priceCaption: "три тарифа участия",
+    note: "Наполнение тарифов сейчас предварительное и будет уточняться до финального запуска продаж.",
+    benefits: [
+      "Офлайн-участие в конференции",
+      "Доступ к основной программе",
+      "Нетворкинг с участниками и экспертами",
+    ],
+    formTitle: "Выберите билет и оставьте заявку",
+    formLead: "После заявки команда свяжется с вами по указанному телефону.",
+    tickets: [
+      {
+        id: "standard-1000",
+        name: "Стандарт",
+        price: "1 000 ₽",
+        description: "Базовое участие",
+        benefits: ["Вход на конференцию", "Основная программа", "Нетворкинг-зона"],
+      },
+      {
+        id: "business-3000",
+        name: "Бизнес",
+        price: "3 000 ₽",
+        description: "Расширенный формат",
+        benefits: [
+          "Всё из тарифа «Стандарт»",
+          "Приоритетная посадка",
+          "Материалы спикеров после события",
+        ],
+        highlighted: true,
+      },
+      {
+        id: "vip-5000",
+        name: "VIP",
+        price: "5 000 ₽",
+        description: "Максимум общения",
+        benefits: [
+          "Всё из тарифа «Бизнес»",
+          "Отдельная VIP-зона / networking",
+          "Приоритетный доступ к общению со спикерами",
+        ],
+      },
+    ],
+  },
+  partners: [],
+  partnersLead:
+    "Партнерский блок для события 26 сентября находится в подготовке. Подтвержденные партнеры будут добавляться по мере согласования.",
+  partnersCta: "Стать партнером",
+  faq: [
+    {
+      question: "Когда пройдет конференция?",
+      answer: "26 сентября 2026 года с 12:00 до 17:00 в Екатеринбурге.",
+    },
+    {
+      question: "Где пройдет конференция?",
+      answer: "БЦ «Саммит», Екатеринбург, ул. 8 Марта, 51. Точный зал и схема прохода будут добавлены отдельно.",
+    },
+    {
+      question: "Какие есть билеты?",
+      answer: "Сейчас предусмотрены три тарифа: 1 000 ₽, 3 000 ₽ и 5 000 ₽. Наполнение тарифов пока предварительное и будет уточняться.",
+    },
+    {
+      question: "Кто выступит?",
+      answer: "В предварительной программе — Василий Климов, Владислав Бычков и Максим Бумарсков.",
+    },
+    {
+      question: "Можно ли уже зарегистрироваться?",
+      answer: "Да. Регистрация на событие открыта; выберите тариф в форме и оставьте контактные данные.",
+    },
+    {
+      question: "Можно ли стать партнером?",
+      answer: "Да, партнерская заявка доступна отдельно. Условия и финальные пакеты будут уточняться.",
+    },
+  ],
+  location: {
+    verified: true,
+    description: "Конференция пройдет в деловом центре Екатеринбурга — БЦ «Саммит».",
+    venue: "БЦ «Саммит»",
+    address: "Екатеринбург, ул. 8 Марта, 51",
+    venueDescription: "Площадка в центре Екатеринбурга. Точный зал и схема прохода будут добавлены ближе к событию.",
+    note: "Адрес подтвержден; номер зала и инструкции по входу пока являются следующими данными для публикации.",
+    advantages: ["Центр Екатеринбурга", "Деловой формат площадки", "Удобно для офлайн-нетворкинга"],
+    routeUrl: "https://yandex.ru/maps/?text=%D0%95%D0%BA%D0%B0%D1%82%D0%B5%D1%80%D0%B8%D0%BD%D0%B1%D1%83%D1%80%D0%B3%2C%20%D1%83%D0%BB.%208%20%D0%9C%D0%B0%D1%80%D1%82%D0%B0%2C%2051",
+  },
+  footer: {
+    ...ekbArchiveEvent.footer,
+    ctaTitle: "Увидимся 26 сентября на «Цифровом капитале»",
+    ctaCopy: "Екатеринбург · БЦ «Саммит» · 12:00–17:00. Регистрация уже открыта.",
+    ctaButton: "Зарегистрироваться",
+    participantLinks: [
+      { label: "Регистрация", href: "#register" },
+      { label: "Программа", href: "#program" },
+      { label: "FAQ", href: "#faq" },
+      { label: "Контакты", href: "#footer-contacts" },
+    ],
+    newsletterTitle: "Контакты",
+    newsletterCopy: "Email и телефон организатора пока отмечены как placeholders и будут заменены перед финальным запуском.",
+  },
+  contacts: {
+    email: "",
+    phone: "",
+  },
+  socials: [],
+};
+
 export const eventContentCatalog: Record<string, EventData> = {
   [ekbArchiveEvent.eventId]: ekbArchiveEvent,
+  [ekbSeptemberEvent.eventId]: ekbSeptemberEvent,
 };
 
 export function getEventContent(eventId: string): EventData | null {
