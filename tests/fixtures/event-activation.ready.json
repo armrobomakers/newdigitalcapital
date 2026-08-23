@@ -1,0 +1,42 @@
+{
+  "template": false,
+  "checkAt": "2099-01-15T12:00:00+03:00",
+  "lifecycle": {
+    "id": "synthetic-ready-2099",
+    "slug": "synthetic-ready",
+    "status": "sales",
+    "startsAt": "2099-02-01T12:00:00+03:00",
+    "pageReady": true,
+    "leadCapture": {
+      "attendee": true,
+      "partner": true,
+      "speaker": true,
+      "media": true
+    },
+    "leadCaptureWindows": {
+      "attendee": {
+        "opensAt": "2099-01-01T09:00:00+03:00",
+        "closesAt": "2099-02-01T11:00:00+03:00"
+      }
+    }
+  },
+  "content": {
+    "locationVerified": true,
+    "emailPresent": true,
+    "phonePresent": true,
+    "speakersCount": 3,
+    "programCount": 6,
+    "structuredDataReady": true,
+    "partnersCount": 2,
+    "socialsCount": 2
+  },
+  "infrastructure": {
+    "catalogErrors": [],
+    "legalReady": true,
+    "leadStorageReady": true,
+    "leadStorageSecretReady": true,
+    "analyticsReady": true,
+    "brandedSiteUrlReady": true,
+    "indexingEnabled": true
+  }
+}
