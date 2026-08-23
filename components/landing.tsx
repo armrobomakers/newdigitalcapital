@@ -33,7 +33,8 @@ import {
 } from "@/components/icons";
 import { RegistrationForm } from "@/components/registration-form";
 import { StickyCTA } from "@/components/sticky-cta";
-import { getEventLifecycleBySlug } from "@/data/event-registry";
+import { TemporalRegistrationGate } from "@/components/temporal-registration-gate";
+import { TemporalRegistrationLink } from "@/components/temporal-registration-link";
 import { type AudienceItem, type EventData, type ProgramItem, type Speaker } from "@/data/events";
 import { isLegalConfigReady, legalConfig } from "@/lib/legal";
 
@@ -477,8 +478,6 @@ function PartnerVisualExact({ eventData }: { eventData: EventData }) {
 
 export function LandingPage({ eventData }: { eventData: EventData }) {
   const footerCtaTitleParts = eventData.footer.ctaTitle.match(/^(.*конференции)\s+(«.*»)$/);
-  const lifecycle = getEventLifecycleBySlug(eventData.slug);
-  const registrationOpen = Boolean(lifecycle?.registrationOpen && lifecycle.status === "sales");
   const locationVerified = eventData.location.verified;
   const legalReady = isLegalConfigReady();
   const activeSocials = eventData.socials.filter((social) => social.href && social.href !== "#");
@@ -537,12 +536,11 @@ export function LandingPage({ eventData }: { eventData: EventData }) {
               </div>
             </details>
 
-            <Link
-              href={registrationOpen ? "#register" : "#program"}
+            <TemporalRegistrationLink
+              eventId={eventData.eventId}
+              openLabel={eventData.heroCta}
               className="btn-primary hidden md:inline-flex"
-            >
-              {registrationOpen ? eventData.heroCta : "Смотреть программу"}
-            </Link>
+            />
           </header>
 
           <div id="top" className="mt-5 grid gap-5 lg:mt-6 lg:grid-cols-[1.08fr_0.92fr] lg:items-center">
@@ -574,13 +572,12 @@ export function LandingPage({ eventData }: { eventData: EventData }) {
               </div>
 
               <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-                <Link
-                  href={registrationOpen ? "#register" : "#program"}
+                <TemporalRegistrationLink
+                  eventId={eventData.eventId}
+                  openLabel={eventData.heroCta}
                   className="btn-primary min-w-[270px] justify-between"
-                >
-                  <span>{registrationOpen ? eventData.heroCta : "Смотреть программу"}</span>
-                  <ArrowRightIcon className="h-5 w-5" />
-                </Link>
+                  withArrow
+                />
                 <Link href="#speakers" className="btn-secondary min-w-[270px] justify-between">
                   <span>Спикеры события</span>
                   <CalendarIcon className="h-5 w-5 text-violet-200" />
@@ -721,7 +718,11 @@ export function LandingPage({ eventData }: { eventData: EventData }) {
               </div>
             </div>
 
-            {registrationOpen ? <RegistrationTicket eventData={eventData} /> : <ClosedEventCard eventData={eventData} />}
+            <TemporalRegistrationGate
+              eventId={eventData.eventId}
+              openContent={<RegistrationTicket eventData={eventData} />}
+              closedContent={<ClosedEventCard eventData={eventData} />}
+            />
           </div>
 
           <div className="mt-5 flex items-center gap-4">
@@ -874,12 +875,11 @@ export function LandingPage({ eventData }: { eventData: EventData }) {
               </div>
 
               <div className="flex flex-col items-start gap-4 lg:absolute lg:left-[68%] lg:top-[81%] lg:z-20 lg:flex-row lg:-translate-x-1/2 lg:-translate-y-1/2 lg:items-center">
-                <Link
-                  href={registrationOpen ? "#register" : "#program"}
+                <TemporalRegistrationLink
+                  eventId={eventData.eventId}
+                  openLabel={eventData.footer.ctaButton}
                   className="btn-primary min-w-[286px]"
-                >
-                  {registrationOpen ? eventData.footer.ctaButton : "Смотреть программу"}
-                </Link>
+                />
                 <Link href="#speakers" className="btn-secondary min-w-[286px]">
                   Спикеры события
                 </Link>
