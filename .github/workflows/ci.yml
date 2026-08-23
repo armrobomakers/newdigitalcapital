@@ -97,8 +97,8 @@ jobs:
 
           BASE=http://127.0.0.1:7485
           READY=0
-          for i in $(seq 1 30); do
-            if curl --retry 2 --retry-connrefused --retry-delay 1 -fsS "$BASE/api/health" >/tmp/health.json; then
+          for i in $(seq 1 40); do
+            if curl -fsS "$BASE/api/health" >/tmp/health.json 2>/dev/null; then
               READY=1
               break
             fi
@@ -115,6 +115,19 @@ jobs:
           ! grep -q 'БЦ Саммит' /tmp/ekb.html
           ! grep -q 'application/ld+json' /tmp/ekb.html
 
+          test "$($CURL -o /tmp/september.html -w '%{http_code}' "$BASE/ekb-2026-09-26")" = "200"
+          grep -q '26 сентября 2026' /tmp/september.html
+          grep -q 'БЦ «Саммит»' /tmp/september.html
+          grep -q '1 000 ₽' /tmp/september.html
+          grep -q '3 000 ₽' /tmp/september.html
+          grep -q '5 000 ₽' /tmp/september.html
+          grep -q 'data-registration-state="open"' /tmp/september.html
+          ! grep -q 'application/ld+json' /tmp/september.html
+
+          ROOT_STATUS=$($CURL -o /tmp/root.html -w '%{http_code}' -L "$BASE/")
+          test "$ROOT_STATUS" = "200"
+          grep -q '26 сентября 2026' /tmp/root.html
+
           test "$($CURL -o /tmp/privacy.html -w '%{http_code}' "$BASE/legal/privacy")" = "200"
           test "$($CURL -o /tmp/offer.html -w '%{http_code}' "$BASE/legal/offer")" = "200"
           test "$($CURL -o /tmp/robots.txt -w '%{http_code}' "$BASE/robots.txt")" = "200"
@@ -123,7 +136,13 @@ jobs:
 
           grep -q '"status":"gated"' /tmp/health.json
           grep -q '"ready_for_registration":false' /tmp/health.json
-          grep -q '"sales_event_missing"' /tmp/health.json
+          grep -q '"active_sales_event"' /tmp/health.json
+          grep -q '"id":"ekb-2026-09-26"' /tmp/health.json
+          grep -q '"event_email_missing"' /tmp/health.json
+          grep -q '"event_phone_missing"' /tmp/health.json
+          grep -q '"legal_config_incomplete"' /tmp/health.json
+          grep -q '"lead_storage_unavailable"' /tmp/health.json
+          ! grep -q '"sales_event_missing"' /tmp/health.json
 
           ANALYTICS_ORIGIN_STATUS=$($CURL -o /tmp/analytics-origin.json -w '%{http_code}' \
             -H 'Origin: https://evil.example' \
@@ -184,7 +203,7 @@ jobs:
 
           head -c 17000 /dev/zero | tr '\0' 'a' >/tmp/register-padding.txt
           { printf '{"padding":"'; cat /tmp/register-padding.txt; printf '"}'; } >/tmp/register-large.json
-          LARGE_STATUS=$(curl --retry 3 --retry-connrefused --retry-delay 1 -sS \
+          LARGE_STATUS=$(curl -sS \
             -o /tmp/register-large-response.json -w '%{http_code}' \
             -H 'Content-Type: application/json' \
             -H 'Transfer-Encoding: chunked' \
@@ -200,6 +219,22 @@ jobs:
             "$BASE/api/register")
           test "$RSTATUS" = "409"
           grep -q '"error":"registration_closed"' /tmp/register.json
+
+          INVALID_TICKET_STATUS=$($CURL -o /tmp/register-invalid-ticket.json -w '%{http_code}' \
+            -H 'Content-Type: application/json' \
+            -H 'X-Real-IP: 203.0.113.20' \
+            -d '{"event_id":"ekb-2026-09-26","lead_type":"attendee","ticket":"made-up-tier","name":"Ticket Test","phone":"+79990000002","privacy_consent":true}' \
+            "$BASE/api/register")
+          test "$INVALID_TICKET_STATUS" = "400"
+          grep -q '"error":"invalid_ticket"' /tmp/register-invalid-ticket.json
+
+          OPEN_UI_FAIL_CLOSED_STATUS=$($CURL -o /tmp/register-open-gated.json -w '%{http_code}' \
+            -H 'Content-Type: application/json' \
+            -H 'X-Real-IP: 203.0.113.21' \
+            -d '{"event_id":"ekb-2026-09-26","lead_type":"attendee","ticket":"standard-1000","name":"Open Test","phone":"+79990000003","privacy_consent":true}' \
+            "$BASE/api/register")
+          test "$OPEN_UI_FAIL_CLOSED_STATUS" = "503"
+          grep -q '"error":"legal_configuration_incomplete"' /tmp/register-open-gated.json
 
           for i in 1 2 3 4 5; do
             STATUS=$($CURL -o /tmp/register-rate-$i.json -w '%{http_code}' \
@@ -221,7 +256,7 @@ jobs:
           grep -q '"error":"rate_limited"' /tmp/register-rate.json
           grep -qi '^retry-after: ' /tmp/register-rate-headers.txt
 
-          $CURL -I "$BASE/ekb" >/tmp/headers.txt
+          $CURL -I "$BASE/ekb-2026-09-26" >/tmp/headers.txt
           grep -qi '^content-security-policy-report-only:' /tmp/headers.txt
           grep -qi '^x-content-type-options: nosniff' /tmp/headers.txt
           grep -qi '^x-frame-options: DENY' /tmp/headers.txt
@@ -247,7 +282,7 @@ jobs:
           BASE=http://127.0.0.1:7486
           READY=0
           for i in $(seq 1 40); do
-            if curl --retry 2 --retry-connrefused --retry-delay 1 -fsS "$BASE/api/health" >/tmp/container-health.json; then
+            if curl -fsS "$BASE/api/health" >/tmp/container-health.json 2>/dev/null; then
               READY=1
               break
             fi
@@ -255,7 +290,13 @@ jobs:
           done
           test "$READY" = "1"
           grep -q '"status":"gated"' /tmp/container-health.json
+          grep -q '"id":"ekb-2026-09-26"' /tmp/container-health.json
 
           test "$(curl -sS -o /tmp/container-ekb.html -w '%{http_code}' "$BASE/ekb")" = "200"
           grep -q '13 июня 2026' /tmp/container-ekb.html
           ! grep -q 'application/ld+json' /tmp/container-ekb.html
+
+          test "$(curl -sS -o /tmp/container-september.html -w '%{http_code}' "$BASE/ekb-2026-09-26")" = "200"
+          grep -q '26 сентября 2026' /tmp/container-september.html
+          grep -q '1 000 ₽' /tmp/container-september.html
+          ! grep -q 'application/ld+json' /tmp/container-september.html

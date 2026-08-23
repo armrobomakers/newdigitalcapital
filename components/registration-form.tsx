@@ -3,10 +3,11 @@
 import type { FormEvent } from "react";
 import { useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import { BriefcaseIcon, MailIcon, PhoneIcon, UserIcon } from "@/components/icons";
 import type { LeadCaptureAvailability, LeadType } from "@/data/event-registry";
+import { getEventContent } from "@/data/events";
 import { useLeadCaptureAvailability } from "@/hooks/use-lead-capture-availability";
 import { trackConversionEvent } from "@/lib/analytics-client";
 
@@ -17,7 +18,6 @@ const utmKeys = [
   "utm_content",
   "utm_term",
 ] as const;
-
 
 type Status = "idle" | "loading" | "success" | "error";
 
@@ -83,7 +83,6 @@ export function RegistrationForm({
   leadType = "attendee",
 }: RegistrationFormProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState("");
   const { availability, refresh: refreshAvailability } = useLeadCaptureAvailability(
@@ -93,7 +92,8 @@ export function RegistrationForm({
   const formStarted = useRef(false);
   const idempotencyKeyRef = useRef<string | null>(null);
   const leadCaptureOpen = availability?.open === true;
-
+  const ticketOptions =
+    leadType === "attendee" ? (getEventContent(eventId)?.registration.tickets ?? []) : [];
 
   function getIdempotencyKey() {
     if (!idempotencyKeyRef.current) {
@@ -127,10 +127,19 @@ export function RegistrationForm({
 
     const form = event.currentTarget;
     const formData = new FormData(form);
-    const payload = Object.fromEntries(formData.entries());
-    const idempotencyKey = getIdempotencyKey();
+    const payload: Record<string, FormDataEntryValue | string> = Object.fromEntries(formData.entries());
+    const query = new URLSearchParams(window.location.search);
+    for (const key of utmKeys) {
+      payload[key] = query.get(key) ?? "";
+    }
 
-    trackConversionEvent("lead_submit", eventId, { lead_type: leadType });
+    const idempotencyKey = getIdempotencyKey();
+    const selectedTicket = formData.get("ticket")?.toString() ?? "";
+
+    trackConversionEvent("lead_submit", eventId, {
+      lead_type: leadType,
+      ...(selectedTicket ? { ticket: selectedTicket } : {}),
+    });
 
     try {
       const response = await fetch("/api/register", {
@@ -163,6 +172,7 @@ export function RegistrationForm({
       trackConversionEvent("lead_saved", eventId, {
         lead_type: leadType,
         request_id: result.request_id,
+        ...(selectedTicket ? { ticket: selectedTicket } : {}),
       });
 
       const params = new URLSearchParams({
@@ -170,6 +180,9 @@ export function RegistrationForm({
         request_id: result.request_id,
         lead_type: leadType,
       });
+      if (selectedTicket) {
+        params.set("ticket", selectedTicket);
+      }
       router.push(`/thanks?${params.toString()}`);
     } catch (error) {
       setStatus("error");
@@ -212,6 +225,44 @@ export function RegistrationForm({
           <input name="website" tabIndex={-1} autoComplete="off" />
         </label>
       </div>
+
+      {ticketOptions.length > 0 ? (
+        <fieldset className="rounded-[24px] border border-white/10 bg-white/[0.025] p-3">
+          <legend className="px-2 text-sm font-semibold text-white/85">Выберите билет</legend>
+          <div className="mt-2 grid gap-2 md:grid-cols-3">
+            {ticketOptions.map((ticket, index) => (
+              <label
+                key={ticket.id}
+                className={`relative cursor-pointer rounded-[20px] border p-4 transition has-[:checked]:border-violet-300/70 has-[:checked]:bg-violet-500/12 ${
+                  ticket.highlighted
+                    ? "border-violet-400/35 bg-violet-500/[0.06]"
+                    : "border-white/10 bg-black/15"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="ticket"
+                  value={ticket.id}
+                  required
+                  defaultChecked={index === 0}
+                  className="absolute right-3 top-3 h-4 w-4 accent-violet-500"
+                />
+                <p className="pr-7 text-sm font-semibold text-white">{ticket.name}</p>
+                <p className="mt-2 font-display text-3xl leading-none text-white">{ticket.price}</p>
+                <p className="mt-2 text-xs leading-5 text-white/55">{ticket.description}</p>
+                <ul className="mt-3 space-y-1.5 text-xs leading-5 text-white/68">
+                  {ticket.benefits.map((benefit) => (
+                    <li key={benefit}>• {benefit}</li>
+                  ))}
+                </ul>
+              </label>
+            ))}
+          </div>
+          <p className="mt-3 text-xs leading-5 text-amber-200/70">
+            Наполнение тарифов пока предварительное и будет уточняться.
+          </p>
+        </fieldset>
+      ) : null}
 
       <label className="block">
         <span className="sr-only">Имя</span>
@@ -300,10 +351,6 @@ export function RegistrationForm({
         />
         <span>Хочу получать новости и информационные сообщения о следующих мероприятиях.</span>
       </label>
-
-      {utmKeys.map((key) => (
-        <input key={key} type="hidden" name={key} value={searchParams.get(key) ?? ""} />
-      ))}
 
       <button
         type="submit"
