@@ -59,7 +59,16 @@ export function RegistrationForm({
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState("");
   const formStarted = useRef(false);
+  const idempotencyKeyRef = useRef<string | null>(null);
   const leadCaptureOpen = isLeadCaptureOpen(eventId, leadType);
+
+  function getIdempotencyKey() {
+    if (!idempotencyKeyRef.current) {
+      idempotencyKeyRef.current = crypto.randomUUID();
+    }
+
+    return idempotencyKeyRef.current;
+  }
 
   function handleFormFocus() {
     if (formStarted.current) {
@@ -78,6 +87,7 @@ export function RegistrationForm({
     const form = event.currentTarget;
     const formData = new FormData(form);
     const payload = Object.fromEntries(formData.entries());
+    const idempotencyKey = getIdempotencyKey();
 
     trackConversionEvent("lead_submit", eventId, { lead_type: leadType });
 
@@ -86,6 +96,7 @@ export function RegistrationForm({
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Idempotency-Key": idempotencyKey,
         },
         body: JSON.stringify(payload),
       });
