@@ -145,10 +145,20 @@ export function getLaunchReadinessSnapshot() {
     paidTrafficBlockers.push(item);
   }
 
-  if (!process.env.LEAD_STORAGE_WEBHOOK_URL) {
+  const leadStorageReady = Boolean(process.env.LEAD_STORAGE_WEBHOOK_URL?.trim());
+  const leadStorageSigningReady = Boolean(process.env.LEAD_STORAGE_WEBHOOK_SECRET?.trim());
+
+  if (!leadStorageReady) {
     const item = blocker(
       "lead_storage_unavailable",
       "Не настроено основное хранилище заявок."
+    );
+    registrationBlockers.push(item);
+    paidTrafficBlockers.push(item);
+  } else if (!leadStorageSigningReady) {
+    const item = blocker(
+      "lead_storage_signature_missing",
+      "Основное хранилище заявок настроено без обязательной подписи webhook."
     );
     registrationBlockers.push(item);
     paidTrafficBlockers.push(item);
