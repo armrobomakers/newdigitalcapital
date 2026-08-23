@@ -19,7 +19,7 @@ env:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
@@ -140,3 +140,34 @@ jobs:
           if grep -qi '^x-powered-by:' /tmp/headers.txt; then
             exit 1
           fi
+
+      - name: Container runtime smoke
+        run: |
+          set -euo pipefail
+          docker build \
+            --build-arg NEXT_PUBLIC_SITE_URL=http://127.0.0.1:7485 \
+            --build-arg NEXT_PUBLIC_INDEXING_ENABLED=false \
+            -t digitalcapital:ci .
+
+          test "$(docker inspect digitalcapital:ci --format '{{.Config.User}}')" = "node"
+          docker run --rm --entrypoint node digitalcapital:ci --version | grep -Eq '^v24\.'
+          docker run --rm --entrypoint npm digitalcapital:ci --version | grep -Eq '^11\.17\.0$'
+
+          docker run -d --name digitalcapital-ci -p 7486:7485 digitalcapital:ci >/tmp/digitalcapital-container-id.txt
+          trap 'STATUS=$?; if [ "$STATUS" -ne 0 ]; then echo "--- container log ---"; docker logs digitalcapital-ci || true; fi; docker rm -f digitalcapital-ci >/dev/null 2>&1 || true' EXIT
+
+          BASE=http://127.0.0.1:7486
+          READY=0
+          for i in $(seq 1 40); do
+            if curl --retry 2 --retry-connrefused --retry-delay 1 -fsS "$BASE/api/health" >/tmp/container-health.json; then
+              READY=1
+              break
+            fi
+            sleep 1
+          done
+          test "$READY" = "1"
+          grep -q '"status":"gated"' /tmp/container-health.json
+
+          test "$(curl -sS -o /tmp/container-ekb.html -w '%{http_code}' "$BASE/ekb")" = "200"
+          grep -q '13 июня 2026' /tmp/container-ekb.html
+          ! grep -q 'application/ld+json' /tmp/container-ekb.html
