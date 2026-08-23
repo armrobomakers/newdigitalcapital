@@ -35,11 +35,13 @@ jobs:
           if (pkg.engines?.npm !== '>=11.17.0 <12') throw new Error('npm engine range is unexpected');
           if (pkg.devEngines?.runtime?.name !== 'node' || pkg.devEngines.runtime.onFail !== 'error') throw new Error('runtime devEngine is not strict');
           if (pkg.devEngines?.packageManager?.name !== 'npm' || pkg.devEngines.packageManager.onFail !== 'error') throw new Error('package manager devEngine is not strict');
-          const allowed = pkg.allowScripts || {};
-          const keys = Object.keys(allowed);
-          if (keys.length !== 1 || keys[0] !== 'unrs-resolver@1.12.2' || allowed[keys[0]] !== true) {
-            throw new Error(`unexpected allowScripts policy: ${JSON.stringify(allowed)}`);
+          const policy = pkg.allowScripts || {};
+          const keys = Object.keys(policy).sort();
+          if (keys.length !== 2 || keys[0] !== 'fsevents' || keys[1] !== 'unrs-resolver@1.12.2') {
+            throw new Error(`unexpected allowScripts keys: ${JSON.stringify(keys)}`);
           }
+          if (policy['unrs-resolver@1.12.2'] !== true) throw new Error('unrs-resolver approval missing');
+          if (policy.fsevents !== false) throw new Error('fsevents deny missing');
           if (fs.readFileSync('.node-version', 'utf8').trim() !== '24') throw new Error('.node-version mismatch');
           const npmrc = fs.readFileSync('.npmrc', 'utf8');
           if (!/^engine-strict=true$/m.test(npmrc)) throw new Error('engine-strict is not enabled');
@@ -61,7 +63,7 @@ jobs:
         run: |
           set -euo pipefail
           npm approve-scripts --allow-scripts-pending 2>&1 | tee /tmp/pending.txt
-          if grep -Eq 'package(s)? ha(s|ve) install scripts not yet covered by allowScripts|unrs-resolver@1\.12\.2.*postinstall' /tmp/pending.txt; then
+          if grep -Eq 'package(s)? ha(s|ve) install scripts not yet covered by allowScripts' /tmp/pending.txt; then
             cat /tmp/pending.txt
             exit 1
           fi
@@ -74,29 +76,53 @@ jobs:
           npm run typecheck
           npm run build
 
-      - name: Negative enforcement test
+      - name: Negative test - unrs approval is required
         run: |
           set -euo pipefail
-          rm -rf /tmp/dc08-negative
-          mkdir -p /tmp/dc08-negative
-          cp package.json package-lock.json .npmrc /tmp/dc08-negative/
-          cd /tmp/dc08-negative
+          rm -rf /tmp/dc08-unrs
+          mkdir -p /tmp/dc08-unrs
+          cp package.json package-lock.json .npmrc /tmp/dc08-unrs/
+          cd /tmp/dc08-unrs
           node <<'NODE'
           const fs = require('fs');
           const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-          delete pkg.allowScripts;
+          pkg.allowScripts = { fsevents: false };
           fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
           NODE
           set +e
-          npm ci > /tmp/dc08-negative.log 2>&1
+          npm ci > /tmp/dc08-unrs.log 2>&1
           STATUS=$?
           set -e
-          cat /tmp/dc08-negative.log
+          cat /tmp/dc08-unrs.log
           if [ "$STATUS" -eq 0 ]; then
-            echo 'strict install unexpectedly succeeded without allowScripts'
+            echo 'strict install unexpectedly succeeded without unrs approval'
             exit 1
           fi
-          grep -q 'unrs-resolver@1.12.2' /tmp/dc08-negative.log
+          grep -q 'unrs-resolver@1.12.2' /tmp/dc08-unrs.log
+
+      - name: Negative test - fsevents deny is required
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/dc08-fsevents
+          mkdir -p /tmp/dc08-fsevents
+          cp package.json package-lock.json .npmrc /tmp/dc08-fsevents/
+          cd /tmp/dc08-fsevents
+          node <<'NODE'
+          const fs = require('fs');
+          const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          pkg.allowScripts = { 'unrs-resolver@1.12.2': true };
+          fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+          NODE
+          set +e
+          npm ci > /tmp/dc08-fsevents.log 2>&1
+          STATUS=$?
+          set -e
+          cat /tmp/dc08-fsevents.log
+          if [ "$STATUS" -eq 0 ]; then
+            echo 'strict install unexpectedly succeeded without fsevents deny'
+            exit 1
+          fi
+          grep -q 'fsevents@2.3.3' /tmp/dc08-fsevents.log
 
       - name: Summarize result
         run: |
