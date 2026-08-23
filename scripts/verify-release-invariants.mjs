@@ -24,6 +24,8 @@ const registerRoute = read("app/api/register/route.ts");
 const analyticsRoute = read("app/api/analytics/route.ts");
 const temporalLink = read("components/temporal-registration-link.tsx");
 const temporalGate = read("components/temporal-registration-gate.tsx");
+const leadDelivery = read("lib/lead-delivery.ts");
+const appsScriptLeadStorage = read("integrations/google-apps-script/lead-storage.gs");
 const dockerfile = read("Dockerfile");
 const dockerignore = read(".dockerignore");
 const ci = read(".github/workflows/ci.yml");
@@ -68,6 +70,22 @@ requireMatch("analytics API", analyticsRoute, /Number\.isFinite\(propertyValue\)
 requireMatch("analytics API", analyticsRoute, /normalizeOccurredAt/);
 forbidMatch("analytics API", analyticsRoute, /await request\.json\(\)/);
 
+requireMatch("lead delivery", leadDelivery, /DEFAULT_LEAD_STORAGE_TRANSPORT = "header_hmac"/);
+requireMatch("lead delivery", leadDelivery, /APPS_SCRIPT_BODY_HMAC_VERSION = "apps_script_body_hmac\.v1"/);
+requireMatch("lead delivery", leadDelivery, /resolveLeadStorageTransport/);
+requireMatch("lead delivery", leadDelivery, /transport === "header_hmac"/);
+requireMatch("lead delivery", leadDelivery, /signature: `sha256=\$\{signature\}`/);
+requireMatch("lead delivery", leadDelivery, /payload,/);
+requireMatch("lead delivery", leadDelivery, /primary_storage_transport_invalid/);
+requireMatch("Apps Script lead storage", appsScriptLeadStorage, /DC_TRANSPORT_VERSION = "apps_script_body_hmac\.v1"/);
+requireMatch("Apps Script lead storage", appsScriptLeadStorage, /Utilities\.computeHmacSha256Signature/);
+requireMatch("Apps Script lead storage", appsScriptLeadStorage, /LockService\.getScriptLock\(\)/);
+requireMatch("Apps Script lead storage", appsScriptLeadStorage, /createTextFinder\(requestId\)/);
+requireMatch("Apps Script lead storage", appsScriptLeadStorage, /payload_sha256/);
+requireMatch("Apps Script lead storage", appsScriptLeadStorage, /idempotency_conflict/);
+requireMatch("Apps Script lead storage", appsScriptLeadStorage, /lead_sheet_schema_mismatch/);
+requireMatch("Apps Script lead storage", appsScriptLeadStorage, /\^\[=\+\\-@\]/);
+
 requireMatch("temporal CTA", temporalLink, /useLeadCaptureAvailability\(eventId, "attendee"\)/);
 requireMatch("temporal CTA", temporalLink, /href=\{open \? "#register" : "#program"\}/);
 requireMatch("temporal CTA", temporalLink, /data-registration-state=\{open \? "open" : "closed"\}/);
@@ -102,6 +120,7 @@ requireMatch(".dockerignore", dockerignore, /^node_modules$/m);
 requireMatch(".dockerignore", dockerignore, /^\.next$/m);
 
 requireMatch("environment example", envExample, /^NEXT_PUBLIC_INDEXING_ENABLED=false$/m);
+requireMatch("environment example", envExample, /^LEAD_STORAGE_TRANSPORT=header_hmac$/m);
 requireMatch("environment example", envExample, /^LEAD_STORAGE_WEBHOOK_SECRET=$/m);
 requireMatch("environment example", envExample, /^ANALYTICS_WEBHOOK_URL=$/m);
 if (packageJson?.scripts?.["env:check"] !== "node scripts/verify-env-contract.mjs") {
