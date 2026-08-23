@@ -29,6 +29,11 @@ function isConsistent(lifecycle: EventLifecycle, content: EventData) {
   return lifecycle.id === content.eventId && lifecycle.slug === content.slug;
 }
 
+function parseTimestamp(value: string) {
+  const timestamp = Date.parse(value);
+  return Number.isFinite(timestamp) ? timestamp : null;
+}
+
 export function getConferenceById(eventId: string): ConferenceRecord | null {
   const lifecycle = getEventLifecycle(eventId);
   const content = getEventContent(eventId);
@@ -114,6 +119,36 @@ export function validateConferenceCatalog() {
     }
     if (record.lifecycleReady && record.contentReady && !record.consistent) {
       errors.push(`id_or_slug_mismatch:${record.eventId}`);
+    }
+  }
+
+  for (const lifecycle of listEventLifecycles()) {
+    const startsAtMs = parseTimestamp(lifecycle.startsAt);
+    if (startsAtMs === null) {
+      errors.push(`invalid_starts_at:${lifecycle.id}`);
+      continue;
+    }
+
+    for (const [leadType, window] of Object.entries(lifecycle.leadCaptureWindows ?? {})) {
+      if (!window) {
+        continue;
+      }
+
+      const opensAtMs = window.opensAt ? parseTimestamp(window.opensAt) : null;
+      const closesAtMs = window.closesAt ? parseTimestamp(window.closesAt) : null;
+
+      if (window.opensAt && opensAtMs === null) {
+        errors.push(`invalid_lead_window_open:${lifecycle.id}:${leadType}`);
+      }
+      if (window.closesAt && closesAtMs === null) {
+        errors.push(`invalid_lead_window_close:${lifecycle.id}:${leadType}`);
+      }
+      if (opensAtMs !== null && closesAtMs !== null && opensAtMs >= closesAtMs) {
+        errors.push(`invalid_lead_window_order:${lifecycle.id}:${leadType}`);
+      }
+      if (closesAtMs !== null && closesAtMs > startsAtMs) {
+        errors.push(`lead_window_after_event_start:${lifecycle.id}:${leadType}`);
+      }
     }
   }
 
