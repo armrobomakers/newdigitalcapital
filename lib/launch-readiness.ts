@@ -1,11 +1,7 @@
 import { getLeadCaptureAvailability } from "@/data/event-registry";
 import { listConferences, validateConferenceCatalog } from "@/data/conferences";
 import { getEventSeoConfig } from "@/data/event-seo";
-import {
-  evaluateLaunchReadiness,
-  type LaunchBlocker,
-  type LaunchWarning,
-} from "@/lib/launch-readiness-core";
+import { evaluateLaunchReadiness } from "@/lib/launch-readiness-core";
 import { isValidLeadStorageSecret } from "@/lib/lead-delivery";
 import { isLegalConfigReady } from "@/lib/legal";
 
@@ -67,6 +63,3 @@ export function getLaunchReadinessSnapshot() {
     indexingEnabled: process.env.NEXT_PUBLIC_INDEXING_ENABLED === "true",
   });
 }
-
-// Keep these imports type-visible for downstream consumers that rely on this module's public surface.
-void (0 as unknown as LaunchBlocker | LaunchWarning);
