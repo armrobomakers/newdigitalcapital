@@ -125,6 +125,48 @@ jobs:
           grep -q '"ready_for_registration":false' /tmp/health.json
           grep -q '"sales_event_missing"' /tmp/health.json
 
+          ANALYTICS_ORIGIN_STATUS=$($CURL -o /tmp/analytics-origin.json -w '%{http_code}' \
+            -H 'Origin: https://evil.example' \
+            -H 'Content-Type: application/json' \
+            -d '{}' \
+            "$BASE/api/analytics")
+          test "$ANALYTICS_ORIGIN_STATUS" = "403"
+          grep -q '"error":"origin_not_allowed"' /tmp/analytics-origin.json
+
+          ANALYTICS_TYPE_STATUS=$($CURL -o /tmp/analytics-type.json -w '%{http_code}' \
+            -H 'Content-Type: text/plain' \
+            --data-binary '{}' \
+            "$BASE/api/analytics")
+          test "$ANALYTICS_TYPE_STATUS" = "415"
+          grep -q '"error":"unsupported_content_type"' /tmp/analytics-type.json
+
+          head -c 9000 /dev/zero | tr '\0' 'a' >/tmp/analytics-padding.txt
+          { printf '{"padding":"'; cat /tmp/analytics-padding.txt; printf '"}'; } >/tmp/analytics-large.json
+          ANALYTICS_LARGE_STATUS=$(curl -sS \
+            -o /tmp/analytics-large-response.json -w '%{http_code}' \
+            -H 'Content-Type: application/json' \
+            -H 'Transfer-Encoding: chunked' \
+            --data-binary @/tmp/analytics-large.json \
+            "$BASE/api/analytics")
+          test "$ANALYTICS_LARGE_STATUS" = "413"
+          grep -q '"error":"payload_too_large"' /tmp/analytics-large-response.json
+
+          ANALYTICS_INVALID_STATUS=$($CURL -o /tmp/analytics-invalid.json -w '%{http_code}' \
+            -H 'Content-Type: application/json' \
+            --data-binary '{bad-json' \
+            "$BASE/api/analytics")
+          test "$ANALYTICS_INVALID_STATUS" = "400"
+          grep -q '"error":"invalid_json"' /tmp/analytics-invalid.json
+
+          ANALYTICS_STATUS=$($CURL -D /tmp/analytics-headers.txt -o /tmp/analytics.json -w '%{http_code}' \
+            -H 'Content-Type: application/json' \
+            -d '{"event_name":"page_view","event_id":"ekb-2026-06-13","session_id":"123e4567-e89b-12d3-a456-426614174000","path":"/ekb","occurred_at":"not-a-date","properties":{"source":"ci","count":1}}' \
+            "$BASE/api/analytics")
+          test "$ANALYTICS_STATUS" = "202"
+          grep -q '"accepted":true' /tmp/analytics.json
+          grep -q '"forwarded":false' /tmp/analytics.json
+          grep -qi '^cache-control: no-store' /tmp/analytics-headers.txt
+
           ORIGIN_STATUS=$($CURL -o /tmp/register-origin.json -w '%{http_code}' \
             -H 'Origin: https://evil.example' \
             -H 'Content-Type: application/json' \
