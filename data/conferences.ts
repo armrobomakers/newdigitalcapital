@@ -1,11 +1,15 @@
 import {
+  eventRegistry,
   getEventLifecycle,
   getEventLifecycleBySlug,
   listEventLifecycles,
+  validateEventLifecycleConfig,
   type EventLifecycle,
+  type EventLifecycleConfig,
   type EventLifecycleStatus,
 } from "@/data/event-registry";
 import {
+  eventContentCatalog,
   getEventContent,
   getEventContentBySlug,
   listEventContent,
@@ -32,6 +36,21 @@ function isConsistent(lifecycle: EventLifecycle, content: EventData) {
 function parseTimestamp(value: string) {
   const timestamp = Date.parse(value);
   return Number.isFinite(timestamp) ? timestamp : null;
+}
+
+function findDuplicateValues(values: string[]) {
+  const seen = new Set<string>();
+  const duplicates = new Set<string>();
+
+  for (const value of values) {
+    if (seen.has(value)) {
+      duplicates.add(value);
+    } else {
+      seen.add(value);
+    }
+  }
+
+  return [...duplicates].sort();
 }
 
 export function getConferenceById(eventId: string): ConferenceRecord | null {
@@ -72,8 +91,7 @@ export function getPrimaryConference(): ConferenceRecord | null {
     const match = conferences
       .filter((conference) => conference.lifecycle.status === status)
       .sort(
-        (left, right) =>
-          Date.parse(right.lifecycle.startsAt) - Date.parse(left.lifecycle.startsAt)
+        (left, right) => Date.parse(right.lifecycle.startsAt) - Date.parse(left.lifecycle.startsAt)
       )[0];
 
     if (match) {
@@ -110,6 +128,30 @@ export function getConferenceIntegrity(): ConferenceIntegrityRecord[] {
 export function validateConferenceCatalog() {
   const errors: string[] = [];
 
+  for (const [key, lifecycle] of Object.entries(eventRegistry) as Array<
+    [string, EventLifecycleConfig]
+  >) {
+    if (key !== lifecycle.id) {
+      errors.push(`lifecycle_key_mismatch:${key}:${lifecycle.id}`);
+    }
+  }
+
+  for (const [key, content] of Object.entries(eventContentCatalog)) {
+    if (key !== content.eventId) {
+      errors.push(`content_key_mismatch:${key}:${content.eventId}`);
+    }
+  }
+
+  for (const slug of findDuplicateValues(
+    (Object.values(eventRegistry) as EventLifecycleConfig[]).map((event) => event.slug)
+  )) {
+    errors.push(`duplicate_lifecycle_slug:${slug}`);
+  }
+
+  for (const slug of findDuplicateValues(Object.values(eventContentCatalog).map((event) => event.slug))) {
+    errors.push(`duplicate_content_slug:${slug}`);
+  }
+
   for (const record of getConferenceIntegrity()) {
     if (!record.lifecycleReady) {
       errors.push(`missing_lifecycle:${record.eventId}`);
@@ -123,6 +165,21 @@ export function validateConferenceCatalog() {
   }
 
   for (const lifecycle of listEventLifecycles()) {
+    const lifecycleErrors = validateEventLifecycleConfig(lifecycle).filter(
+      (error) =>
+        ![
+          "invalid_starts_at",
+          "invalid_lead_window_open",
+          "invalid_lead_window_close",
+          "invalid_lead_window_order",
+          "lead_window_after_event_start",
+        ].includes(error)
+    );
+
+    for (const error of lifecycleErrors) {
+      errors.push(`${error}:${lifecycle.id}`);
+    }
+
     const startsAtMs = parseTimestamp(lifecycle.startsAt);
     if (startsAtMs === null) {
       errors.push(`invalid_starts_at:${lifecycle.id}`);
@@ -152,7 +209,7 @@ export function validateConferenceCatalog() {
     }
   }
 
-  return errors;
+  return [...new Set(errors)];
 }
 
 export function assertConferenceCatalog() {
