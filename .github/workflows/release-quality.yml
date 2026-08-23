@@ -67,17 +67,25 @@ jobs:
           set -euo pipefail
           npm run start >/tmp/release-server.log 2>&1 &
           PID=$!
-          trap 'kill "$PID" 2>/dev/null || true' EXIT
+          trap 'STATUS=$?; if [ "$STATUS" -ne 0 ]; then echo "--- server log ---"; cat /tmp/release-server.log || true; fi; kill "$PID" 2>/dev/null || true' EXIT
           BASE=http://127.0.0.1:7485
+          curl_retry='curl --retry 8 --retry-connrefused --retry-delay 1 -sS'
+
+          READY=0
           for i in $(seq 1 30); do
-            if curl -fsS "$BASE/api/health" >/tmp/health.json; then break; fi
+            if $curl_retry -f "$BASE/api/health" >/tmp/health.json; then
+              READY=1
+              break
+            fi
             sleep 1
           done
+          test "$READY" = "1"
+          sleep 1
 
-          ROOT=$(curl -sS -o /tmp/root.html -w '%{http_code}' "$BASE/")
+          ROOT=$($curl_retry -o /tmp/root.html -w '%{http_code}' "$BASE/")
           test "$ROOT" = "307" -o "$ROOT" = "308"
 
-          test "$(curl -sS -o /tmp/ekb.html -w '%{http_code}' "$BASE/ekb")" = "200"
+          test "$($curl_retry -o /tmp/ekb.html -w '%{http_code}' "$BASE/ekb")" = "200"
           grep -q '13 июня 2026' /tmp/ekb.html
           grep -q 'Архив' /tmp/ekb.html
           ! grep -q '6 900 ₽' /tmp/ekb.html
@@ -85,15 +93,15 @@ jobs:
           ! grep -q 'БЦ Саммит' /tmp/ekb.html
           ! grep -q 'application/ld+json' /tmp/ekb.html
 
-          test "$(curl -sS -o /tmp/privacy.html -w '%{http_code}' "$BASE/legal/privacy")" = "200"
-          test "$(curl -sS -o /tmp/offer.html -w '%{http_code}' "$BASE/legal/offer")" = "200"
-          test "$(curl -sS -o /tmp/thanks.html -w '%{http_code}' "$BASE/thanks")" = "200"
-          test "$(curl -sS -o /tmp/partner.html -w '%{http_code}' "$BASE/apply/partner/ekb")" = "200"
-          test "$(curl -sS -o /tmp/unknown.html -w '%{http_code}' "$BASE/not-a-conference")" = "404"
-          test "$(curl -sS -o /tmp/manifest.json -w '%{http_code}' "$BASE/manifest.webmanifest")" = "200"
-          test "$(curl -sS -o /tmp/robots.txt -w '%{http_code}' "$BASE/robots.txt")" = "200"
+          test "$($curl_retry -o /tmp/privacy.html -w '%{http_code}' "$BASE/legal/privacy")" = "200"
+          test "$($curl_retry -o /tmp/offer.html -w '%{http_code}' "$BASE/legal/offer")" = "200"
+          test "$($curl_retry -o /tmp/thanks.html -w '%{http_code}' "$BASE/thanks")" = "200"
+          test "$($curl_retry -o /tmp/partner.html -w '%{http_code}' "$BASE/apply/partner/ekb")" = "200"
+          test "$($curl_retry -o /tmp/unknown.html -w '%{http_code}' "$BASE/not-a-conference")" = "404"
+          test "$($curl_retry -o /tmp/manifest.json -w '%{http_code}' "$BASE/manifest.webmanifest")" = "200"
+          test "$($curl_retry -o /tmp/robots.txt -w '%{http_code}' "$BASE/robots.txt")" = "200"
           grep -qi 'Disallow: /' /tmp/robots.txt
-          test "$(curl -sS -o /tmp/sitemap.xml -w '%{http_code}' "$BASE/sitemap.xml")" = "200"
+          test "$($curl_retry -o /tmp/sitemap.xml -w '%{http_code}' "$BASE/sitemap.xml")" = "200"
 
           grep -q '"status":"gated"' /tmp/health.json
           grep -q '"ready_for_registration":false' /tmp/health.json
@@ -102,14 +110,14 @@ jobs:
           grep -q '"lead_storage_unavailable"' /tmp/health.json
           grep -q '"reason":"lead_type_disabled"' /tmp/health.json
 
-          ASTATUS=$(curl -sS -o /tmp/analytics.json -w '%{http_code}' \
+          ASTATUS=$($curl_retry -o /tmp/analytics.json -w '%{http_code}' \
             -H 'Content-Type: application/json' \
             -d '{"event":"page_view","event_id":"ekb-2026-06-13","session_id":"release-smoke-123456","properties":{"pathname":"/ekb"}}' \
             "$BASE/api/analytics")
           test "$ASTATUS" = "202"
           grep -q '"accepted":true' /tmp/analytics.json
 
-          RSTATUS=$(curl -sS -o /tmp/register.json -w '%{http_code}' \
+          RSTATUS=$($curl_retry -o /tmp/register.json -w '%{http_code}' \
             -H 'Content-Type: application/json' \
             -H 'Idempotency-Key: 123e4567-e89b-12d3-a456-426614174000' \
             -d '{"event_id":"ekb-2026-06-13","lead_type":"attendee","name":"Release Test","phone":"+79990000000","privacy_consent":true}' \
@@ -118,7 +126,7 @@ jobs:
           grep -q '"error":"registration_closed"' /tmp/register.json
           grep -q '"reason":"lead_type_disabled"' /tmp/register.json
 
-          curl -sSI "$BASE/ekb" >/tmp/headers.txt
+          $curl_retry -I "$BASE/ekb" >/tmp/headers.txt
           grep -qi '^content-security-policy-report-only:' /tmp/headers.txt
           grep -qi '^x-content-type-options: nosniff' /tmp/headers.txt
           grep -qi '^x-frame-options: DENY' /tmp/headers.txt
