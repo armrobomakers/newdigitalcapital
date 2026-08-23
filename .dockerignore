@@ -9,7 +9,6 @@ npm-debug.log*
 .env
 .env.*
 !.env.example
-!.env.local.example
 Dockerfile*
 docker-compose*.yml
 README.md

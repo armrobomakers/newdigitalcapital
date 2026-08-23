@@ -14,8 +14,11 @@ The repository currently serves the verified archive event and contains the life
 
 ```bash
 npm ci
+cp .env.example .env.local
 npm run dev
 ```
+
+Keep `.env.example` as the single documented environment-variable source of truth. Never commit real secrets to `.env.local`.
 
 Open `http://127.0.0.1:7485/ekb`.
 
@@ -25,7 +28,13 @@ Open `http://127.0.0.1:7485/ekb`.
 npm run check
 ```
 
-This runs lint, typecheck and a production build. Pull requests also run lifecycle/readiness matrices, release invariants, runtime/security smoke and a production Docker smoke.
+This first verifies the environment contract, then runs lint, typecheck and a production build. Pull requests also run lifecycle/readiness matrices, release invariants, runtime/security smoke and a production Docker smoke.
+
+To check only environment documentation drift:
+
+```bash
+npm run env:check
+```
 
 ## Next event activation
 
@@ -55,6 +64,7 @@ See `docs/CONTAINER-RUNTIME.md`.
 - `lib/launch-readiness.ts` — runtime launch gate adapter.
 - `lib/launch-readiness-core.ts` — pure launch-readiness evaluator.
 - `/api/register` — fail-closed lead submission endpoint.
+- `/api/analytics` — privacy-safe conversion ingestion endpoint.
 - `/api/health` — operational readiness status.
 
 Vercel Git auto-deploy remains disabled by policy; intermediate development is validated in GitHub CI and deployed only as an intentional release batch.
