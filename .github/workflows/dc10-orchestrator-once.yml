@@ -44,6 +44,14 @@ jobs:
 
           patch = "\n".join(lines)
           exec(compile(patch, 'dc10-patch', 'exec'))
+
+          hook_path = Path('hooks/use-lead-capture-availability.ts')
+          hook = hook_path.read_text(encoding='utf-8')
+          old = '  useEffect(() => {\n    refresh();\n    const timer = window.setInterval(refresh, LEAD_WINDOW_REFRESH_MS);'
+          new = '  useEffect(() => {\n    const timer = window.setInterval(refresh, LEAD_WINDOW_REFRESH_MS);'
+          if hook.count(old) != 1:
+              raise SystemExit(f'hook refresh cleanup mismatch: {hook.count(old)}')
+          hook_path.write_text(hook.replace(old, new), encoding='utf-8')
           PY
 
       - name: Validate complete DC-10 batch
