@@ -30,7 +30,9 @@
     "typecheck": "tsc --noEmit",
     "env:check": "node scripts/verify-env-contract.mjs",
     "check": "npm run env:check && npm run lint && npm run typecheck && npm run build",
-    "event:check": "node scripts/check-event-activation.cjs"
+    "event:check": "node scripts/check-event-activation.cjs",
+    "lead:check": "node scripts/check-lead-storage.mjs",
+    "lead:check:test": "node scripts/verify-lead-storage-check.mjs"
   },
   "dependencies": {
     "next": "16.3.2",
