@@ -3,9 +3,6 @@
   "installCommand": "npm ci",
   "buildCommand": "npm run check",
   "git": {
-    "deploymentEnabled": {
-      "main": true,
-      "*": false
-    }
+    "deploymentEnabled": false
   }
 }
