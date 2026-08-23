@@ -20,6 +20,9 @@ const eventSeoRegistry: Record<string, EventSeoConfig> = {
   "ekb-2026-06-13": {
     structuredDataReady: false,
   },
+  "ekb-2026-09-26": {
+    structuredDataReady: false,
+  },
 };
 
 export function getEventSeoConfig(eventId: string): EventSeoConfig {
