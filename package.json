@@ -2,6 +2,25 @@
   "name": "newdigitalcapital",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": "24.x",
+    "npm": ">=11.17.0 <12"
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "24.x",
+      "onFail": "error"
+    },
+    "packageManager": {
+      "name": "npm",
+      "version": ">=11.17.0 <12",
+      "onFail": "error"
+    }
+  },
+  "allowScripts": {
+    "unrs-resolver@1.12.2": true
+  },
   "scripts": {
     "dev": "next dev -p 7485 -H 0.0.0.0",
     "build": "next build",
