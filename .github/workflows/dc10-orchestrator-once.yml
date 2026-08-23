@@ -32,8 +32,17 @@ jobs:
           marker = "          python - <<'PY'\n"
           start = workflow.index(marker) + len(marker)
           end = workflow.index("\n          PY", start)
-          lines = workflow[start:end].splitlines()
-          patch = "\n".join(line[10:] if line.startswith("          ") else line for line in lines)
+          raw_lines = workflow[start:end].splitlines()
+
+          lines = []
+          in_triple = False
+          for raw in raw_lines:
+              line = raw if in_triple else (raw[10:] if raw.startswith("          ") else raw)
+              lines.append(line)
+              if line.count("'''") % 2 == 1:
+                  in_triple = not in_triple
+
+          patch = "\n".join(lines)
           exec(compile(patch, 'dc10-patch', 'exec'))
           PY
 
