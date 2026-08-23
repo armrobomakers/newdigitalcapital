@@ -168,7 +168,9 @@ jobs:
             test "$STATUS" = "409"
           done
 
-          RATE_STATUS=$($CURL -D /tmp/register-rate-headers.txt -o /tmp/register-rate.json -w '%{http_code}' \
+          # 429 is the expected response here. Do not use curl --retry: curl honors Retry-After
+          # and would intentionally sleep for the full rate-limit window before retrying.
+          RATE_STATUS=$(curl -sS -D /tmp/register-rate-headers.txt -o /tmp/register-rate.json -w '%{http_code}' \
             -H 'X-Real-IP: 203.0.113.10' \
             -H 'Content-Type: application/json' \
             -d '{"event_id":"ekb-2026-06-13","lead_type":"attendee","name":"Rate Test","phone":"+79990000001","privacy_consent":true}' \
