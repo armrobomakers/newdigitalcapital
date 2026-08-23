@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import {
   getEventLifecycle,
-  isLeadCaptureOpen,
+  getLeadCaptureAvailability,
   type LeadType,
 } from "@/data/event-registry";
 import {
@@ -321,11 +321,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "unknown_event" }, { status: 404 });
   }
 
-  if (!isLeadCaptureOpen(payload.event_id, payload.lead_type)) {
+  const availability = getLeadCaptureAvailability(payload.event_id, payload.lead_type);
+  if (!availability?.open) {
     return NextResponse.json(
       {
         ok: false,
         error: payload.lead_type === "attendee" ? "registration_closed" : "lead_capture_closed",
+        reason: availability?.reason ?? "status_closed",
       },
       { status: 409 }
     );
