@@ -1,0 +1,37 @@
+{
+  "template": true,
+  "checkAt": "__REQUIRED_ISO_TIMESTAMP__",
+  "lifecycle": {
+    "id": "__REQUIRED_EVENT_ID__",
+    "slug": "__REQUIRED_SLUG__",
+    "status": "draft",
+    "startsAt": "__REQUIRED_ISO_TIMESTAMP__",
+    "pageReady": false,
+    "leadCapture": {
+      "attendee": false,
+      "partner": false,
+      "speaker": false,
+      "media": false
+    },
+    "leadCaptureWindows": {}
+  },
+  "content": {
+    "locationVerified": false,
+    "emailPresent": false,
+    "phonePresent": false,
+    "speakersCount": 0,
+    "programCount": 0,
+    "structuredDataReady": false,
+    "partnersCount": 0,
+    "socialsCount": 0
+  },
+  "infrastructure": {
+    "catalogErrors": [],
+    "legalReady": false,
+    "leadStorageReady": false,
+    "leadStorageSecretReady": false,
+    "analyticsReady": false,
+    "brandedSiteUrlReady": false,
+    "indexingEnabled": false
+  }
+}

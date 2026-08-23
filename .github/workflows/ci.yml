@@ -64,6 +64,27 @@ jobs:
             --outDir /tmp/dc12-readiness
           node scripts/verify-launch-readiness-core.cjs /tmp/dc12-readiness/launch-readiness-core.js
 
+      - name: Event activation CLI contract
+        run: |
+          set -euo pipefail
+          npm run event:check -- tests/fixtures/event-activation.ready.json paid-traffic >/tmp/activation-ready.json
+          grep -q '"registration_ready": true' /tmp/activation-ready.json
+          grep -q '"paid_traffic_ready": true' /tmp/activation-ready.json
+
+          if npm run event:check -- tests/fixtures/event-activation.blocked.json registration >/tmp/activation-blocked.json 2>&1; then
+            echo "blocked activation fixture unexpectedly passed"
+            exit 1
+          fi
+          grep -q '"registration_ready": false' /tmp/activation-blocked.json
+          grep -q '"venue_unverified"' /tmp/activation-blocked.json
+          grep -q '"legal_config_incomplete"' /tmp/activation-blocked.json
+
+          if npm run event:check -- config/event-activation.template.json config >/tmp/activation-template.json 2>&1; then
+            echo "template activation manifest unexpectedly passed"
+            exit 1
+          fi
+          grep -q 'activation_manifest_is_template' /tmp/activation-template.json
+
       - name: Release regression invariants
         run: node scripts/verify-release-invariants.mjs
 

@@ -28,7 +28,8 @@
     "start": "next start -p 7485 -H 0.0.0.0",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "check": "npm run lint && npm run typecheck && npm run build"
+    "check": "npm run lint && npm run typecheck && npm run build",
+    "event:check": "node scripts/check-event-activation.cjs"
   },
   "dependencies": {
     "next": "16.3.2",
