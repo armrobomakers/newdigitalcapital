@@ -20,6 +20,7 @@ const hook = read("hooks/use-lead-capture-availability.ts");
 const landing = read("components/landing.tsx");
 const sticky = read("components/sticky-cta.tsx");
 const form = read("components/registration-form.tsx");
+const registerRoute = read("app/api/register/route.ts");
 const temporalLink = read("components/temporal-registration-link.tsx");
 const temporalGate = read("components/temporal-registration-gate.tsx");
 const dockerfile = read("Dockerfile");
@@ -38,6 +39,18 @@ requireMatch("registration form", form, /const currentAvailability = refreshAvai
 requireMatch("registration form", form, /if \(!currentAvailability\?\.open\)/);
 requireMatch("registration form", form, /response\.status === 409/);
 requireMatch("registration form", form, /refreshAvailability\(\)/);
+
+requireMatch("registration API", registerRoute, /MAX_REQUEST_BODY_BYTES\s*=\s*16_384/);
+requireMatch("registration API", registerRoute, /request\.body\.getReader\(\)/);
+requireMatch("registration API", registerRoute, /totalBytes > MAX_REQUEST_BODY_BYTES/);
+requireMatch("registration API", registerRoute, /supportedMediaTypes/);
+requireMatch("registration API", registerRoute, /application\/x-www-form-urlencoded/);
+requireMatch("registration API", registerRoute, /isAllowedBrowserOrigin\(request\)/);
+requireMatch("registration API", registerRoute, /origin_not_allowed/);
+requireMatch("registration API", registerRoute, /unsupported_content_type/);
+requireMatch("registration API", registerRoute, /"Retry-After"/);
+forbidMatch("registration API", registerRoute, /await request\.json\(\)/);
+forbidMatch("registration API", registerRoute, /await request\.formData\(\)/);
 
 requireMatch("temporal CTA", temporalLink, /useLeadCaptureAvailability\(eventId, "attendee"\)/);
 requireMatch("temporal CTA", temporalLink, /href=\{open \? "#register" : "#program"\}/);
@@ -73,6 +86,9 @@ requireMatch(".dockerignore", dockerignore, /^\.next$/m);
 requireMatch("CI", ci, /- name: Container runtime smoke/);
 requireMatch("CI", ci, /docker build/);
 requireMatch("CI", ci, /docker inspect digitalcapital:ci --format '\{\{\.Config\.User\}\}'/);
+requireMatch("CI", ci, /origin_not_allowed/);
+requireMatch("CI", ci, /payload_too_large/);
+requireMatch("CI", ci, /unsupported_content_type/);
 
 if (vercelConfig?.git?.deploymentEnabled !== false) {
   throw new Error("vercel.json: automatic Git deployments must remain disabled outside an explicit one-shot release trigger");

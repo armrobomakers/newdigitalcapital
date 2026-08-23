@@ -125,6 +125,32 @@ jobs:
           grep -q '"ready_for_registration":false' /tmp/health.json
           grep -q '"sales_event_missing"' /tmp/health.json
 
+          ORIGIN_STATUS=$($CURL -o /tmp/register-origin.json -w '%{http_code}' \
+            -H 'Origin: https://evil.example' \
+            -H 'Content-Type: application/json' \
+            -d '{}' \
+            "$BASE/api/register")
+          test "$ORIGIN_STATUS" = "403"
+          grep -q '"error":"origin_not_allowed"' /tmp/register-origin.json
+
+          TYPE_STATUS=$($CURL -o /tmp/register-type.json -w '%{http_code}' \
+            -H 'Content-Type: text/plain' \
+            --data-binary 'not-json' \
+            "$BASE/api/register")
+          test "$TYPE_STATUS" = "415"
+          grep -q '"error":"unsupported_content_type"' /tmp/register-type.json
+
+          head -c 17000 /dev/zero | tr '\0' 'a' >/tmp/register-padding.txt
+          { printf '{"padding":"'; cat /tmp/register-padding.txt; printf '"}'; } >/tmp/register-large.json
+          LARGE_STATUS=$(curl --retry 3 --retry-connrefused --retry-delay 1 -sS \
+            -o /tmp/register-large-response.json -w '%{http_code}' \
+            -H 'Content-Type: application/json' \
+            -H 'Transfer-Encoding: chunked' \
+            --data-binary @/tmp/register-large.json \
+            "$BASE/api/register")
+          test "$LARGE_STATUS" = "413"
+          grep -q '"error":"payload_too_large"' /tmp/register-large-response.json
+
           RSTATUS=$($CURL -o /tmp/register.json -w '%{http_code}' \
             -H 'Content-Type: application/json' \
             -H 'Idempotency-Key: 123e4567-e89b-12d3-a456-426614174000' \
@@ -132,6 +158,26 @@ jobs:
             "$BASE/api/register")
           test "$RSTATUS" = "409"
           grep -q '"error":"registration_closed"' /tmp/register.json
+
+          for i in 1 2 3 4 5; do
+            STATUS=$($CURL -o /tmp/register-rate-$i.json -w '%{http_code}' \
+              -H 'X-Real-IP: 203.0.113.10' \
+              -H 'Content-Type: application/json' \
+              -d '{"event_id":"ekb-2026-06-13","lead_type":"attendee","name":"Rate Test","phone":"+79990000001","privacy_consent":true}' \
+              "$BASE/api/register")
+            test "$STATUS" = "409"
+          done
+
+          # 429 is the expected response here. Do not use curl --retry: curl honors Retry-After
+          # and would intentionally sleep for the full rate-limit window before retrying.
+          RATE_STATUS=$(curl -sS -D /tmp/register-rate-headers.txt -o /tmp/register-rate.json -w '%{http_code}' \
+            -H 'X-Real-IP: 203.0.113.10' \
+            -H 'Content-Type: application/json' \
+            -d '{"event_id":"ekb-2026-06-13","lead_type":"attendee","name":"Rate Test","phone":"+79990000001","privacy_consent":true}' \
+            "$BASE/api/register")
+          test "$RATE_STATUS" = "429"
+          grep -q '"error":"rate_limited"' /tmp/register-rate.json
+          grep -qi '^retry-after: ' /tmp/register-rate-headers.txt
 
           $CURL -I "$BASE/ekb" >/tmp/headers.txt
           grep -qi '^content-security-policy-report-only:' /tmp/headers.txt
