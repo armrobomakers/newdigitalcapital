@@ -1,16 +1,15 @@
-# One-time orchestrator; self-removes after a validated DC-10 patch.
 name: DC-10 one-time GitHub orchestrator
 
 on:
-  push:
+  pull_request:
     branches: [main]
-    paths: [.github/workflows/dc10-orchestrator-once.yml]
 
 permissions:
   contents: write
 
 jobs:
   apply:
+    if: github.head_ref == 'stage/dc-10-live-temporal-ux'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
