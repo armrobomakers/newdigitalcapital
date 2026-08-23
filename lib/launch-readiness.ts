@@ -1,5 +1,6 @@
 import { listConferences, validateConferenceCatalog } from "@/data/conferences";
 import { getEventSeoConfig } from "@/data/event-seo";
+import { isValidLeadStorageSecret } from "@/lib/lead-delivery";
 import { isLegalConfigReady } from "@/lib/legal";
 
 export type LaunchBlocker = {
@@ -146,7 +147,7 @@ export function getLaunchReadinessSnapshot() {
   }
 
   const leadStorageReady = Boolean(process.env.LEAD_STORAGE_WEBHOOK_URL?.trim());
-  const leadStorageSigningReady = Boolean(process.env.LEAD_STORAGE_WEBHOOK_SECRET?.trim());
+  const leadStorageSecret = process.env.LEAD_STORAGE_WEBHOOK_SECRET?.trim() ?? "";
 
   if (!leadStorageReady) {
     const item = blocker(
@@ -155,10 +156,10 @@ export function getLaunchReadinessSnapshot() {
     );
     registrationBlockers.push(item);
     paidTrafficBlockers.push(item);
-  } else if (!leadStorageSigningReady) {
+  } else if (!isValidLeadStorageSecret(leadStorageSecret)) {
     const item = blocker(
       "lead_storage_signature_missing",
-      "Основное хранилище заявок настроено без обязательной подписи webhook."
+      "Основное хранилище заявок настроено без достаточно сильной обязательной подписи webhook."
     );
     registrationBlockers.push(item);
     paidTrafficBlockers.push(item);
