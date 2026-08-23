@@ -136,10 +136,11 @@ jobs:
               method: 'POST',
               headers: { 'content-type': 'application/json' },
               body: JSON.stringify({
-                event: 'page_view',
+                event_name: 'page_view',
                 event_id: 'ekb-2026-06-13',
                 session_id: 'release-smoke-123456',
-                properties: { pathname: '/ekb' },
+                path: '/ekb',
+                properties: { source: 'release_smoke' },
               }),
             }, 202);
             const analyticsBody = await analytics.json();
