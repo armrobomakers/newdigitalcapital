@@ -3,6 +3,7 @@ import { createHmac } from "node:crypto";
 export const LEAD_SCHEMA_VERSION = "lead.v1";
 export const PRIMARY_LEAD_TIMEOUT_MS = 8_000;
 export const AUXILIARY_DELIVERY_TIMEOUT_MS = 5_000;
+export const MIN_LEAD_STORAGE_SECRET_LENGTH = 32;
 
 export type PrimaryLeadAck = {
   ok: true;
@@ -94,4 +95,8 @@ export async function deliverPrimaryLead({
 
 export function isValidIdempotencyKey(value: string) {
   return /^[A-Za-z0-9][A-Za-z0-9._:-]{15,127}$/.test(value);
+}
+
+export function isValidLeadStorageSecret(value: string) {
+  return value.trim().length >= MIN_LEAD_STORAGE_SECRET_LENGTH;
 }
