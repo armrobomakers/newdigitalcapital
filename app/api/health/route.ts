@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { getLeadCaptureAvailability } from "@/data/event-registry";
 import { getConferenceIntegrity, listConferences } from "@/data/conferences";
 import { getEventSeoConfig } from "@/data/event-seo";
 import { getLaunchReadinessSnapshot } from "@/lib/launch-readiness";
@@ -20,6 +21,7 @@ export async function GET() {
     contacts_ready: Boolean(content.contacts.email.trim() && content.contacts.phone.trim()),
     structured_data_ready: getEventSeoConfig(lifecycle.id).structuredDataReady,
     lead_capture: lifecycle.leadCapture,
+    attendee_capture: getLeadCaptureAvailability(lifecycle.id, "attendee"),
     starts_at: lifecycle.startsAt,
   }));
 
