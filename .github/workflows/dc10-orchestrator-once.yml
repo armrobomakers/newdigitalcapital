@@ -1,3 +1,4 @@
+# One-time orchestrator; self-removes after a validated DC-10 patch.
 name: DC-10 one-time GitHub orchestrator
 
 on:
