@@ -41,6 +41,21 @@ export type LeadCaptureAvailability = {
   closesAt: string;
 };
 
+export type EventLifecycleValidationError =
+  | "id_missing"
+  | "slug_missing"
+  | "invalid_starts_at"
+  | "draft_lead_capture_enabled"
+  | "scheduled_attendee_capture_enabled"
+  | "sales_page_not_ready"
+  | "sales_attendee_capture_disabled"
+  | "sold_out_attendee_capture_enabled"
+  | "past_lead_capture_enabled"
+  | "invalid_lead_window_open"
+  | "invalid_lead_window_close"
+  | "invalid_lead_window_order"
+  | "lead_window_after_event_start";
+
 export const eventRegistry = {
   "ekb-2026-06-13": {
     id: "ekb-2026-06-13",
@@ -74,6 +89,73 @@ function normalizeNow(now: Date | number | string) {
   }
 
   return parseTimestamp(now);
+}
+
+function enabledLeadTypes(event: EventLifecycleConfig) {
+  return (Object.entries(event.leadCapture) as Array<[LeadType, boolean]>)
+    .filter(([, enabled]) => enabled)
+    .map(([leadType]) => leadType);
+}
+
+export function validateEventLifecycleConfig(event: EventLifecycleConfig) {
+  const errors: EventLifecycleValidationError[] = [];
+  const startsAtMs = parseTimestamp(event.startsAt);
+  const enabledLeads = enabledLeadTypes(event);
+
+  if (!event.id.trim()) {
+    errors.push("id_missing");
+  }
+  if (!event.slug.trim()) {
+    errors.push("slug_missing");
+  }
+  if (startsAtMs === null) {
+    errors.push("invalid_starts_at");
+  }
+
+  if (event.status === "draft" && enabledLeads.length > 0) {
+    errors.push("draft_lead_capture_enabled");
+  }
+  if (event.status === "scheduled" && event.leadCapture.attendee) {
+    errors.push("scheduled_attendee_capture_enabled");
+  }
+  if (event.status === "sales" && !event.pageReady) {
+    errors.push("sales_page_not_ready");
+  }
+  if (event.status === "sales" && !event.leadCapture.attendee) {
+    errors.push("sales_attendee_capture_disabled");
+  }
+  if (event.status === "sold_out" && event.leadCapture.attendee) {
+    errors.push("sold_out_attendee_capture_enabled");
+  }
+  if (event.status === "past" && enabledLeads.length > 0) {
+    errors.push("past_lead_capture_enabled");
+  }
+
+  if (startsAtMs !== null) {
+    for (const window of Object.values(event.leadCaptureWindows ?? {})) {
+      if (!window) {
+        continue;
+      }
+
+      const opensAtMs = window.opensAt ? parseTimestamp(window.opensAt) : null;
+      const closesAtMs = window.closesAt ? parseTimestamp(window.closesAt) : null;
+
+      if (window.opensAt && opensAtMs === null) {
+        errors.push("invalid_lead_window_open");
+      }
+      if (window.closesAt && closesAtMs === null) {
+        errors.push("invalid_lead_window_close");
+      }
+      if (opensAtMs !== null && closesAtMs !== null && opensAtMs >= closesAtMs) {
+        errors.push("invalid_lead_window_order");
+      }
+      if (closesAtMs !== null && closesAtMs > startsAtMs) {
+        errors.push("lead_window_after_event_start");
+      }
+    }
+  }
+
+  return [...new Set(errors)];
 }
 
 function statusAllowsLeadType(status: EventLifecycleStatus, leadType: LeadType) {
