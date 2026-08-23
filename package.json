@@ -19,7 +19,8 @@
     }
   },
   "allowScripts": {
-    "unrs-resolver@1.12.2": true
+    "unrs-resolver@1.12.2": true,
+    "fsevents": false
   },
   "scripts": {
     "dev": "next dev -p 7485 -H 0.0.0.0",
