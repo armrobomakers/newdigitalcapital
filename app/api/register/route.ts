@@ -5,6 +5,13 @@ import {
   isLeadCaptureOpen,
   type LeadType,
 } from "@/data/event-registry";
+import {
+  AUXILIARY_DELIVERY_TIMEOUT_MS,
+  buildLeadEnvelope,
+  deliverPrimaryLead,
+  isValidIdempotencyKey,
+  type LeadEnvelope,
+} from "@/lib/lead-delivery";
 import { isLegalConfigReady } from "@/lib/legal";
 
 type RegistrationPayload = {
@@ -168,17 +175,31 @@ function isRateLimited(ip: string) {
   return false;
 }
 
-function buildStoredPayload(payload: NormalizedPayload, requestId: string) {
-  return {
-    ...payload,
-    website: undefined,
-    request_id: requestId,
-    submitted_at: new Date().toISOString(),
-    source: "newdigitalcapital",
-  };
+function resolveRequestId(request: Request) {
+  const supplied = request.headers.get("idempotency-key")?.trim() ?? "";
+  if (!supplied) {
+    return crypto.randomUUID();
+  }
+
+  return isValidIdempotencyKey(supplied) ? supplied : null;
 }
 
-async function postJsonWebhook(url: string, body: unknown, errorPrefix: string) {
+function buildStoredEnvelope(payload: NormalizedPayload, requestId: string) {
+  return buildLeadEnvelope(
+    {
+      ...payload,
+      website: undefined,
+    },
+    requestId
+  );
+}
+
+async function postJsonWebhook(
+  url: string,
+  body: unknown,
+  errorPrefix: string,
+  timeoutMs = AUXILIARY_DELIVERY_TIMEOUT_MS
+) {
   const response = await fetch(url, {
     method: "POST",
     headers: {
@@ -186,6 +207,7 @@ async function postJsonWebhook(url: string, body: unknown, errorPrefix: string) 
     },
     body: JSON.stringify(body),
     cache: "no-store",
+    signal: AbortSignal.timeout(timeoutMs),
   });
 
   if (!response.ok) {
@@ -193,32 +215,33 @@ async function postJsonWebhook(url: string, body: unknown, errorPrefix: string) 
   }
 }
 
-async function postToPrimaryStorage(payload: NormalizedPayload, requestId: string) {
-  const webhook = process.env.LEAD_STORAGE_WEBHOOK_URL;
+async function postToPrimaryStorage(envelope: LeadEnvelope) {
+  const webhook = process.env.LEAD_STORAGE_WEBHOOK_URL?.trim();
+  const secret = process.env.LEAD_STORAGE_WEBHOOK_SECRET?.trim();
 
   if (!webhook) {
     throw new Error("primary_storage_not_configured");
   }
 
-  await postJsonWebhook(
-    webhook,
-    buildStoredPayload(payload, requestId),
-    "primary_storage_delivery_failed"
-  );
+  if (!secret) {
+    throw new Error("primary_storage_signature_not_configured");
+  }
+
+  return deliverPrimaryLead({
+    url: webhook,
+    secret,
+    envelope,
+  });
 }
 
-async function postToSheetsMirror(payload: NormalizedPayload, requestId: string) {
-  const webhook = process.env.GOOGLE_SHEETS_WEBHOOK_URL;
+async function postToSheetsMirror(envelope: LeadEnvelope) {
+  const webhook = process.env.GOOGLE_SHEETS_WEBHOOK_URL?.trim();
 
   if (!webhook) {
     return;
   }
 
-  await postJsonWebhook(
-    webhook,
-    buildStoredPayload(payload, requestId),
-    "sheets_mirror_delivery_failed"
-  );
+  await postJsonWebhook(webhook, envelope, "sheets_mirror_delivery_failed");
 }
 
 async function postToTelegram(message: string) {
@@ -241,11 +264,27 @@ async function postToTelegram(message: string) {
       disable_web_page_preview: true,
     }),
     cache: "no-store",
+    signal: AbortSignal.timeout(AUXILIARY_DELIVERY_TIMEOUT_MS),
   });
 
   if (!response.ok) {
     throw new Error(`telegram_delivery_failed:${response.status}`);
   }
+}
+
+function buildTelegramNotification(payload: NormalizedPayload, requestId: string) {
+  const safe = (value: string) => escapeHtml(value);
+  return [
+    "<b>Новая заявка на Цифровой капитал</b>",
+    `<b>ID:</b> ${safe(requestId)}`,
+    `<b>Event:</b> ${safe(payload.event_id)}`,
+    `<b>Тип:</b> ${safe(payload.lead_type)}`,
+    payload.utm_source ? `<b>UTM Source:</b> ${safe(payload.utm_source)}` : null,
+    payload.utm_campaign ? `<b>UTM Campaign:</b> ${safe(payload.utm_campaign)}` : null,
+    "Персональные данные доступны только в основном хранилище заявок.",
+  ]
+    .filter(Boolean)
+    .join("\n");
 }
 
 export async function POST(request: Request) {
@@ -298,38 +337,31 @@ export async function POST(request: Request) {
     );
   }
 
-  if (!process.env.LEAD_STORAGE_WEBHOOK_URL) {
+  if (!process.env.LEAD_STORAGE_WEBHOOK_URL?.trim()) {
     return NextResponse.json(
       { ok: false, error: "primary_storage_unavailable" },
       { status: 503 }
     );
   }
 
-  const requestId = crypto.randomUUID();
-  const safe = (value: string) => escapeHtml(value);
-  const message = [
-    "<b>Новая заявка на Цифровой капитал</b>",
-    `<b>ID:</b> ${safe(requestId)}`,
-    `<b>Event:</b> ${safe(payload.event_id)}`,
-    `<b>Тип:</b> ${safe(payload.lead_type)}`,
-    `Имя: ${safe(payload.name)}`,
-    `Контакт: ${safe(payload.contact)}`,
-    payload.email ? `Email: ${safe(payload.email)}` : null,
-    payload.phone ? `Телефон: ${safe(payload.phone)}` : null,
-    payload.company ? `Компания: ${safe(payload.company)}` : null,
-    "Согласие на ПД: да",
-    `Инфосообщения: ${payload.marketing_consent ? "да" : "нет"}`,
-    payload.utm_source ? `UTM Source: ${safe(payload.utm_source)}` : null,
-    payload.utm_medium ? `UTM Medium: ${safe(payload.utm_medium)}` : null,
-    payload.utm_campaign ? `UTM Campaign: ${safe(payload.utm_campaign)}` : null,
-    payload.utm_content ? `UTM Content: ${safe(payload.utm_content)}` : null,
-    payload.utm_term ? `UTM Term: ${safe(payload.utm_term)}` : null,
-  ]
-    .filter(Boolean)
-    .join("\n");
+  if (!process.env.LEAD_STORAGE_WEBHOOK_SECRET?.trim()) {
+    return NextResponse.json(
+      { ok: false, error: "primary_storage_signature_unavailable" },
+      { status: 503 }
+    );
+  }
 
+  const requestId = resolveRequestId(request);
+  if (!requestId) {
+    return NextResponse.json({ ok: false, error: "invalid_idempotency_key" }, { status: 400 });
+  }
+
+  const envelope = buildStoredEnvelope(payload, requestId);
+
+  let duplicate = false;
   try {
-    await postToPrimaryStorage(payload, requestId);
+    const ack = await postToPrimaryStorage(envelope);
+    duplicate = ack.duplicate === true;
   } catch (error) {
     console.error("registration_primary_storage_failed", {
       requestId,
@@ -344,23 +376,26 @@ export async function POST(request: Request) {
     );
   }
 
-  const [sheetsResult, telegramResult] = await Promise.allSettled([
-    postToSheetsMirror(payload, requestId),
-    postToTelegram(message),
-  ]);
+  if (!duplicate) {
+    const [sheetsResult, telegramResult] = await Promise.allSettled([
+      postToSheetsMirror(envelope),
+      postToTelegram(buildTelegramNotification(payload, requestId)),
+    ]);
 
-  if (sheetsResult.status === "rejected" || telegramResult.status === "rejected") {
-    console.warn("registration_auxiliary_delivery_failed", {
-      requestId,
-      eventId: payload.event_id,
-      sheets: sheetsResult.status,
-      telegram: telegramResult.status,
-    });
+    if (sheetsResult.status === "rejected" || telegramResult.status === "rejected") {
+      console.warn("registration_auxiliary_delivery_failed", {
+        requestId,
+        eventId: payload.event_id,
+        sheets: sheetsResult.status,
+        telegram: telegramResult.status,
+      });
+    }
   }
 
   return NextResponse.json({
     ok: true,
     message: "registration_received",
     request_id: requestId,
+    deduplicated: duplicate,
   });
 }
