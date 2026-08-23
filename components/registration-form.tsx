@@ -1,12 +1,16 @@
 "use client";
 
 import type { FormEvent } from "react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { BriefcaseIcon, MailIcon, PhoneIcon, UserIcon } from "@/components/icons";
-import { isLeadCaptureOpen, type LeadType } from "@/data/event-registry";
+import {
+  getLeadCaptureAvailability,
+  type LeadCaptureAvailability,
+  type LeadType,
+} from "@/data/event-registry";
 import { trackConversionEvent } from "@/lib/analytics-client";
 
 const utmKeys = [
@@ -16,6 +20,8 @@ const utmKeys = [
   "utm_content",
   "utm_term",
 ] as const;
+
+const LEAD_WINDOW_REFRESH_MS = 30_000;
 
 type Status = "idle" | "loading" | "success" | "error";
 
@@ -32,23 +38,49 @@ type RegistrationResult = {
 
 const closedLeadCopy: Record<LeadType, { title: string; description: string }> = {
   attendee: {
-    title: "Регистрация на эту конференцию завершена",
+    title: "Регистрация на эту конференцию закрыта",
     description:
-      "Страница сохранена как архив события. Новая дата и площадка будут опубликованы после подтверждения следующей конференции.",
+      "Прием новых заявок сейчас недоступен. Актуальный статус следующего события будет опубликован на его странице.",
   },
   partner: {
     title: "Прием партнерских заявок закрыт",
-    description: "Партнерские форматы будут открыты отдельно для следующего подтвержденного события.",
+    description: "Партнерские форматы будут доступны только в подтвержденном окне следующего события.",
   },
   speaker: {
     title: "Прием заявок от спикеров закрыт",
-    description: "Новый call for speakers будет открыт вместе с программой следующей конференции.",
+    description: "Call for speakers будет доступен только в подтвержденном окне следующего события.",
   },
   media: {
     title: "Медиа-аккредитация закрыта",
-    description: "Аккредитация будет открыта для следующего подтвержденного события.",
+    description: "Аккредитация будет доступна только в подтвержденном окне следующего события.",
   },
 };
+
+function getAvailabilityCopy(leadType: LeadType, availability: LeadCaptureAvailability | null) {
+  if (availability?.reason === "window_not_open") {
+    return {
+      title: leadType === "attendee" ? "Регистрация еще не открыта" : "Прием заявок еще не открыт",
+      description:
+        "Временное окно приема заявок еще не началось. Страница автоматически обновит доступность после открытия окна.",
+    };
+  }
+
+  if (availability?.reason === "event_started") {
+    return {
+      title: leadType === "attendee" ? "Регистрация завершена" : "Прием заявок завершен",
+      description: "Событие уже началось, поэтому новые заявки автоматически закрыты.",
+    };
+  }
+
+  if (availability?.reason === "window_closed") {
+    return {
+      title: leadType === "attendee" ? "Регистрация завершена" : "Прием заявок завершен",
+      description: "Установленное окно приема заявок уже закрыто.",
+    };
+  }
+
+  return closedLeadCopy[leadType];
+}
 
 export function RegistrationForm({
   eventId = "ekb-2026-06-13",
@@ -58,9 +90,27 @@ export function RegistrationForm({
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState("");
+  const [availability, setAvailability] = useState<LeadCaptureAvailability | null>(() =>
+    getLeadCaptureAvailability(eventId, leadType)
+  );
   const formStarted = useRef(false);
   const idempotencyKeyRef = useRef<string | null>(null);
-  const leadCaptureOpen = isLeadCaptureOpen(eventId, leadType);
+  const leadCaptureOpen = availability?.open === true;
+
+  useEffect(() => {
+    const refreshAvailability = () => {
+      setAvailability(getLeadCaptureAvailability(eventId, leadType));
+    };
+
+    refreshAvailability();
+    const timer = window.setInterval(refreshAvailability, LEAD_WINDOW_REFRESH_MS);
+    document.addEventListener("visibilitychange", refreshAvailability);
+
+    return () => {
+      window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", refreshAvailability);
+    };
+  }, [eventId, leadType]);
 
   function getIdempotencyKey() {
     if (!idempotencyKeyRef.current) {
@@ -81,6 +131,15 @@ export function RegistrationForm({
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    const currentAvailability = getLeadCaptureAvailability(eventId, leadType);
+    setAvailability(currentAvailability);
+    if (!currentAvailability?.open) {
+      setStatus("idle");
+      setMessage("");
+      return;
+    }
+
     setStatus("loading");
     setMessage("");
 
@@ -110,6 +169,11 @@ export function RegistrationForm({
           error_code: errorCode,
           http_status: response.status,
         });
+
+        if (response.status === 409) {
+          setAvailability(getLeadCaptureAvailability(eventId, leadType));
+        }
+
         throw new Error(errorCode);
       }
 
@@ -141,14 +205,14 @@ export function RegistrationForm({
   }
 
   if (!leadCaptureOpen) {
-    const copy = closedLeadCopy[leadType];
+    const copy = getAvailabilityCopy(leadType, availability);
     return (
       <div className="rounded-[24px] border border-violet-300/20 bg-white/[0.035] p-5">
         <p className="text-lg font-semibold text-white">{copy.title}</p>
         <p className="mt-2 text-sm leading-7 text-white/65">{copy.description}</p>
         {leadType === "attendee" ? (
           <Link href="#program" className="btn-secondary mt-4 inline-flex" data-analytics-cta="archive_program">
-            Смотреть программу прошедшего события
+            Смотреть программу
           </Link>
         ) : null}
       </div>
