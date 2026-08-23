@@ -4,6 +4,9 @@ on:
   push:
     branches: [stage/dc-07-lead-delivery-reliability]
     paths: [.github/workflows/dc-07-quality.yml]
+  pull_request:
+    branches: [stage/dc-06-launch-ops]
+    paths: [.github/workflows/dc-07-quality.yml]
 
 permissions:
   contents: write
