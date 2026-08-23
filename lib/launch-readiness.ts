@@ -2,7 +2,10 @@ import { getLeadCaptureAvailability } from "@/data/event-registry";
 import { listConferences, validateConferenceCatalog } from "@/data/conferences";
 import { getEventSeoConfig } from "@/data/event-seo";
 import { evaluateLaunchReadiness } from "@/lib/launch-readiness-core";
-import { isValidLeadStorageSecret } from "@/lib/lead-delivery";
+import {
+  isValidLeadStorageSecret,
+  resolveLeadStorageTransport,
+} from "@/lib/lead-delivery";
 import { isLegalConfigReady } from "@/lib/legal";
 
 export type { LaunchBlocker, LaunchWarning } from "@/lib/launch-readiness-core";
@@ -31,7 +34,8 @@ function getConfiguredSalesConference() {
 
 export function getLaunchReadinessSnapshot() {
   const salesConference = getConfiguredSalesConference();
-  const leadStorageReady = Boolean(process.env.LEAD_STORAGE_WEBHOOK_URL?.trim());
+  const leadStorageTransportReady = resolveLeadStorageTransport() !== null;
+  const leadStorageReady = Boolean(process.env.LEAD_STORAGE_WEBHOOK_URL?.trim()) && leadStorageTransportReady;
   const leadStorageSecret = process.env.LEAD_STORAGE_WEBHOOK_SECRET?.trim() ?? "";
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim() ?? "";
 
