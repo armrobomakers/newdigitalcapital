@@ -64,7 +64,7 @@ The receiver:
 - accepts only `lead.v1` from `newdigitalcapital`;
 - validates `request_id`;
 - takes a script lock before idempotency/storage work;
-- deduplicates by `request_id`;
+- deduplicates by exact case-sensitive `request_id`;
 - stores and compares `payload_sha256` to detect idempotency conflicts;
 - prefixes spreadsheet-formula-like user strings so lead data cannot become a formula;
 - verifies the exact Sheet header contract before every write;
@@ -145,18 +145,46 @@ TELEGRAM_CHAT_ID=<operations chat id>
 
 The Telegram message contains request/event/ticket/UTM metadata only. Name, phone, email and company remain in primary storage.
 
-## Acceptance test
+## Executable acceptance check
+
+After the Web App is deployed and the three `LEAD_STORAGE_*` runtime values are available, run:
+
+```text
+npm run lead:check
+```
+
+The checker uses synthetic, non-user data. It performs three requests with one generated request id:
+
+1. first write must return the exact ACK;
+2. an identical retry must return `duplicate:true` without creating another row;
+3. the same request id with a changed payload must not return a valid ACK.
+
+A successful run prints:
+
+```json
+{
+  "ok": true,
+  "first_write": "acknowledged",
+  "duplicate_retry": "deduplicated",
+  "changed_payload_retry": "rejected"
+}
+```
+
+One synthetic acceptance-check row is intentionally retained in primary storage as evidence that durable storage was actually exercised. The checker never prints the configured secret or submitted contact fields.
+
+The checker contract itself is exercised against local mock receivers for both supported transports during the canonical `npm run check`, so CI can validate its behavior without calling production storage.
+
+## Production acceptance checklist
 
 Before registration is treated as production-ready, verify all of the following:
 
-1. Submit one synthetic lead with a stable idempotency key.
-2. Confirm exactly one new row appears in `Leads`.
-3. Confirm `/api/register` receives the matching ACK and returns success.
-4. Retry the exact same request/idempotency key.
-5. Confirm no second row is created and the receiver returns `duplicate:true`.
-6. Retry the same request id with a changed payload and confirm the sender fails closed because the receiver returns an idempotency conflict instead of a valid ACK.
-7. Change the signing secret on one side only and confirm the lead is rejected.
-8. Confirm raw PII is absent from application logs and Telegram.
-9. Confirm `/api/health` no longer reports the lead-storage blocker after the correct transport, URL and secret are configured.
+1. Deploy the Apps Script receiver and set its Script properties.
+2. Configure the matching site transport, Web App `/exec` URL and secret.
+3. Run `npm run lead:check`.
+4. Confirm exactly one synthetic acceptance row appears in `Leads`.
+5. Confirm the checker reports first write acknowledged, duplicate retry deduplicated and changed-payload retry rejected.
+6. Change the signing secret on one side only in a controlled test and confirm the lead is rejected, then restore the matching secret.
+7. Confirm raw PII is absent from application logs and Telegram.
+8. Confirm `/api/health` no longer reports the lead-storage blocker after the correct transport, URL and secret are configured.
 
 Do not enable paid traffic only because lead storage is ready. Legal contacts, analytics, branded domain, structured data and indexing have separate launch gates.
