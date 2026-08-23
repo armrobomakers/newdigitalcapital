@@ -16,40 +16,38 @@ import {
 import { isLegalConfigReady } from "@/lib/legal";
 
 type RegistrationPayload = {
-  event_id?: string;
-  lead_type?: string;
-  name?: string;
-  contact?: string;
-  email?: string;
-  phone?: string;
-  company?: string;
-  privacy_consent?: string | boolean;
-  marketing_consent?: string | boolean;
-  website?: string;
-  utm_source?: string;
-  utm_medium?: string;
-  utm_campaign?: string;
-  utm_content?: string;
-  utm_term?: string;
+  event_id?: unknown;
+  lead_type?: unknown;
+  name?: unknown;
+  contact?: unknown;
+  email?: unknown;
+  phone?: unknown;
+  company?: unknown;
+  privacy_consent?: unknown;
+  marketing_consent?: unknown;
+  website?: unknown;
+  utm_source?: unknown;
+  utm_medium?: unknown;
+  utm_campaign?: unknown;
+  utm_content?: unknown;
+  utm_term?: unknown;
 };
 
 type NormalizedPayload = ReturnType<typeof normalizePayload>;
 
+const MAX_REQUEST_BODY_BYTES = 16_384;
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_MAX = 5;
 const RATE_LIMIT_MAX_KEYS = 5000;
 const leadTypes = new Set<LeadType>(["attendee", "partner", "speaker", "media"]);
+const supportedMediaTypes = new Set(["application/json", "application/x-www-form-urlencoded"]);
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
 
-function toStringValue(value: FormDataEntryValue | undefined) {
-  return typeof value === "string" ? value.trim() : "";
+function clip(value: unknown, maxLength: number) {
+  return typeof value === "string" ? value.trim().slice(0, maxLength) : "";
 }
 
-function clip(value: string | undefined, maxLength: number) {
-  return (value ?? "").trim().slice(0, maxLength);
-}
-
-function toBoolean(value: string | boolean | undefined) {
+function toBoolean(value: unknown) {
   return value === true || value === "true" || value === "on" || value === "yes";
 }
 
@@ -77,31 +75,137 @@ function normalizePayload(data: RegistrationPayload) {
   };
 }
 
-async function readPayload(request: Request): Promise<RegistrationPayload> {
-  const contentType = request.headers.get("content-type") ?? "";
+function getMediaType(request: Request) {
+  return (request.headers.get("content-type") ?? "")
+    .split(";", 1)[0]
+    .trim()
+    .toLowerCase();
+}
 
-  if (contentType.includes("application/json")) {
-    return (await request.json()) as RegistrationPayload;
+async function readLimitedText(request: Request) {
+  const declaredLength = request.headers.get("content-length")?.trim();
+  if (declaredLength) {
+    const bytes = Number(declaredLength);
+    if (!Number.isFinite(bytes) || bytes < 0) {
+      throw new Error("invalid_payload");
+    }
+    if (bytes > MAX_REQUEST_BODY_BYTES) {
+      throw new Error("payload_too_large");
+    }
   }
 
-  const formData = await request.formData();
+  if (!request.body) {
+    return "";
+  }
+
+  const reader = request.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let totalBytes = 0;
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) {
+        break;
+      }
+      if (!value) {
+        continue;
+      }
+
+      totalBytes += value.byteLength;
+      if (totalBytes > MAX_REQUEST_BODY_BYTES) {
+        await reader.cancel();
+        throw new Error("payload_too_large");
+      }
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+
+  const body = new Uint8Array(totalBytes);
+  let offset = 0;
+  for (const chunk of chunks) {
+    body.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+
+  try {
+    return new TextDecoder("utf-8", { fatal: true }).decode(body);
+  } catch {
+    throw new Error("invalid_payload");
+  }
+}
+
+function payloadFromSearchParams(params: URLSearchParams): RegistrationPayload {
+  const get = (key: string) => params.get(key) ?? undefined;
   return {
-    event_id: toStringValue(formData.get("event_id") ?? undefined),
-    lead_type: toStringValue(formData.get("lead_type") ?? undefined),
-    name: toStringValue(formData.get("name") ?? undefined),
-    contact: toStringValue(formData.get("contact") ?? undefined),
-    email: toStringValue(formData.get("email") ?? undefined),
-    phone: toStringValue(formData.get("phone") ?? undefined),
-    company: toStringValue(formData.get("company") ?? undefined),
-    privacy_consent: toStringValue(formData.get("privacy_consent") ?? undefined),
-    marketing_consent: toStringValue(formData.get("marketing_consent") ?? undefined),
-    website: toStringValue(formData.get("website") ?? undefined),
-    utm_source: toStringValue(formData.get("utm_source") ?? undefined),
-    utm_medium: toStringValue(formData.get("utm_medium") ?? undefined),
-    utm_campaign: toStringValue(formData.get("utm_campaign") ?? undefined),
-    utm_content: toStringValue(formData.get("utm_content") ?? undefined),
-    utm_term: toStringValue(formData.get("utm_term") ?? undefined),
+    event_id: get("event_id"),
+    lead_type: get("lead_type"),
+    name: get("name"),
+    contact: get("contact"),
+    email: get("email"),
+    phone: get("phone"),
+    company: get("company"),
+    privacy_consent: get("privacy_consent"),
+    marketing_consent: get("marketing_consent"),
+    website: get("website"),
+    utm_source: get("utm_source"),
+    utm_medium: get("utm_medium"),
+    utm_campaign: get("utm_campaign"),
+    utm_content: get("utm_content"),
+    utm_term: get("utm_term"),
   };
+}
+
+async function readPayload(request: Request): Promise<RegistrationPayload> {
+  const mediaType = getMediaType(request);
+  if (!supportedMediaTypes.has(mediaType)) {
+    throw new Error("unsupported_content_type");
+  }
+
+  const rawBody = await readLimitedText(request);
+  if (mediaType === "application/x-www-form-urlencoded") {
+    return payloadFromSearchParams(new URLSearchParams(rawBody));
+  }
+
+  const parsed = JSON.parse(rawBody || "{}");
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+    throw new Error("invalid_payload");
+  }
+
+  return parsed as RegistrationPayload;
+}
+
+function safeOrigin(value: string | null | undefined) {
+  if (!value) {
+    return null;
+  }
+
+  try {
+    return new URL(value).origin;
+  } catch {
+    return null;
+  }
+}
+
+function isAllowedBrowserOrigin(request: Request) {
+  const suppliedOrigin = request.headers.get("origin")?.trim();
+  if (!suppliedOrigin) {
+    return true;
+  }
+
+  const browserOrigin = safeOrigin(suppliedOrigin);
+  if (!browserOrigin) {
+    return false;
+  }
+
+  if (browserOrigin === safeOrigin(request.url)) {
+    return true;
+  }
+
+  const configuredOrigin = safeOrigin(process.env.NEXT_PUBLIC_SITE_URL?.trim());
+  return configuredOrigin !== null && browserOrigin === configuredOrigin;
 }
 
 function escapeHtml(value: string) {
@@ -158,22 +262,26 @@ function pruneRateLimitStore(now: number) {
   }
 }
 
-function isRateLimited(ip: string) {
+function checkRateLimit(ip: string) {
   const now = Date.now();
   pruneRateLimitStore(now);
   const current = rateLimitStore.get(ip);
 
   if (!current || current.resetAt <= now) {
-    rateLimitStore.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
-    return false;
+    const resetAt = now + RATE_LIMIT_WINDOW_MS;
+    rateLimitStore.set(ip, { count: 1, resetAt });
+    return { limited: false, retryAfterSeconds: 0 };
   }
 
   if (current.count >= RATE_LIMIT_MAX) {
-    return true;
+    return {
+      limited: true,
+      retryAfterSeconds: Math.max(1, Math.ceil((current.resetAt - now) / 1000)),
+    };
   }
 
   current.count += 1;
-  return false;
+  return { limited: false, retryAfterSeconds: 0 };
 }
 
 function resolveRequestId(request: Request) {
@@ -289,22 +397,34 @@ function buildTelegramNotification(payload: NormalizedPayload, requestId: string
 }
 
 export async function POST(request: Request) {
-  const contentLength = Number(request.headers.get("content-length") ?? "0");
-  if (Number.isFinite(contentLength) && contentLength > 16_384) {
-    return NextResponse.json({ ok: false, error: "payload_too_large" }, { status: 413 });
-  }
-
-  const ip = getClientIp(request);
-  if (isRateLimited(ip)) {
-    return NextResponse.json({ ok: false, error: "rate_limited" }, { status: 429 });
+  if (!isAllowedBrowserOrigin(request)) {
+    return NextResponse.json({ ok: false, error: "origin_not_allowed" }, { status: 403 });
   }
 
   let payload: NormalizedPayload;
 
   try {
     payload = normalizePayload(await readPayload(request));
-  } catch {
+  } catch (error) {
+    const code = error instanceof Error ? error.message : "invalid_payload";
+    if (code === "payload_too_large") {
+      return NextResponse.json({ ok: false, error: code }, { status: 413 });
+    }
+    if (code === "unsupported_content_type") {
+      return NextResponse.json({ ok: false, error: code }, { status: 415 });
+    }
     return NextResponse.json({ ok: false, error: "invalid_payload" }, { status: 400 });
+  }
+
+  const rateLimit = checkRateLimit(getClientIp(request));
+  if (rateLimit.limited) {
+    return NextResponse.json(
+      { ok: false, error: "rate_limited" },
+      {
+        status: 429,
+        headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
+      }
+    );
   }
 
   // Honeypot: acknowledge automated submissions without forwarding personal data.
