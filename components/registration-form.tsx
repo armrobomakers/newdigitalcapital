@@ -1,16 +1,13 @@
 "use client";
 
 import type { FormEvent } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { BriefcaseIcon, MailIcon, PhoneIcon, UserIcon } from "@/components/icons";
-import {
-  getLeadCaptureAvailability,
-  type LeadCaptureAvailability,
-  type LeadType,
-} from "@/data/event-registry";
+import type { LeadCaptureAvailability, LeadType } from "@/data/event-registry";
+import { useLeadCaptureAvailability } from "@/hooks/use-lead-capture-availability";
 import { trackConversionEvent } from "@/lib/analytics-client";
 
 const utmKeys = [
@@ -21,7 +18,6 @@ const utmKeys = [
   "utm_term",
 ] as const;
 
-const LEAD_WINDOW_REFRESH_MS = 30_000;
 
 type Status = "idle" | "loading" | "success" | "error";
 
@@ -90,27 +86,14 @@ export function RegistrationForm({
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState("");
-  const [availability, setAvailability] = useState<LeadCaptureAvailability | null>(() =>
-    getLeadCaptureAvailability(eventId, leadType)
+  const { availability, refresh: refreshAvailability } = useLeadCaptureAvailability(
+    eventId,
+    leadType
   );
   const formStarted = useRef(false);
   const idempotencyKeyRef = useRef<string | null>(null);
   const leadCaptureOpen = availability?.open === true;
 
-  useEffect(() => {
-    const refreshAvailability = () => {
-      setAvailability(getLeadCaptureAvailability(eventId, leadType));
-    };
-
-    refreshAvailability();
-    const timer = window.setInterval(refreshAvailability, LEAD_WINDOW_REFRESH_MS);
-    document.addEventListener("visibilitychange", refreshAvailability);
-
-    return () => {
-      window.clearInterval(timer);
-      document.removeEventListener("visibilitychange", refreshAvailability);
-    };
-  }, [eventId, leadType]);
 
   function getIdempotencyKey() {
     if (!idempotencyKeyRef.current) {
@@ -132,8 +115,7 @@ export function RegistrationForm({
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const currentAvailability = getLeadCaptureAvailability(eventId, leadType);
-    setAvailability(currentAvailability);
+    const currentAvailability = refreshAvailability();
     if (!currentAvailability?.open) {
       setStatus("idle");
       setMessage("");
@@ -171,7 +153,7 @@ export function RegistrationForm({
         });
 
         if (response.status === 409) {
-          setAvailability(getLeadCaptureAvailability(eventId, leadType));
+          refreshAvailability();
         }
 
         throw new Error(errorCode);
