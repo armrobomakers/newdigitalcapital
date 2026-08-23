@@ -1,8 +1,8 @@
 name: Apply DC-10 live temporal UX
 
 on:
-  push:
-    branches: [stage/dc-10-live-temporal-ux]
+  pull_request:
+    branches: [main]
     paths: [.github/workflows/dc-10-apply.yml]
 
 permissions:
