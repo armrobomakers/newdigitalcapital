@@ -27,6 +27,8 @@ const temporalGate = read("components/temporal-registration-gate.tsx");
 const dockerfile = read("Dockerfile");
 const dockerignore = read(".dockerignore");
 const ci = read(".github/workflows/ci.yml");
+const envExample = read(".env.example");
+const packageJson = JSON.parse(read("package.json"));
 const vercelConfig = JSON.parse(read("vercel.json"));
 
 requireMatch("temporal hook", hook, /LEAD_WINDOW_REFRESH_MS\s*=\s*30_000/);
@@ -94,8 +96,20 @@ forbidMatch("Dockerfile", dockerfile, /^FROM node:20/m);
 
 requireMatch(".dockerignore", dockerignore, /^\.env$/m);
 requireMatch(".dockerignore", dockerignore, /^\.env\.\*$/m);
+requireMatch(".dockerignore", dockerignore, /^!\.env\.example$/m);
+forbidMatch(".dockerignore", dockerignore, /\.env\.local\.example/);
 requireMatch(".dockerignore", dockerignore, /^node_modules$/m);
 requireMatch(".dockerignore", dockerignore, /^\.next$/m);
+
+requireMatch("environment example", envExample, /^NEXT_PUBLIC_INDEXING_ENABLED=false$/m);
+requireMatch("environment example", envExample, /^LEAD_STORAGE_WEBHOOK_SECRET=$/m);
+requireMatch("environment example", envExample, /^ANALYTICS_WEBHOOK_URL=$/m);
+if (packageJson?.scripts?.["env:check"] !== "node scripts/verify-env-contract.mjs") {
+  throw new Error("package.json: env:check must execute the canonical environment contract verifier");
+}
+if (!packageJson?.scripts?.check?.includes("npm run env:check")) {
+  throw new Error("package.json: npm run check must include env:check before build");
+}
 
 requireMatch("CI", ci, /- name: Container runtime smoke/);
 requireMatch("CI", ci, /docker build/);
