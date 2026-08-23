@@ -21,6 +21,7 @@ const landing = read("components/landing.tsx");
 const sticky = read("components/sticky-cta.tsx");
 const form = read("components/registration-form.tsx");
 const registerRoute = read("app/api/register/route.ts");
+const analyticsRoute = read("app/api/analytics/route.ts");
 const temporalLink = read("components/temporal-registration-link.tsx");
 const temporalGate = read("components/temporal-registration-gate.tsx");
 const dockerfile = read("Dockerfile");
@@ -51,6 +52,19 @@ requireMatch("registration API", registerRoute, /unsupported_content_type/);
 requireMatch("registration API", registerRoute, /"Retry-After"/);
 forbidMatch("registration API", registerRoute, /await request\.json\(\)/);
 forbidMatch("registration API", registerRoute, /await request\.formData\(\)/);
+
+requireMatch("analytics API", analyticsRoute, /MAX_BODY_BYTES\s*=\s*8_192/);
+requireMatch("analytics API", analyticsRoute, /request\.body\.getReader\(\)/);
+requireMatch("analytics API", analyticsRoute, /totalBytes > MAX_BODY_BYTES/);
+requireMatch("analytics API", analyticsRoute, /mediaType !== "application\/json"/);
+requireMatch("analytics API", analyticsRoute, /isAllowedBrowserOrigin\(request\)/);
+requireMatch("analytics API", analyticsRoute, /origin_not_allowed/);
+requireMatch("analytics API", analyticsRoute, /"Retry-After"/);
+requireMatch("analytics API", analyticsRoute, /AbortSignal\.timeout\(ANALYTICS_WEBHOOK_TIMEOUT_MS\)/);
+requireMatch("analytics API", analyticsRoute, /"Cache-Control": "no-store"/);
+requireMatch("analytics API", analyticsRoute, /Number\.isFinite\(propertyValue\)/);
+requireMatch("analytics API", analyticsRoute, /normalizeOccurredAt/);
+forbidMatch("analytics API", analyticsRoute, /await request\.json\(\)/);
 
 requireMatch("temporal CTA", temporalLink, /useLeadCaptureAvailability\(eventId, "attendee"\)/);
 requireMatch("temporal CTA", temporalLink, /href=\{open \? "#register" : "#program"\}/);
@@ -89,6 +103,8 @@ requireMatch("CI", ci, /docker inspect digitalcapital:ci --format '\{\{\.Config\
 requireMatch("CI", ci, /origin_not_allowed/);
 requireMatch("CI", ci, /payload_too_large/);
 requireMatch("CI", ci, /unsupported_content_type/);
+requireMatch("CI", ci, /analytics-origin\.json/);
+requireMatch("CI", ci, /analytics-large-response\.json/);
 
 if (vercelConfig?.git?.deploymentEnabled !== false) {
   throw new Error("vercel.json: automatic Git deployments must remain disabled outside an explicit one-shot release trigger");
