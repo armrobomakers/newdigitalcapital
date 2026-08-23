@@ -70,6 +70,19 @@ export const eventRegistry = {
       media: false,
     },
   },
+  "ekb-2026-09-26": {
+    id: "ekb-2026-09-26",
+    slug: "ekb-2026-09-26",
+    status: "sales",
+    startsAt: "2026-09-26T12:00:00+05:00",
+    pageReady: true,
+    leadCapture: {
+      attendee: true,
+      partner: false,
+      speaker: false,
+      media: false,
+    },
+  },
 } as const satisfies Record<string, EventLifecycleConfig>;
 
 export type EventId = keyof typeof eventRegistry;
