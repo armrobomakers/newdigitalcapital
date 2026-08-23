@@ -22,6 +22,9 @@ const sticky = read("components/sticky-cta.tsx");
 const form = read("components/registration-form.tsx");
 const temporalLink = read("components/temporal-registration-link.tsx");
 const temporalGate = read("components/temporal-registration-gate.tsx");
+const dockerfile = read("Dockerfile");
+const dockerignore = read(".dockerignore");
+const ci = read(".github/workflows/ci.yml");
 const vercelConfig = JSON.parse(read("vercel.json"));
 
 requireMatch("temporal hook", hook, /LEAD_WINDOW_REFRESH_MS\s*=\s*30_000/);
@@ -53,6 +56,23 @@ forbidMatch("landing", landing, /getEventLifecycleBySlug/);
 forbidMatch("landing", landing, /const registrationOpen\s*=/);
 forbidMatch("sticky CTA", sticky, /getEventLifecycleBySlug/);
 forbidMatch("sticky CTA", sticky, /const registrationOpen\s*=/);
+
+requireMatch("Dockerfile", dockerfile, /^FROM node:24-alpine AS base$/m);
+requireMatch("Dockerfile", dockerfile, /npm install --global npm@11\.17\.0/);
+requireMatch("Dockerfile", dockerfile, /^RUN npm ci$/m);
+requireMatch("Dockerfile", dockerfile, /^RUN npm ci --omit=dev && npm cache clean --force$/m);
+requireMatch("Dockerfile", dockerfile, /^USER node$/m);
+requireMatch("Dockerfile", dockerfile, /^HEALTHCHECK .*\\$/m);
+forbidMatch("Dockerfile", dockerfile, /^FROM node:20/m);
+
+requireMatch(".dockerignore", dockerignore, /^\.env$/m);
+requireMatch(".dockerignore", dockerignore, /^\.env\.\*$/m);
+requireMatch(".dockerignore", dockerignore, /^node_modules$/m);
+requireMatch(".dockerignore", dockerignore, /^\.next$/m);
+
+requireMatch("CI", ci, /- name: Container runtime smoke/);
+requireMatch("CI", ci, /docker build/);
+requireMatch("CI", ci, /docker inspect digitalcapital:ci --format '\{\{\.Config\.User\}\}'/);
 
 if (vercelConfig?.git?.deploymentEnabled !== false) {
   throw new Error("vercel.json: automatic Git deployments must remain disabled outside an explicit one-shot release trigger");
