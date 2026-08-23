@@ -68,69 +68,105 @@ jobs:
           npm run start >/tmp/release-server.log 2>&1 &
           PID=$!
           trap 'STATUS=$?; if [ "$STATUS" -ne 0 ]; then echo "--- server log ---"; cat /tmp/release-server.log || true; fi; kill "$PID" 2>/dev/null || true' EXIT
-          BASE=http://127.0.0.1:7485
-          curl_retry='curl --retry 8 --retry-connrefused --retry-delay 1 -sS'
-
-          READY=0
-          for i in $(seq 1 30); do
-            if $curl_retry -f "$BASE/api/health" >/tmp/health.json; then
-              READY=1
-              break
-            fi
-            sleep 1
-          done
-          test "$READY" = "1"
           sleep 1
+          node <<'NODE'
+          const assert = require('node:assert/strict');
+          const base = 'http://127.0.0.1:7485';
 
-          ROOT=$($curl_retry -o /tmp/root.html -w '%{http_code}' "$BASE/")
-          test "$ROOT" = "307" -o "$ROOT" = "308"
+          async function sleep(ms) {
+            await new Promise((resolve) => setTimeout(resolve, ms));
+          }
 
-          test "$($curl_retry -o /tmp/ekb.html -w '%{http_code}' "$BASE/ekb")" = "200"
-          grep -q '13 июня 2026' /tmp/ekb.html
-          grep -q 'Архив' /tmp/ekb.html
-          ! grep -q '6 900 ₽' /tmp/ekb.html
-          ! grep -q 'Малышева 51' /tmp/ekb.html
-          ! grep -q 'БЦ Саммит' /tmp/ekb.html
-          ! grep -q 'application/ld+json' /tmp/ekb.html
+          async function request(path, options = {}, expected) {
+            let lastError;
+            for (let attempt = 1; attempt <= 30; attempt += 1) {
+              try {
+                const response = await fetch(base + path, options);
+                if (expected === undefined || response.status === expected || (Array.isArray(expected) && expected.includes(response.status))) {
+                  return response;
+                }
+                lastError = new Error(`${path}: unexpected status ${response.status}`);
+              } catch (error) {
+                lastError = error;
+              }
+              await sleep(500);
+            }
+            throw lastError ?? new Error(`${path}: request failed`);
+          }
 
-          test "$($curl_retry -o /tmp/privacy.html -w '%{http_code}' "$BASE/legal/privacy")" = "200"
-          test "$($curl_retry -o /tmp/offer.html -w '%{http_code}' "$BASE/legal/offer")" = "200"
-          test "$($curl_retry -o /tmp/thanks.html -w '%{http_code}' "$BASE/thanks")" = "200"
-          test "$($curl_retry -o /tmp/partner.html -w '%{http_code}' "$BASE/apply/partner/ekb")" = "200"
-          test "$($curl_retry -o /tmp/unknown.html -w '%{http_code}' "$BASE/not-a-conference")" = "404"
-          test "$($curl_retry -o /tmp/manifest.json -w '%{http_code}' "$BASE/manifest.webmanifest")" = "200"
-          test "$($curl_retry -o /tmp/robots.txt -w '%{http_code}' "$BASE/robots.txt")" = "200"
-          grep -qi 'Disallow: /' /tmp/robots.txt
-          test "$($curl_retry -o /tmp/sitemap.xml -w '%{http_code}' "$BASE/sitemap.xml")" = "200"
+          (async () => {
+            const healthResponse = await request('/api/health', {}, 200);
+            const health = await healthResponse.json();
+            assert.equal(health.status, 'gated');
+            assert.equal(health.readiness.ready_for_registration, false);
+            const registrationCodes = health.blockers.registration.map((item) => item.code);
+            assert.ok(registrationCodes.includes('sales_event_missing'));
+            assert.ok(registrationCodes.includes('legal_config_incomplete'));
+            assert.ok(registrationCodes.includes('lead_storage_unavailable'));
+            assert.equal(health.events[0].attendee_capture.reason, 'lead_type_disabled');
 
-          grep -q '"status":"gated"' /tmp/health.json
-          grep -q '"ready_for_registration":false' /tmp/health.json
-          grep -q '"sales_event_missing"' /tmp/health.json
-          grep -q '"legal_config_incomplete"' /tmp/health.json
-          grep -q '"lead_storage_unavailable"' /tmp/health.json
-          grep -q '"reason":"lead_type_disabled"' /tmp/health.json
+            const root = await request('/', { redirect: 'manual' }, [307, 308]);
+            assert.match(root.headers.get('location') || '', /\/ekb$/);
 
-          ASTATUS=$($curl_retry -o /tmp/analytics.json -w '%{http_code}' \
-            -H 'Content-Type: application/json' \
-            -d '{"event":"page_view","event_id":"ekb-2026-06-13","session_id":"release-smoke-123456","properties":{"pathname":"/ekb"}}' \
-            "$BASE/api/analytics")
-          test "$ASTATUS" = "202"
-          grep -q '"accepted":true' /tmp/analytics.json
+            const ekbResponse = await request('/ekb', {}, 200);
+            const ekb = await ekbResponse.text();
+            assert.ok(ekb.includes('13 июня 2026'));
+            assert.ok(ekb.includes('Архив'));
+            assert.ok(!ekb.includes('6 900 ₽'));
+            assert.ok(!ekb.includes('Малышева 51'));
+            assert.ok(!ekb.includes('БЦ Саммит'));
+            assert.ok(!ekb.includes('application/ld+json'));
+            assert.ok(ekbResponse.headers.has('content-security-policy-report-only'));
+            assert.equal(ekbResponse.headers.get('x-content-type-options'), 'nosniff');
+            assert.equal(ekbResponse.headers.get('x-frame-options'), 'DENY');
+            assert.equal(ekbResponse.headers.has('x-powered-by'), false);
 
-          RSTATUS=$($curl_retry -o /tmp/register.json -w '%{http_code}' \
-            -H 'Content-Type: application/json' \
-            -H 'Idempotency-Key: 123e4567-e89b-12d3-a456-426614174000' \
-            -d '{"event_id":"ekb-2026-06-13","lead_type":"attendee","name":"Release Test","phone":"+79990000000","privacy_consent":true}' \
-            "$BASE/api/register")
-          test "$RSTATUS" = "409"
-          grep -q '"error":"registration_closed"' /tmp/register.json
-          grep -q '"reason":"lead_type_disabled"' /tmp/register.json
+            await request('/legal/privacy', {}, 200);
+            await request('/legal/offer', {}, 200);
+            await request('/thanks', {}, 200);
+            await request('/apply/partner/ekb', {}, 200);
+            await request('/not-a-conference', {}, 404);
+            await request('/manifest.webmanifest', {}, 200);
 
-          $curl_retry -I "$BASE/ekb" >/tmp/headers.txt
-          grep -qi '^content-security-policy-report-only:' /tmp/headers.txt
-          grep -qi '^x-content-type-options: nosniff' /tmp/headers.txt
-          grep -qi '^x-frame-options: DENY' /tmp/headers.txt
-          if grep -qi '^x-powered-by:' /tmp/headers.txt; then exit 1; fi
+            const robots = await (await request('/robots.txt', {}, 200)).text();
+            assert.match(robots, /Disallow:\s*\//i);
+            await request('/sitemap.xml', {}, 200);
+
+            const analytics = await request('/api/analytics', {
+              method: 'POST',
+              headers: { 'content-type': 'application/json' },
+              body: JSON.stringify({
+                event: 'page_view',
+                event_id: 'ekb-2026-06-13',
+                session_id: 'release-smoke-123456',
+                properties: { pathname: '/ekb' },
+              }),
+            }, 202);
+            const analyticsBody = await analytics.json();
+            assert.equal(analyticsBody.accepted, true);
+
+            const registration = await request('/api/register', {
+              method: 'POST',
+              headers: {
+                'content-type': 'application/json',
+                'idempotency-key': '123e4567-e89b-12d3-a456-426614174000',
+              },
+              body: JSON.stringify({
+                event_id: 'ekb-2026-06-13',
+                lead_type: 'attendee',
+                name: 'Release Test',
+                phone: '+79990000000',
+                privacy_consent: true,
+              }),
+            }, 409);
+            const registrationBody = await registration.json();
+            assert.equal(registrationBody.error, 'registration_closed');
+            assert.equal(registrationBody.reason, 'lead_type_disabled');
+          })().catch((error) => {
+            console.error(error);
+            process.exit(1);
+          });
+          NODE
 
       - name: Summarize
         run: |
