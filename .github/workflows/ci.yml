@@ -40,6 +40,18 @@ jobs:
       - name: Lint, typecheck and production build
         run: npm run check
 
+      - name: Event lifecycle activation matrix
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/dc13-lifecycle
+          npx tsc data/event-registry.ts \
+            --target ES2022 \
+            --module commonjs \
+            --moduleResolution node \
+            --skipLibCheck \
+            --outDir /tmp/dc13-lifecycle
+          node scripts/verify-event-lifecycle.cjs /tmp/dc13-lifecycle/event-registry.js
+
       - name: Launch readiness contract matrix
         run: |
           set -euo pipefail
