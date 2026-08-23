@@ -5,6 +5,7 @@ import {
   getLeadCaptureAvailability,
   type LeadType,
 } from "@/data/event-registry";
+import { getEventContent } from "@/data/events";
 import {
   AUXILIARY_DELIVERY_TIMEOUT_MS,
   buildLeadEnvelope,
@@ -18,6 +19,7 @@ import { isLegalConfigReady } from "@/lib/legal";
 type RegistrationPayload = {
   event_id?: unknown;
   lead_type?: unknown;
+  ticket?: unknown;
   name?: unknown;
   contact?: unknown;
   email?: unknown;
@@ -59,6 +61,7 @@ function normalizePayload(data: RegistrationPayload) {
   return {
     event_id: clip(data.event_id, 80),
     lead_type: clip(data.lead_type, 32) || "attendee",
+    ticket: clip(data.ticket, 64),
     name: clip(data.name, 100),
     contact,
     email,
@@ -142,6 +145,7 @@ function payloadFromSearchParams(params: URLSearchParams): RegistrationPayload {
   return {
     event_id: get("event_id"),
     lead_type: get("lead_type"),
+    ticket: get("ticket"),
     name: get("name"),
     contact: get("contact"),
     email: get("email"),
@@ -235,6 +239,24 @@ function isPayloadValid(payload: NormalizedPayload) {
   );
 }
 
+function isTicketSelectionValid(payload: NormalizedPayload) {
+  if (payload.lead_type !== "attendee") {
+    return payload.ticket.length === 0;
+  }
+
+  const event = getEventContent(payload.event_id);
+  if (!event) {
+    return false;
+  }
+
+  const tickets = event.registration.tickets ?? [];
+  if (tickets.length === 0) {
+    return payload.ticket.length === 0;
+  }
+
+  return tickets.some((ticket) => ticket.id === payload.ticket);
+}
+
 function getClientIp(request: Request) {
   return (
     request.headers.get("x-real-ip") ??
@@ -311,9 +333,7 @@ async function postJsonWebhook(
 ) {
   const response = await fetch(url, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
     cache: "no-store",
     signal: AbortSignal.timeout(timeoutMs),
@@ -331,41 +351,31 @@ async function postToPrimaryStorage(envelope: LeadEnvelope) {
   if (!webhook) {
     throw new Error("primary_storage_not_configured");
   }
-
   if (!secret || !isValidLeadStorageSecret(secret)) {
     throw new Error("primary_storage_signature_not_configured");
   }
 
-  return deliverPrimaryLead({
-    url: webhook,
-    secret,
-    envelope,
-  });
+  return deliverPrimaryLead({ url: webhook, secret, envelope });
 }
 
 async function postToSheetsMirror(envelope: LeadEnvelope) {
   const webhook = process.env.GOOGLE_SHEETS_WEBHOOK_URL?.trim();
-
   if (!webhook) {
     return;
   }
-
   await postJsonWebhook(webhook, envelope, "sheets_mirror_delivery_failed");
 }
 
 async function postToTelegram(message: string) {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
-
   if (!token || !chatId) {
     return;
   }
 
   const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       chat_id: chatId,
       text: message,
@@ -388,6 +398,7 @@ function buildTelegramNotification(payload: NormalizedPayload, requestId: string
     `<b>ID:</b> ${safe(requestId)}`,
     `<b>Event:</b> ${safe(payload.event_id)}`,
     `<b>Тип:</b> ${safe(payload.lead_type)}`,
+    payload.ticket ? `<b>Билет:</b> ${safe(payload.ticket)}` : null,
     payload.utm_source ? `<b>UTM Source:</b> ${safe(payload.utm_source)}` : null,
     payload.utm_campaign ? `<b>UTM Campaign:</b> ${safe(payload.utm_campaign)}` : null,
     "Персональные данные доступны только в основном хранилище заявок.",
@@ -402,7 +413,6 @@ export async function POST(request: Request) {
   }
 
   let payload: NormalizedPayload;
-
   try {
     payload = normalizePayload(await readPayload(request));
   } catch (error) {
@@ -420,14 +430,10 @@ export async function POST(request: Request) {
   if (rateLimit.limited) {
     return NextResponse.json(
       { ok: false, error: "rate_limited" },
-      {
-        status: 429,
-        headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
-      }
+      { status: 429, headers: { "Retry-After": String(rateLimit.retryAfterSeconds) } }
     );
   }
 
-  // Honeypot: acknowledge automated submissions without forwarding personal data.
   if (payload.website) {
     return NextResponse.json({ ok: true, message: "registration_received" });
   }
@@ -437,7 +443,7 @@ export async function POST(request: Request) {
   }
 
   const lifecycle = getEventLifecycle(payload.event_id);
-  if (!lifecycle) {
+  if (!lifecycle || !getEventContent(payload.event_id)) {
     return NextResponse.json({ ok: false, error: "unknown_event" }, { status: 404 });
   }
 
@@ -451,6 +457,10 @@ export async function POST(request: Request) {
       },
       { status: 409 }
     );
+  }
+
+  if (!isTicketSelectionValid(payload)) {
+    return NextResponse.json({ ok: false, error: "invalid_ticket" }, { status: 400 });
   }
 
   if (!isLegalConfigReady()) {
@@ -481,8 +491,8 @@ export async function POST(request: Request) {
   }
 
   const envelope = buildStoredEnvelope(payload, requestId);
-
   let duplicate = false;
+
   try {
     const ack = await postToPrimaryStorage(envelope);
     duplicate = ack.duplicate === true;
@@ -493,7 +503,6 @@ export async function POST(request: Request) {
       leadType: payload.lead_type,
       error: error instanceof Error ? error.message : "unknown_error",
     });
-
     return NextResponse.json(
       { ok: false, error: "registration_delivery_failed", request_id: requestId },
       { status: 502 }
