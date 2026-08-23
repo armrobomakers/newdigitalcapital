@@ -195,6 +195,7 @@ function dcFindRequestId(sheet, requestId) {
   return sheet
     .getRange(2, 3, lastRow - 1, 1)
     .createTextFinder(requestId)
+    .matchCase(true)
     .matchEntireCell(true)
     .findNext();
 }
