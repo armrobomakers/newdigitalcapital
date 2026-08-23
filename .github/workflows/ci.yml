@@ -40,6 +40,18 @@ jobs:
       - name: Lint, typecheck and production build
         run: npm run check
 
+      - name: Launch readiness contract matrix
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/dc12-readiness
+          npx tsc lib/launch-readiness-core.ts \
+            --target ES2022 \
+            --module commonjs \
+            --moduleResolution node \
+            --skipLibCheck \
+            --outDir /tmp/dc12-readiness
+          node scripts/verify-launch-readiness-core.cjs /tmp/dc12-readiness/launch-readiness-core.js
+
       - name: Release regression invariants
         run: node scripts/verify-release-invariants.mjs
 
