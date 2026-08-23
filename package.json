@@ -28,7 +28,8 @@
     "start": "next start -p 7485 -H 0.0.0.0",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "check": "npm run lint && npm run typecheck && npm run build",
+    "env:check": "node scripts/verify-env-contract.mjs",
+    "check": "npm run env:check && npm run lint && npm run typecheck && npm run build",
     "event:check": "node scripts/check-event-activation.cjs"
   },
   "dependencies": {
