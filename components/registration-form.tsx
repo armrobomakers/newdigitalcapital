@@ -3,7 +3,7 @@
 import type { FormEvent } from "react";
 import { useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import { BriefcaseIcon, MailIcon, PhoneIcon, UserIcon } from "@/components/icons";
 import type { LeadCaptureAvailability, LeadType } from "@/data/event-registry";
@@ -83,7 +83,6 @@ export function RegistrationForm({
   leadType = "attendee",
 }: RegistrationFormProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState("");
   const { availability, refresh: refreshAvailability } = useLeadCaptureAvailability(
@@ -128,7 +127,12 @@ export function RegistrationForm({
 
     const form = event.currentTarget;
     const formData = new FormData(form);
-    const payload = Object.fromEntries(formData.entries());
+    const payload: Record<string, FormDataEntryValue | string> = Object.fromEntries(formData.entries());
+    const query = new URLSearchParams(window.location.search);
+    for (const key of utmKeys) {
+      payload[key] = query.get(key) ?? "";
+    }
+
     const idempotencyKey = getIdempotencyKey();
     const selectedTicket = formData.get("ticket")?.toString() ?? "";
 
@@ -347,10 +351,6 @@ export function RegistrationForm({
         />
         <span>Хочу получать новости и информационные сообщения о следующих мероприятиях.</span>
       </label>
-
-      {utmKeys.map((key) => (
-        <input key={key} type="hidden" name={key} value={searchParams.get(key) ?? ""} />
-      ))}
 
       <button
         type="submit"
