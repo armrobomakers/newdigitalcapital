@@ -1,0 +1,46 @@
+name: Promote validated Vercel release
+
+on:
+  push:
+    branches: [ops/vercel-promote-release]
+    paths: [.github/workflows/vercel-promote-release.yml]
+
+permissions:
+  contents: read
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: team_kB8fwmZ17a3YObMJXgKaaIB9
+      DEPLOYMENT_URL: https://digitalcapital-qa0nl78je-armrobomakers-7944s-projects.vercel.app
+    steps:
+      - name: Check deploy credential
+        id: credential
+        shell: bash
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "VERCEL_TOKEN_UNAVAILABLE"
+          else
+            echo "available=true" >> "$GITHUB_OUTPUT"
+            echo "VERCEL_TOKEN_AVAILABLE"
+          fi
+
+      - name: Install Vercel CLI
+        if: steps.credential.outputs.available == 'true'
+        run: npm install --global vercel@latest
+
+      - name: Promote validated READY deployment
+        if: steps.credential.outputs.available == 'true'
+        run: vercel promote "$DEPLOYMENT_URL" --token="$VERCEL_TOKEN" --scope="$VERCEL_ORG_ID"
+
+      - name: Result
+        run: |
+          if [ "${{ steps.credential.outputs.available }}" = "true" ]; then
+            echo "PROMOTION_ATTEMPT_COMPLETED"
+          else
+            echo "PROMOTION_SKIPPED_NO_TOKEN"
+          fi
