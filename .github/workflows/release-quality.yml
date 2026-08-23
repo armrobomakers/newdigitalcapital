@@ -1,0 +1,132 @@
+name: Digital Capital final release gate
+
+on:
+  pull_request:
+    branches: [main]
+    paths: [.github/workflows/release-quality.yml]
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      NEXT_PUBLIC_SITE_URL: http://127.0.0.1:7485
+      NEXT_PUBLIC_INDEXING_ENABLED: "false"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: release/archive-platform-2026-08-23
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Strict install and security audit
+        run: |
+          set -euo pipefail
+          npm ci
+          npm approve-scripts --allow-scripts-pending | tee /tmp/pending.txt
+          grep -q 'No packages with unreviewed install scripts' /tmp/pending.txt
+          npm audit --omit=dev --audit-level=high
+          npm audit --audit-level=high
+
+      - name: Release source invariants
+        run: |
+          set -euo pipefail
+          grep -q 'status: "past"' data/event-registry.ts
+          grep -q 'attendee: false' data/event-registry.ts
+          grep -q 'partner: false' data/event-registry.ts
+          grep -q 'speaker: false' data/event-registry.ts
+          grep -q 'media: false' data/event-registry.ts
+          grep -q 'verified: false' data/events.ts
+          grep -q 'price: ""' data/events.ts
+          grep -q 'benefits: \[\]' data/events.ts
+          grep -q 'Площадка архивного события сейчас не указана' data/events.ts
+          ! grep -q '6 900 ₽' data/events.ts
+          ! grep -q 'противоречили друг другу' data/events.ts
+          ! grep -q 'Малышева 51' data/events.ts
+          ! grep -q 'БЦ Саммит' data/events.ts
+          ! grep -Rq 'href="#"' app components data --include='*.tsx' --include='*.ts'
+          grep -q 'structuredDataReady: false' data/event-seo.ts
+          grep -q 'strict-allow-scripts=true' .npmrc
+          grep -q '"unrs-resolver@1.12.2": true' package.json
+          grep -q '"fsevents": false' package.json
+
+      - name: Code quality and production build
+        run: |
+          npm run lint
+          npm run typecheck
+          npm run build
+
+      - name: HTTP and security smoke
+        run: |
+          set -euo pipefail
+          npm run start >/tmp/release-server.log 2>&1 &
+          PID=$!
+          trap 'kill "$PID" 2>/dev/null || true' EXIT
+          BASE=http://127.0.0.1:7485
+          for i in $(seq 1 30); do
+            if curl -fsS "$BASE/api/health" >/tmp/health.json; then break; fi
+            sleep 1
+          done
+
+          ROOT=$(curl -sS -o /tmp/root.html -w '%{http_code}' "$BASE/")
+          test "$ROOT" = "307" -o "$ROOT" = "308"
+
+          test "$(curl -sS -o /tmp/ekb.html -w '%{http_code}' "$BASE/ekb")" = "200"
+          grep -q '13 июня 2026' /tmp/ekb.html
+          grep -q 'Архив' /tmp/ekb.html
+          ! grep -q '6 900 ₽' /tmp/ekb.html
+          ! grep -q 'Малышева 51' /tmp/ekb.html
+          ! grep -q 'БЦ Саммит' /tmp/ekb.html
+          ! grep -q 'application/ld+json' /tmp/ekb.html
+
+          test "$(curl -sS -o /tmp/privacy.html -w '%{http_code}' "$BASE/legal/privacy")" = "200"
+          test "$(curl -sS -o /tmp/offer.html -w '%{http_code}' "$BASE/legal/offer")" = "200"
+          test "$(curl -sS -o /tmp/thanks.html -w '%{http_code}' "$BASE/thanks")" = "200"
+          test "$(curl -sS -o /tmp/partner.html -w '%{http_code}' "$BASE/apply/partner/ekb")" = "200"
+          test "$(curl -sS -o /tmp/unknown.html -w '%{http_code}' "$BASE/not-a-conference")" = "404"
+          test "$(curl -sS -o /tmp/manifest.json -w '%{http_code}' "$BASE/manifest.webmanifest")" = "200"
+          test "$(curl -sS -o /tmp/robots.txt -w '%{http_code}' "$BASE/robots.txt")" = "200"
+          grep -qi 'Disallow: /' /tmp/robots.txt
+          test "$(curl -sS -o /tmp/sitemap.xml -w '%{http_code}' "$BASE/sitemap.xml")" = "200"
+
+          grep -q '"status":"gated"' /tmp/health.json
+          grep -q '"ready_for_registration":false' /tmp/health.json
+          grep -q '"sales_event_missing"' /tmp/health.json
+          grep -q '"legal_config_incomplete"' /tmp/health.json
+          grep -q '"lead_storage_unavailable"' /tmp/health.json
+          grep -q '"reason":"lead_type_disabled"' /tmp/health.json
+
+          ASTATUS=$(curl -sS -o /tmp/analytics.json -w '%{http_code}' \
+            -H 'Content-Type: application/json' \
+            -d '{"event":"page_view","event_id":"ekb-2026-06-13","session_id":"release-smoke-123456","properties":{"pathname":"/ekb"}}' \
+            "$BASE/api/analytics")
+          test "$ASTATUS" = "202"
+          grep -q '"accepted":true' /tmp/analytics.json
+
+          RSTATUS=$(curl -sS -o /tmp/register.json -w '%{http_code}' \
+            -H 'Content-Type: application/json' \
+            -H 'Idempotency-Key: 123e4567-e89b-12d3-a456-426614174000' \
+            -d '{"event_id":"ekb-2026-06-13","lead_type":"attendee","name":"Release Test","phone":"+79990000000","privacy_consent":true}' \
+            "$BASE/api/register")
+          test "$RSTATUS" = "409"
+          grep -q '"error":"registration_closed"' /tmp/register.json
+          grep -q '"reason":"lead_type_disabled"' /tmp/register.json
+
+          curl -sSI "$BASE/ekb" >/tmp/headers.txt
+          grep -qi '^content-security-policy-report-only:' /tmp/headers.txt
+          grep -qi '^x-content-type-options: nosniff' /tmp/headers.txt
+          grep -qi '^x-frame-options: DENY' /tmp/headers.txt
+          if grep -qi '^x-powered-by:' /tmp/headers.txt; then exit 1; fi
+
+      - name: Summarize
+        run: |
+          echo 'FINAL RELEASE GATE PASS'
+          echo "commit=$(git rev-parse HEAD)"
+          echo "node=$(node --version)"
+          echo "npm=$(npm --version)"
