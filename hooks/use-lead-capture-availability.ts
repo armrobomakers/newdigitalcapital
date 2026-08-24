@@ -32,10 +32,9 @@ function publishRegistrationReadiness(ready: boolean) {
   }
 }
 
-function refreshRegistrationReadiness(force = false) {
+function refreshRegistrationReadiness() {
   const now = Date.now();
   if (
-    !force &&
     cachedRegistrationReady !== null &&
     now - registrationReadinessCheckedAt < REGISTRATION_READINESS_TTL_MS
   ) {
@@ -69,19 +68,15 @@ function refreshRegistrationReadiness(force = false) {
 }
 
 function useAttendeeRegistrationReadiness(enabled: boolean) {
-  const [ready, setReady] = useState<boolean | null>(() =>
-    enabled ? cachedRegistrationReady : true
-  );
+  const [ready, setReady] = useState<boolean | null>(() => cachedRegistrationReady);
 
   useEffect(() => {
     if (!enabled) {
-      setReady(true);
       return;
     }
 
     const listener: RegistrationReadinessListener = (nextReady) => setReady(nextReady);
     registrationReadinessListeners.add(listener);
-    listener(cachedRegistrationReady);
     void refreshRegistrationReadiness();
 
     const timer = window.setInterval(() => {
@@ -90,7 +85,7 @@ function useAttendeeRegistrationReadiness(enabled: boolean) {
 
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
-        void refreshRegistrationReadiness(true);
+        void refreshRegistrationReadiness();
       }
     };
 
@@ -103,7 +98,7 @@ function useAttendeeRegistrationReadiness(enabled: boolean) {
     };
   }, [enabled]);
 
-  return ready;
+  return enabled ? ready : true;
 }
 
 function applyRegistrationReadiness(
@@ -133,7 +128,7 @@ export function useLeadCaptureAvailability(eventId: string, leadType: LeadType) 
     setAvailability(nextAvailability);
 
     if (leadType === "attendee") {
-      void refreshRegistrationReadiness(true);
+      void refreshRegistrationReadiness();
     }
 
     return applyRegistrationReadiness(nextAvailability, leadType, registrationReady);
