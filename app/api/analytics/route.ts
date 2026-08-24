@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { getEventLifecycle } from "@/data/event-registry";
+import { isSecureWebhookUrl } from "@/lib/config-values";
 import { isConversionEventName } from "@/lib/conversion-events";
 
 type AnalyticsPayload = {
@@ -288,8 +289,8 @@ export async function POST(request: Request) {
     received_at: receivedAt,
   };
 
-  const webhook = process.env.ANALYTICS_WEBHOOK_URL?.trim();
-  if (!webhook) {
+  const webhook = process.env.ANALYTICS_WEBHOOK_URL?.trim() ?? "";
+  if (!isSecureWebhookUrl(webhook)) {
     return json({ accepted: true, forwarded: false }, 202);
   }
 

@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { isResolvedConfigValue } from "@/lib/config-values";
 import { isLegalConfigReady, legalConfig } from "@/lib/legal";
 
 export const metadata = {
@@ -9,6 +10,9 @@ export const metadata = {
 
 export default function OfferPage() {
   const ready = isLegalConfigReady();
+  const privacyEmail = isResolvedConfigValue(legalConfig.privacyEmail)
+    ? legalConfig.privacyEmail
+    : "контакт будет указан до открытия продаж";
 
   return (
     <main className="min-h-screen bg-ink-900 px-5 py-12 text-white sm:px-8">
@@ -63,9 +67,7 @@ export default function OfferPage() {
 
           <section>
             <h2 className="text-xl font-semibold text-white">5. Контакты</h2>
-            <p className="mt-2">
-              По вопросам участия и документов: {legalConfig.privacyEmail || "контакт будет указан до открытия продаж"}.
-            </p>
+            <p className="mt-2">По вопросам участия и документов: {privacyEmail}.</p>
           </section>
         </div>
       </article>

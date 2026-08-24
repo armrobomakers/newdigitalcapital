@@ -121,7 +121,8 @@ jobs:
           grep -q '1 000 ₽' /tmp/september.html
           grep -q '3 000 ₽' /tmp/september.html
           grep -q '5 000 ₽' /tmp/september.html
-          grep -q 'data-registration-state="open"' /tmp/september.html
+          grep -q 'data-registration-state="closed"' /tmp/september.html
+          ! grep -q 'data-registration-state="open"' /tmp/september.html
           ! grep -q 'application/ld+json' /tmp/september.html
 
           ROOT_STATUS=$($CURL -o /tmp/root.html -w '%{http_code}' -L "$BASE/")
@@ -138,7 +139,7 @@ jobs:
           grep -q '"ready_for_registration":false' /tmp/health.json
           grep -q '"active_sales_event"' /tmp/health.json
           grep -q '"id":"ekb-2026-09-26"' /tmp/health.json
-          grep -q '"event_email_missing"' /tmp/health.json
+          ! grep -q '"event_email_missing"' /tmp/health.json
           grep -q '"event_phone_missing"' /tmp/health.json
           grep -q '"legal_config_incomplete"' /tmp/health.json
           grep -q '"lead_storage_unavailable"' /tmp/health.json

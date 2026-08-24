@@ -17,17 +17,17 @@ const leadPageCopy: Record<Exclude<LeadType, "attendee">, { title: string; descr
   partner: {
     title: "Партнерство с «Цифровым капиталом»",
     description:
-      "Оставьте отдельную партнерскую заявку. Она будет сохранена как partner lead и не смешается с регистрациями участников.",
+      "Отдельный поток для партнерских обращений. Актуальная доступность приема заявок отображается в форме и не смешивается с регистрациями участников.",
   },
   speaker: {
     title: "Заявка спикера",
     description:
-      "Оставьте контакт для участия в программе. Заявка будет обработана отдельно от билетов и партнерских обращений.",
+      "Отдельный поток для предложений в программу. Актуальная доступность приема заявок отображается в форме и не зависит от продажи билетов.",
   },
   media: {
     title: "Медиа-аккредитация",
     description:
-      "Оставьте заявку редакции или автора. Медиа-обращения ведутся отдельным потоком.",
+      "Отдельный поток для редакций и авторов. Актуальная доступность аккредитации отображается в форме ниже.",
   },
 };
 
@@ -68,7 +68,7 @@ export default async function ApplyPage({ params }: { params: ParamsValue }) {
           <div className="mt-6 rounded-[22px] border border-white/10 bg-black/20 p-4 text-sm leading-7 text-white/60">
             <p>{content.dateLabel}</p>
             <p>{content.cityLabel}</p>
-            <p>Статус: {lifecycle.status}</p>
+            <p>Статус события: {lifecycle.status}</p>
           </div>
           <Link href={`/${lifecycle.slug}`} className="btn-secondary mt-6 inline-flex">
             Вернуться к событию

@@ -24,6 +24,7 @@ const registerRoute = read("app/api/register/route.ts");
 const analyticsRoute = read("app/api/analytics/route.ts");
 const temporalLink = read("components/temporal-registration-link.tsx");
 const temporalGate = read("components/temporal-registration-gate.tsx");
+const configValues = read("lib/config-values.ts");
 const leadDelivery = read("lib/lead-delivery.ts");
 const appsScriptLeadStorage = read("integrations/google-apps-script/lead-storage.gs");
 const dockerfile = read("Dockerfile");
@@ -34,10 +35,23 @@ const packageJson = JSON.parse(read("package.json"));
 const vercelConfig = JSON.parse(read("vercel.json"));
 
 requireMatch("temporal hook", hook, /LEAD_WINDOW_REFRESH_MS\s*=\s*30_000/);
+requireMatch("temporal hook", hook, /REGISTRATION_READINESS_TTL_MS\s*=\s*25_000/);
+requireMatch("temporal hook", hook, /fetch\("\/api\/health", \{ cache: "no-store" \}\)/);
+requireMatch("temporal hook", hook, /ready_for_registration/);
+requireMatch("temporal hook", hook, /applyRegistrationReadiness/);
 requireMatch("temporal hook", hook, /window\.setInterval\(refresh,\s*LEAD_WINDOW_REFRESH_MS\)/);
 requireMatch("temporal hook", hook, /document\.addEventListener\("visibilitychange",\s*handleVisibilityChange\)/);
 requireMatch("temporal hook", hook, /document\.visibilityState\s*===\s*"visible"/);
-requireMatch("temporal hook", hook, /return \{ availability, refresh \}/);
+requireMatch("temporal hook", hook, /availability:\s*applyRegistrationReadiness\(/);
+requireMatch("temporal hook", hook, /\brefresh,\s*\n\s*\}/);
+
+requireMatch("placeholder config", configValues, /TODO/);
+requireMatch("placeholder config", configValues, /TBD/);
+requireMatch("placeholder config", configValues, /PLACEHOLDER/);
+requireMatch("placeholder config", configValues, /isResolvedConfigValue/);
+requireMatch("placeholder config", configValues, /isBrandedPublicUrl/);
+requireMatch("placeholder config", configValues, /url\.protocol === "https:"/);
+requireMatch("placeholder config", configValues, /\.vercel\.app/);
 
 requireMatch("registration form", form, /useLeadCaptureAvailability\(/);
 requireMatch("registration form", form, /const currentAvailability = refreshAvailability\(\)/);
@@ -77,6 +91,7 @@ requireMatch("lead delivery", leadDelivery, /transport === "header_hmac"/);
 requireMatch("lead delivery", leadDelivery, /signature: `sha256=\$\{signature\}`/);
 requireMatch("lead delivery", leadDelivery, /payload,/);
 requireMatch("lead delivery", leadDelivery, /primary_storage_transport_invalid/);
+requireMatch("lead delivery", leadDelivery, /isResolvedConfigValue\(normalized\)/);
 requireMatch("Apps Script lead storage", appsScriptLeadStorage, /DC_TRANSPORT_VERSION = "apps_script_body_hmac\.v1"/);
 requireMatch("Apps Script lead storage", appsScriptLeadStorage, /Utilities\.computeHmacSha256Signature/);
 requireMatch("Apps Script lead storage", appsScriptLeadStorage, /LockService\.getScriptLock\(\)/);
@@ -141,6 +156,24 @@ requireMatch("CI", ci, /analytics-large-response\.json/);
 
 if (vercelConfig?.git?.deploymentEnabled !== false) {
   throw new Error("vercel.json: automatic Git deployments must remain disabled outside an explicit one-shot release trigger");
+}
+
+const requiredHeaders = new Map(
+  (vercelConfig.headers?.find((rule) => rule.source === "/(.*)")?.headers ?? []).map((header) => [
+    header.key,
+    header.value,
+  ])
+);
+for (const key of [
+  "X-Content-Type-Options",
+  "X-Frame-Options",
+  "Referrer-Policy",
+  "Permissions-Policy",
+  "Cross-Origin-Opener-Policy",
+]) {
+  if (!requiredHeaders.has(key)) {
+    throw new Error(`vercel.json: required baseline security header missing: ${key}`);
+  }
 }
 
 console.log("Release regression invariants: PASS");

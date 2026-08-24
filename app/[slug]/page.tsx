@@ -9,6 +9,7 @@ import {
   getConferenceBySlug,
   listPageReadyConferences,
 } from "@/data/conferences";
+import { isBrandedPublicUrl } from "@/lib/config-values";
 
 type ParamsValue = { slug: string } | Promise<{ slug: string }>;
 
@@ -35,25 +36,33 @@ export async function generateMetadata({
   }
 
   const { lifecycle, content: eventData } = conference;
-  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://digitalcapital.vercel.app").replace(
-    /\/$/,
-    ""
-  );
+  const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim() ?? "";
+  const brandedSiteReady = isBrandedPublicUrl(configuredSiteUrl);
   const indexingEnabled = process.env.NEXT_PUBLIC_INDEXING_ENABLED === "true";
-  const indexPage = Boolean(indexingEnabled && lifecycle.status !== "draft");
-  const canonical = `${siteUrl}/${slug}`;
+  const indexPage = Boolean(indexingEnabled && brandedSiteReady && lifecycle.status !== "draft");
   const title = `${eventData.name} — конференция о бизнесе, инвестициях и AI`;
-  const socialImage = `${siteUrl}${eventData.assets.heroImage}`;
 
-  return {
+  const baseMetadata: Metadata = {
     title,
     description: eventData.subtitle,
-    alternates: {
-      canonical,
-    },
     robots: {
       index: indexPage,
       follow: indexPage,
+    },
+  };
+
+  if (!brandedSiteReady) {
+    return baseMetadata;
+  }
+
+  const siteUrl = configuredSiteUrl.replace(/\/$/, "");
+  const canonical = `${siteUrl}/${slug}`;
+  const socialImage = `${siteUrl}${eventData.assets.heroImage}`;
+
+  return {
+    ...baseMetadata,
+    alternates: {
+      canonical,
     },
     openGraph: {
       type: "website",

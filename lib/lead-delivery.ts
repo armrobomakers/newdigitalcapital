@@ -1,5 +1,7 @@
 import { createHmac } from "node:crypto";
 
+import { isResolvedConfigValue, isSecureWebhookUrl } from "@/lib/config-values";
+
 export const LEAD_SCHEMA_VERSION = "lead.v1";
 export const PRIMARY_LEAD_TIMEOUT_MS = 8_000;
 export const AUXILIARY_DELIVERY_TIMEOUT_MS = 5_000;
@@ -137,6 +139,12 @@ export async function deliverPrimaryLead({
   if (!configuredTransport) {
     throw new Error("primary_storage_transport_invalid");
   }
+  if (!isSecureWebhookUrl(url)) {
+    throw new Error("primary_storage_url_invalid");
+  }
+  if (!isValidLeadStorageSecret(secret)) {
+    throw new Error("primary_storage_signature_not_configured");
+  }
 
   const request = buildPrimaryLeadRequest(envelope, secret, configuredTransport);
   const response = await fetch(url, {
@@ -164,5 +172,6 @@ export function isValidIdempotencyKey(value: string) {
 }
 
 export function isValidLeadStorageSecret(value: string) {
-  return value.trim().length >= MIN_LEAD_STORAGE_SECRET_LENGTH;
+  const normalized = value.trim();
+  return isResolvedConfigValue(normalized) && normalized.length >= MIN_LEAD_STORAGE_SECRET_LENGTH;
 }

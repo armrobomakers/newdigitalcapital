@@ -1,3 +1,5 @@
+import { isResolvedConfigValue } from "@/lib/config-values";
+
 const confirmedLegalOperator = {
   name: "ООО «Родственные Души»",
   inn: "7733390668",
@@ -10,14 +12,14 @@ export const legalConfig = {
   operatorInn: process.env.NEXT_PUBLIC_LEGAL_OPERATOR_INN?.trim() || confirmedLegalOperator.inn,
   operatorAddress:
     process.env.NEXT_PUBLIC_LEGAL_OPERATOR_ADDRESS?.trim() || confirmedLegalOperator.address,
-  privacyEmail: process.env.NEXT_PUBLIC_LEGAL_PRIVACY_EMAIL?.trim() ?? "",
+  privacyEmail: process.env.NEXT_PUBLIC_LEGAL_PRIVACY_EMAIL?.trim() || "TODO_PRIVACY_EMAIL",
 };
 
 export function isLegalConfigReady() {
   return Boolean(
-    legalConfig.operatorName &&
-      legalConfig.operatorInn &&
-      legalConfig.operatorAddress &&
-      legalConfig.privacyEmail
+    isResolvedConfigValue(legalConfig.operatorName) &&
+      isResolvedConfigValue(legalConfig.operatorInn) &&
+      isResolvedConfigValue(legalConfig.operatorAddress) &&
+      isResolvedConfigValue(legalConfig.privacyEmail)
   );
 }

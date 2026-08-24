@@ -1,6 +1,11 @@
 import { getLeadCaptureAvailability } from "@/data/event-registry";
 import { listConferences, validateConferenceCatalog } from "@/data/conferences";
 import { getEventSeoConfig } from "@/data/event-seo";
+import {
+  isBrandedPublicUrl,
+  isResolvedConfigValue,
+  isSecureWebhookUrl,
+} from "@/lib/config-values";
 import { evaluateLaunchReadiness } from "@/lib/launch-readiness-core";
 import {
   isValidLeadStorageSecret,
@@ -9,15 +14,6 @@ import {
 import { isLegalConfigReady } from "@/lib/legal";
 
 export type { LaunchBlocker, LaunchWarning } from "@/lib/launch-readiness-core";
-
-function isBrandedSiteUrl(siteUrl: string) {
-  return Boolean(
-    siteUrl &&
-      !siteUrl.includes("localhost") &&
-      !siteUrl.includes("127.0.0.1") &&
-      !siteUrl.includes("vercel.app")
-  );
-}
 
 function getConfiguredSalesConference() {
   return (
@@ -35,7 +31,8 @@ function getConfiguredSalesConference() {
 export function getLaunchReadinessSnapshot() {
   const salesConference = getConfiguredSalesConference();
   const leadStorageTransportReady = resolveLeadStorageTransport() !== null;
-  const leadStorageReady = Boolean(process.env.LEAD_STORAGE_WEBHOOK_URL?.trim()) && leadStorageTransportReady;
+  const leadStorageUrl = process.env.LEAD_STORAGE_WEBHOOK_URL?.trim() ?? "";
+  const leadStorageReady = isSecureWebhookUrl(leadStorageUrl) && leadStorageTransportReady;
   const leadStorageSecret = process.env.LEAD_STORAGE_WEBHOOK_SECRET?.trim() ?? "";
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim() ?? "";
 
@@ -46,8 +43,8 @@ export function getLaunchReadinessSnapshot() {
         startsAt: salesConference.lifecycle.startsAt,
         attendeeCapture: getLeadCaptureAvailability(salesConference.lifecycle.id, "attendee"),
         locationVerified: salesConference.content.location.verified,
-        emailPresent: Boolean(salesConference.content.contacts.email.trim()),
-        phonePresent: Boolean(salesConference.content.contacts.phone.trim()),
+        emailPresent: isResolvedConfigValue(salesConference.content.contacts.email),
+        phonePresent: isResolvedConfigValue(salesConference.content.contacts.phone),
         speakersCount: salesConference.content.speakers.length,
         programCount: salesConference.content.program.length,
         structuredDataReady: getEventSeoConfig(salesConference.lifecycle.id).structuredDataReady,
@@ -62,8 +59,8 @@ export function getLaunchReadinessSnapshot() {
     legalReady: isLegalConfigReady(),
     leadStorageReady,
     leadStorageSecretReady: leadStorageReady && isValidLeadStorageSecret(leadStorageSecret),
-    analyticsReady: Boolean(process.env.ANALYTICS_WEBHOOK_URL?.trim()),
-    brandedSiteUrlReady: isBrandedSiteUrl(siteUrl),
+    analyticsReady: isSecureWebhookUrl(process.env.ANALYTICS_WEBHOOK_URL),
+    brandedSiteUrlReady: isBrandedPublicUrl(siteUrl),
     indexingEnabled: process.env.NEXT_PUBLIC_INDEXING_ENABLED === "true",
   });
 }

@@ -1,0 +1,52 @@
+{
+  "draft": true,
+  "checkAt": "2026-08-24T15:00:00+05:00",
+  "lifecycle": {
+    "id": "ekb-2026-09-26",
+    "slug": "ekb-2026-09-26",
+    "status": "sales",
+    "startsAt": "2026-09-26T12:00:00+05:00",
+    "pageReady": true,
+    "leadCapture": {
+      "attendee": true,
+      "partner": false,
+      "speaker": false,
+      "media": false
+    },
+    "leadCaptureWindows": {}
+  },
+  "content": {
+    "locationVerified": true,
+    "emailPresent": true,
+    "phonePresent": false,
+    "speakersCount": 3,
+    "programCount": 8,
+    "structuredDataReady": false,
+    "partnersCount": 0,
+    "socialsCount": 0
+  },
+  "infrastructure": {
+    "catalogErrors": [],
+    "legalReady": false,
+    "leadStorageReady": true,
+    "leadStorageSecretReady": true,
+    "analyticsReady": false,
+    "brandedSiteUrlReady": false,
+    "indexingEnabled": false
+  },
+  "unresolved": {
+    "organizerPhone": "TODO_ORGANIZER_PHONE",
+    "privacyEmail": "TODO_PRIVACY_EMAIL",
+    "brandedSiteUrl": "TODO_BRANDED_SITE_URL",
+    "analyticsWebhookUrl": "TODO_ANALYTICS_WEBHOOK_URL",
+    "eventHall": "TODO_EVENT_HALL",
+    "entryInstructions": "TODO_ENTRY_INSTRUCTIONS",
+    "partnerList": "TODO_CONFIRMED_PARTNERS_OR_LEAVE_EMPTY",
+    "socialLinks": "TODO_CONFIRMED_SOCIAL_LINKS_OR_LEAVE_EMPTY"
+  },
+  "notes": {
+    "leadStorage": "Production primary storage and signature path were self-tested before this draft; do not replace secrets in this file.",
+    "deployment": "Keep Vercel Git deployment disabled until a reviewed release batch is ready.",
+    "seo": "Event JSON-LD draft exists, but structuredDataReady must remain false until brandedSiteUrl is resolved."
+  }
+}

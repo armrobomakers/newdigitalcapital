@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { getLeadCaptureAvailability } from "@/data/event-registry";
 import { getConferenceIntegrity, listConferences } from "@/data/conferences";
 import { getEventSeoConfig } from "@/data/event-seo";
+import { isResolvedConfigValue } from "@/lib/config-values";
 import { getLaunchReadinessSnapshot } from "@/lib/launch-readiness";
 
 export const dynamic = "force-dynamic";
@@ -18,7 +19,9 @@ export async function GET() {
     status: lifecycle.status,
     page_ready: lifecycle.pageReady,
     location_verified: content.location.verified,
-    contacts_ready: Boolean(content.contacts.email.trim() && content.contacts.phone.trim()),
+    contacts_ready:
+      isResolvedConfigValue(content.contacts.email) &&
+      isResolvedConfigValue(content.contacts.phone),
     structured_data_ready: getEventSeoConfig(lifecycle.id).structuredDataReady,
     lead_capture: lifecycle.leadCapture,
     attendee_capture: getLeadCaptureAvailability(lifecycle.id, "attendee"),

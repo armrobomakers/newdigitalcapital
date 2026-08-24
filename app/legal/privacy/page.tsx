@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { isResolvedConfigValue } from "@/lib/config-values";
 import { isLegalConfigReady, legalConfig } from "@/lib/legal";
 
 export const metadata = {
@@ -9,6 +10,9 @@ export const metadata = {
 
 export default function PrivacyPage() {
   const ready = isLegalConfigReady();
+  const privacyEmail = isResolvedConfigValue(legalConfig.privacyEmail)
+    ? legalConfig.privacyEmail
+    : "не указан";
 
   return (
     <main className="min-h-screen bg-ink-900 px-5 py-12 text-white sm:px-8">
@@ -36,7 +40,7 @@ export default function PrivacyPage() {
               Оператор: {legalConfig.operatorName || "не указан"}. ИНН:{" "}
               {legalConfig.operatorInn || "не указан"}. Адрес:{" "}
               {legalConfig.operatorAddress || "не указан"}. Контакт по вопросам персональных
-              данных: {legalConfig.privacyEmail || "не указан"}.
+              данных: {privacyEmail}.
             </p>
           </section>
 
