@@ -1,10 +1,13 @@
 import type { MetadataRoute } from "next";
 
-export default function robots(): MetadataRoute.Robots {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://digitalcapital.vercel.app";
-  const indexingEnabled = process.env.NEXT_PUBLIC_INDEXING_ENABLED === "true";
+import { isBrandedPublicUrl } from "@/lib/config-values";
 
-  if (!indexingEnabled) {
+export default function robots(): MetadataRoute.Robots {
+  const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim() ?? "";
+  const indexingEnabled = process.env.NEXT_PUBLIC_INDEXING_ENABLED === "true";
+  const publicIndexingReady = indexingEnabled && isBrandedPublicUrl(configuredSiteUrl);
+
+  if (!publicIndexingReady) {
     return {
       rules: {
         userAgent: "*",
@@ -13,11 +16,12 @@ export default function robots(): MetadataRoute.Robots {
     };
   }
 
+  const siteUrl = configuredSiteUrl.replace(/\/$/, "");
   return {
     rules: {
       userAgent: "*",
       allow: "/",
     },
-    sitemap: `${siteUrl.replace(/\/$/, "")}/sitemap.xml`,
+    sitemap: `${siteUrl}/sitemap.xml`,
   };
 }
