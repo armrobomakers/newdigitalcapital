@@ -121,7 +121,8 @@ jobs:
           grep -q '1 000 ₽' /tmp/september.html
           grep -q '3 000 ₽' /tmp/september.html
           grep -q '5 000 ₽' /tmp/september.html
-          grep -q 'data-registration-state="open"' /tmp/september.html
+          grep -q 'data-registration-state="closed"' /tmp/september.html
+          ! grep -q 'data-registration-state="open"' /tmp/september.html
           ! grep -q 'application/ld+json' /tmp/september.html
 
           ROOT_STATUS=$($CURL -o /tmp/root.html -w '%{http_code}' -L "$BASE/")
