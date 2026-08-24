@@ -139,7 +139,7 @@ jobs:
           grep -q '"ready_for_registration":false' /tmp/health.json
           grep -q '"active_sales_event"' /tmp/health.json
           grep -q '"id":"ekb-2026-09-26"' /tmp/health.json
-          grep -q '"event_email_missing"' /tmp/health.json
+          ! grep -q '"event_email_missing"' /tmp/health.json
           grep -q '"event_phone_missing"' /tmp/health.json
           grep -q '"legal_config_incomplete"' /tmp/health.json
           grep -q '"lead_storage_unavailable"' /tmp/health.json
