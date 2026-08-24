@@ -1,18 +1,17 @@
 import type { MetadataRoute } from "next";
 
 import { assertConferenceCatalog, listPageReadyConferences } from "@/data/conferences";
+import { isBrandedPublicUrl } from "@/lib/config-values";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://digitalcapital.vercel.app").replace(
-    /\/$/,
-    ""
-  );
+  const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim() ?? "";
   const indexingEnabled = process.env.NEXT_PUBLIC_INDEXING_ENABLED === "true";
 
-  if (!indexingEnabled) {
+  if (!indexingEnabled || !isBrandedPublicUrl(configuredSiteUrl)) {
     return [];
   }
 
+  const siteUrl = configuredSiteUrl.replace(/\/$/, "");
   assertConferenceCatalog();
 
   return listPageReadyConferences()
