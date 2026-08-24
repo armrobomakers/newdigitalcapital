@@ -1,16 +1,20 @@
 import type { EventData } from "@/data/events";
 import { getEventSeoConfig } from "@/data/event-seo";
+import { isBrandedPublicUrl } from "@/lib/config-values";
 
 export function EventStructuredData({ eventData }: { eventData: EventData }) {
   const config = getEventSeoConfig(eventData.eventId);
-  if (!config.structuredDataReady) {
+  const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim() ?? "";
+
+  if (
+    !config.structuredDataReady ||
+    !isBrandedPublicUrl(configuredSiteUrl) ||
+    !isBrandedPublicUrl(config.organizerUrl)
+  ) {
     return null;
   }
 
-  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://digitalcapital.vercel.app").replace(
-    /\/$/,
-    ""
-  );
+  const siteUrl = configuredSiteUrl.replace(/\/$/, "");
   const eventUrl = `${siteUrl}/${eventData.slug}`;
   const schema = {
     "@context": "https://schema.org",
