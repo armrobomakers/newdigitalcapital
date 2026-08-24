@@ -4,13 +4,18 @@ import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 
 const checker = join(process.cwd(), "scripts", "check-launch-placeholders.mjs");
+const activationChecker = join(process.cwd(), "scripts", "check-event-activation.cjs");
 const draftPath = join(process.cwd(), "config", "event-activation.september-draft.json");
 
-function run(args) {
-  return spawnSync(process.execPath, [checker, ...args], {
+function runScript(script, args) {
+  return spawnSync(process.execPath, [script, ...args], {
     cwd: process.cwd(),
     encoding: "utf8",
   });
+}
+
+function run(args) {
+  return runScript(checker, args);
 }
 
 function fail(message, result) {
@@ -51,6 +56,17 @@ for (const required of [
 const strictDraft = run([draftPath, "--strict"]);
 if (strictDraft.status !== 3) {
   fail("strict launch check must reject draft/unresolved manifest with exit 3", strictDraft);
+}
+
+const activationDraft = runScript(activationChecker, [draftPath, "config"]);
+if (activationDraft.status !== 2) {
+  fail("event activation checker must reject September draft before compilation", activationDraft);
+}
+if (!activationDraft.stderr.includes("activation_manifest_is_template")) {
+  fail("event activation checker must label draft as activation_manifest_is_template", activationDraft);
+}
+if (!activationDraft.stderr.includes("$.unresolved.organizerPhone")) {
+  fail("event activation checker must report TODO placeholder paths", activationDraft);
 }
 
 const tempDir = mkdtempSync(join(tmpdir(), "digital-capital-launch-check-"));
