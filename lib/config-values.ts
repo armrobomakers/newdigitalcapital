@@ -22,6 +22,24 @@ export function isResolvedConfigValue(value: string | null | undefined) {
   return Boolean(normalized) && !isPlaceholderValue(normalized);
 }
 
+export function isSecureWebhookUrl(value: string | null | undefined) {
+  const normalized = value?.trim() ?? "";
+  if (!isResolvedConfigValue(normalized)) {
+    return false;
+  }
+
+  try {
+    const url = new URL(normalized);
+    const hostname = url.hostname.toLowerCase();
+    const localDevelopmentHost =
+      hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
+
+    return url.protocol === "https:" || (url.protocol === "http:" && localDevelopmentHost);
+  } catch {
+    return false;
+  }
+}
+
 export function isBrandedPublicUrl(value: string | null | undefined) {
   const normalized = value?.trim() ?? "";
   if (!isResolvedConfigValue(normalized)) {
