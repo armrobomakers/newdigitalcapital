@@ -8,6 +8,8 @@ const PLACEHOLDER_PATTERNS = [
   /^<.+>$/,
 ];
 
+const PLACEHOLDER_HOST_TOKENS = ["todo", "tbd", "placeholder", "replace-me", "replace_me", "changeme", "change-me"];
+
 export function isPlaceholderValue(value: string | null | undefined) {
   const normalized = value?.trim() ?? "";
   if (!normalized) {
@@ -22,6 +24,11 @@ export function isResolvedConfigValue(value: string | null | undefined) {
   return Boolean(normalized) && !isPlaceholderValue(normalized);
 }
 
+function isPlaceholderHostname(hostname: string) {
+  const normalized = hostname.toLowerCase();
+  return PLACEHOLDER_HOST_TOKENS.some((token) => normalized.includes(token));
+}
+
 export function isSecureWebhookUrl(value: string | null | undefined) {
   const normalized = value?.trim() ?? "";
   if (!isResolvedConfigValue(normalized)) {
@@ -33,6 +40,10 @@ export function isSecureWebhookUrl(value: string | null | undefined) {
     const hostname = url.hostname.toLowerCase();
     const localDevelopmentHost =
       hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
+
+    if (!hostname || isPlaceholderHostname(hostname)) {
+      return false;
+    }
 
     return url.protocol === "https:" || (url.protocol === "http:" && localDevelopmentHost);
   } catch {
@@ -56,8 +67,7 @@ export function isBrandedPublicUrl(value: string | null | undefined) {
       hostname !== "127.0.0.1" &&
       hostname !== "::1" &&
       !hostname.endsWith(".vercel.app") &&
-      !hostname.includes("todo") &&
-      !hostname.includes("placeholder")
+      !isPlaceholderHostname(hostname)
     );
   } catch {
     return false;
