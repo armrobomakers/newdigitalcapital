@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
 
+import { isBrandedPublicUrl } from "@/lib/config-values";
+
 import "./globals.css";
 
-const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://digitalcapital.vercel.app").replace(
-  /\/$/,
-  ""
-);
-const indexingEnabled = process.env.NEXT_PUBLIC_INDEXING_ENABLED === "true";
+const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim() ?? "";
+const brandedSiteReady = isBrandedPublicUrl(configuredSiteUrl);
+const indexingEnabled =
+  process.env.NEXT_PUBLIC_INDEXING_ENABLED === "true" && brandedSiteReady;
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  ...(brandedSiteReady ? { metadataBase: new URL(configuredSiteUrl) } : {}),
   applicationName: "Цифровой капитал",
   title: {
     default: "Цифровой капитал — конференции о бизнесе, инвестициях и AI",
