@@ -1,7 +1,11 @@
 import { getLeadCaptureAvailability } from "@/data/event-registry";
 import { listConferences, validateConferenceCatalog } from "@/data/conferences";
 import { getEventSeoConfig } from "@/data/event-seo";
-import { isBrandedPublicUrl, isResolvedConfigValue } from "@/lib/config-values";
+import {
+  isBrandedPublicUrl,
+  isResolvedConfigValue,
+  isSecureWebhookUrl,
+} from "@/lib/config-values";
 import { evaluateLaunchReadiness } from "@/lib/launch-readiness-core";
 import {
   isValidLeadStorageSecret,
@@ -28,7 +32,7 @@ export function getLaunchReadinessSnapshot() {
   const salesConference = getConfiguredSalesConference();
   const leadStorageTransportReady = resolveLeadStorageTransport() !== null;
   const leadStorageUrl = process.env.LEAD_STORAGE_WEBHOOK_URL?.trim() ?? "";
-  const leadStorageReady = isResolvedConfigValue(leadStorageUrl) && leadStorageTransportReady;
+  const leadStorageReady = isSecureWebhookUrl(leadStorageUrl) && leadStorageTransportReady;
   const leadStorageSecret = process.env.LEAD_STORAGE_WEBHOOK_SECRET?.trim() ?? "";
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim() ?? "";
 
@@ -55,7 +59,7 @@ export function getLaunchReadinessSnapshot() {
     legalReady: isLegalConfigReady(),
     leadStorageReady,
     leadStorageSecretReady: leadStorageReady && isValidLeadStorageSecret(leadStorageSecret),
-    analyticsReady: isResolvedConfigValue(process.env.ANALYTICS_WEBHOOK_URL),
+    analyticsReady: isSecureWebhookUrl(process.env.ANALYTICS_WEBHOOK_URL),
     brandedSiteUrlReady: isBrandedPublicUrl(siteUrl),
     indexingEnabled: process.env.NEXT_PUBLIC_INDEXING_ENABLED === "true",
   });
