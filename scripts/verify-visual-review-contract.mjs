@@ -6,6 +6,7 @@ const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
 
 const route = read("app/internal/visual-review/page.tsx");
 const workflow = read(".github/workflows/visual-review.yml");
+const capture = read("scripts/capture-visual-screenshot.mjs");
 const failures = [];
 
 function expect(condition, message) {
@@ -22,15 +23,23 @@ expect(route.includes("TODO_BRANDED_SITE_URL"), "visual review fixture must use 
 
 expect(workflow.includes("VISUAL_REVIEW_ENABLED: \"true\""), "visual review workflow must explicitly enable the internal route");
 expect(workflow.includes("actions/upload-artifact@v4"), "visual review workflow must upload screenshots");
-expect(workflow.includes("playwright@1.55.0"), "visual review workflow must pin the screenshot runtime");
+expect(workflow.includes("Resolve runner Chrome"), "visual review workflow must resolve the preinstalled runner browser");
+expect(workflow.includes("capture-visual-screenshot.mjs"), "visual review workflow must use the source-owned capture script");
 expect(workflow.includes("landing-desktop.png"), "desktop landing screenshot is required");
 expect(workflow.includes("landing-tablet.png"), "tablet landing screenshot is required");
 expect(workflow.includes("landing-mobile.png"), "mobile landing screenshot is required");
 expect(workflow.includes("ui-gallery-desktop.png"), "desktop UI gallery screenshot is required");
 expect(workflow.includes("ui-gallery-mobile.png"), "mobile UI gallery screenshot is required");
-expect(workflow.includes("--full-page"), "visual review screenshots must capture full pages");
 expect(workflow.includes("retention-days: 14"), "visual review artifacts must have bounded retention");
-expect(!workflow.includes("vercel"), "visual review workflow must remain independent from Vercel");
+expect(!workflow.includes("playwright"), "visual review workflow must not add a temporary browser package");
+expect(!workflow.includes("npx"), "visual review workflow must not bypass repository install-script policy through npx");
+expect(!workflow.toLowerCase().includes("vercel"), "visual review workflow must remain independent from Vercel");
+
+expect(capture.includes("Page.captureScreenshot"), "capture script must use Chrome DevTools full-page screenshot API");
+expect(capture.includes("captureBeyondViewport: true"), "capture script must capture beyond the initial viewport");
+expect(capture.includes("horizontal_overflow"), "capture script must fail on horizontal overflow");
+expect(capture.includes("Emulation.setDeviceMetricsOverride"), "capture script must set explicit responsive viewport metrics");
+expect(!capture.includes("playwright"), "capture script must stay dependency-free");
 
 if (failures.length) {
   console.error("visual_review_contract_failed");
@@ -40,5 +49,7 @@ if (failures.length) {
 
 console.log("visual_review_contract_ok");
 console.log("viewports=desktop,tablet,mobile");
+console.log("capture=chrome-cdp-node24");
+console.log("horizontal_overflow_gate=enabled");
 console.log("production_route_default=404");
 console.log("vercel_dependency=none");
