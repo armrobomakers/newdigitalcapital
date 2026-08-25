@@ -34,7 +34,8 @@
     "launch:todo:test": "node scripts/verify-launch-placeholder-check.mjs",
     "seo:safety:test": "node scripts/verify-seo-release-safety.mjs",
     "ui:pattern:test": "node scripts/verify-ui-pattern-contract.mjs",
-    "check": "npm run env:check && npm run lead:check:test && npm run launch:todo:test && npm run seo:safety:test && npm run ui:pattern:test && npm run lint && npm run typecheck && npm run build",
+    "visual:contract:test": "node scripts/verify-visual-review-contract.mjs",
+    "check": "npm run env:check && npm run lead:check:test && npm run launch:todo:test && npm run seo:safety:test && npm run ui:pattern:test && npm run visual:contract:test && npm run lint && npm run typecheck && npm run build",
     "event:check": "node scripts/check-event-activation.cjs",
     "lead:check": "node scripts/check-lead-storage.mjs",
     "lead:check:test": "node scripts/verify-lead-storage-check.mjs"

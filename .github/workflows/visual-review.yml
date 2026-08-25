@@ -1,0 +1,113 @@
+name: Digital Capital Visual Review
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: digital-capital-visual-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NEXT_PUBLIC_SITE_URL: http://127.0.0.1:7485
+  NEXT_PUBLIC_INDEXING_ENABLED: "false"
+  VISUAL_REVIEW_ENABLED: "true"
+
+jobs:
+  screenshots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Install project
+        run: npm ci
+
+      - name: Production build
+        run: npm run build
+
+      - name: Resolve runner Chrome
+        run: |
+          set -euo pipefail
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          echo "CHROME_BIN=$CHROME" >> "$GITHUB_ENV"
+          "$CHROME" --version
+
+      - name: Capture responsive visual review
+        run: |
+          set -euo pipefail
+          mkdir -p visual-review
+
+          npm run start >/tmp/digital-capital-visual-server.log 2>&1 &
+          PID=$!
+          trap 'STATUS=$?; cp /tmp/digital-capital-visual-server.log visual-review/server.log 2>/dev/null || true; if [ "$STATUS" -ne 0 ]; then echo "--- visual server log ---"; cat /tmp/digital-capital-visual-server.log || true; fi; kill "$PID" 2>/dev/null || true' EXIT
+
+          BASE=http://127.0.0.1:7485
+          READY=0
+          for i in $(seq 1 40); do
+            if curl -fsS "$BASE/ekb-2026-09-26" >/dev/null 2>&1; then
+              READY=1
+              break
+            fi
+            sleep 1
+          done
+          test "$READY" = "1"
+
+          test "$(curl -sS -o /tmp/visual-gallery.html -w '%{http_code}' "$BASE/internal/visual-review")" = "200"
+          grep -q 'CI visual review' /tmp/visual-gallery.html
+          grep -q 'TODO_ORGANIZER_PHONE' /tmp/visual-gallery.html
+
+          node scripts/capture-visual-screenshot.mjs \
+            "$BASE/ekb-2026-09-26" \
+            visual-review/landing-desktop.png \
+            1440 1000
+
+          node scripts/capture-visual-screenshot.mjs \
+            "$BASE/ekb-2026-09-26" \
+            visual-review/landing-tablet.png \
+            1024 900
+
+          node scripts/capture-visual-screenshot.mjs \
+            "$BASE/ekb-2026-09-26" \
+            visual-review/landing-mobile.png \
+            390 844
+
+          node scripts/capture-visual-screenshot.mjs \
+            "$BASE/internal/visual-review" \
+            visual-review/ui-gallery-desktop.png \
+            1440 1000
+
+          node scripts/capture-visual-screenshot.mjs \
+            "$BASE/internal/visual-review" \
+            visual-review/ui-gallery-mobile.png \
+            390 844
+
+          cp /tmp/digital-capital-visual-server.log visual-review/server.log
+          {
+            echo "commit=${GITHUB_SHA}"
+            echo "event=/ekb-2026-09-26"
+            echo "gallery=/internal/visual-review"
+            echo "capture=chrome-cdp-node24"
+            echo "viewports=1440x1000,1024x900,390x844"
+            echo "generated_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            sha256sum visual-review/*.png
+          } > visual-review/manifest.txt
+
+      - name: Upload visual review artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: digital-capital-visual-review-${{ github.sha }}
+          path: visual-review/
+          if-no-files-found: warn
+          retention-days: 14
