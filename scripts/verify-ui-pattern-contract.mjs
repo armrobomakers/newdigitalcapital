@@ -7,11 +7,13 @@ const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
 const eventPage = read("app/[slug]/page.tsx");
 const trustBar = read("components/event-trust-bar.tsx");
 const landing = read("components/landing.tsx");
+const stickyCta = read("components/sticky-cta.tsx");
 const registrationForm = read("components/registration-form.tsx");
 const formControls = read("components/ui/form-controls.tsx");
 const uiCss = read("app/ui-library.css");
 const footerCss = read("app/ui-footer.css");
 const trustCss = read("app/ui-trust.css");
+const responsiveCss = read("app/ui-responsive.css");
 const layout = read("app/layout.tsx");
 
 const failures = [];
@@ -23,6 +25,7 @@ function expect(condition, message) {
 expect(layout.includes('import "./ui-library.css";'), "ui-library.css must stay loaded from app/layout.tsx");
 expect(layout.includes('import "./ui-footer.css";'), "ui-footer.css must stay loaded from app/layout.tsx");
 expect(layout.includes('import "./ui-trust.css";'), "ui-trust.css must stay loaded from app/layout.tsx");
+expect(layout.includes('import "./ui-responsive.css";'), "ui-responsive.css must stay loaded last from app/layout.tsx");
 expect(landing.includes('id="top"'), "hero root #top is required by the curated UI layer");
 expect(landing.includes("eventData.stats.map"), "hero stats collection is required by the bento pattern");
 expect(landing.includes('id="audience"'), "#audience section is required by the audience bento pattern");
@@ -71,11 +74,26 @@ for (const selector of [
   expect(trustCss.includes(selector), `missing trust UI selector/contract: ${selector}`);
 }
 
+expect(stickyCta.includes('data-ui="sticky-registration-cta"'), "sticky CTA must expose stable responsive hook");
+for (const contract of [
+  "@media (max-width: 1023px)",
+  "@media (min-width: 640px) and (max-width: 1023px)",
+  "@media (max-width: 639px)",
+  "@media (max-width: 359px)",
+  '[data-ui="sticky-registration-cta"]',
+  "env(safe-area-inset-bottom)",
+  "#speakers > .mt-5.grid",
+  "#register [data-ui=\"choice-card\"]",
+]) {
+  expect(responsiveCss.includes(contract), `missing responsive UI contract: ${contract}`);
+}
+
 expect(!uiCss.includes("cursor: none"), "curated UI layer must not hijack the pointer");
 expect(!uiCss.includes("<canvas"), "curated UI layer must stay canvas-free by default");
 expect(!footerCss.includes("placeholder@digitalcapital.ru"), "footer cleanup must not reintroduce fake contact data");
 expect(!trustCss.includes("TODO_"), "trust UI CSS must not hard-code unresolved placeholders");
 expect(!trustCss.includes("placeholder@"), "trust UI CSS must not hard-code placeholder contacts");
+expect(!responsiveCss.includes("overflow-x: visible"), "responsive layer must not explicitly allow horizontal overflow");
 
 if (failures.length) {
   console.error("ui_pattern_contract_failed");
@@ -84,5 +102,5 @@ if (failures.length) {
 }
 
 console.log("ui_pattern_contract_ok");
-console.log("patterns=hero_stats_bento,audience_bento,faq_accordion,program_timeline,speaker_spotlight,source_owned_form,footer_grid,event_trust_bar,verified_location");
+console.log("patterns=hero_stats_bento,audience_bento,faq_accordion,program_timeline,speaker_spotlight,source_owned_form,footer_grid,event_trust_bar,verified_location,responsive_hardening");
 console.log("runtime_dependencies_added=0");
