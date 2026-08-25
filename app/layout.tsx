@@ -6,6 +6,7 @@ import "./globals.css";
 import "./ui-library.css";
 import "./ui-footer.css";
 import "./ui-trust.css";
+import "./ui-responsive.css";
 
 const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim() ?? "";
 const brandedSiteReady = isBrandedPublicUrl(configuredSiteUrl);
