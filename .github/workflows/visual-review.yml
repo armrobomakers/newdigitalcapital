@@ -63,6 +63,13 @@ jobs:
           done
           test "$READY" = "1"
 
+          test "$(curl -sS -o /tmp/september-public.html -w '%{http_code}' "$BASE/ekb-2026-09-26")" = "200"
+          ! grep -Eq 'TODO_|TBD_|PLACEHOLDER_|REPLACE_ME_|CHANGE_ME_' /tmp/september-public.html
+          grep -q 'Зал:' /tmp/september-public.html
+          grep -q 'будет указан дополнительно' /tmp/september-public.html
+          grep -q 'Вход:' /tmp/september-public.html
+          grep -q 'схема прохода появится ближе к событию' /tmp/september-public.html
+
           test "$(curl -sS -o /tmp/visual-gallery.html -w '%{http_code}' "$BASE/internal/visual-review")" = "200"
           grep -q 'CI visual review' /tmp/visual-gallery.html
           grep -q 'TODO_ORGANIZER_PHONE' /tmp/visual-gallery.html
@@ -98,6 +105,7 @@ jobs:
             echo "event=/ekb-2026-09-26"
             echo "gallery=/internal/visual-review"
             echo "capture=chrome-cdp-node24"
+            echo "public_placeholder_gate=enabled"
             echo "viewports=1440x1000,1024x900,390x844"
             echo "generated_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
             sha256sum visual-review/*.png
