@@ -3,7 +3,7 @@
   "installCommand": "npm ci",
   "buildCommand": "npm run check",
   "git": {
-    "deploymentEnabled": true
+    "deploymentEnabled": false
   },
   "headers": [
     {
