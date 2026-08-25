@@ -30,6 +30,10 @@ expect(workflow.includes("landing-tablet.png"), "tablet landing screenshot is re
 expect(workflow.includes("landing-mobile.png"), "mobile landing screenshot is required");
 expect(workflow.includes("ui-gallery-desktop.png"), "desktop UI gallery screenshot is required");
 expect(workflow.includes("ui-gallery-mobile.png"), "mobile UI gallery screenshot is required");
+expect(workflow.includes("/tmp/september-public.html"), "visual review must inspect public September HTML");
+expect(workflow.includes("! grep -Eq 'TODO_|TBD_|PLACEHOLDER_|REPLACE_ME_|CHANGE_ME_'"), "public HTML must reject raw technical placeholders");
+expect(workflow.includes("будет указан дополнительно"), "public hall fallback must be asserted in visual review");
+expect(workflow.includes("схема прохода появится ближе к событию"), "public entry fallback must be asserted in visual review");
 expect(workflow.includes("retention-days: 14"), "visual review artifacts must have bounded retention");
 expect(!workflow.includes("playwright"), "visual review workflow must not add a temporary browser package");
 expect(!workflow.includes("npx"), "visual review workflow must not bypass repository install-script policy through npx");
@@ -55,5 +59,6 @@ console.log("viewports=desktop,tablet,mobile");
 console.log("capture=chrome-cdp-node24");
 console.log("lazy_images=scroll_and_settle");
 console.log("horizontal_overflow_gate=enabled");
+console.log("public_placeholder_gate=enabled");
 console.log("production_route_default=404");
 console.log("vercel_dependency=none");
