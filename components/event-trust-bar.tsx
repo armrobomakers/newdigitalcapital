@@ -19,7 +19,7 @@ export function EventTrustBar({ eventData }: { eventData: EventData }) {
 
   return (
     <aside
-      aria-label="Подтвержденные данные события"
+      aria-label="Данные события и организационные детали"
       data-ui="event-trust-bar"
       className="section-shell pt-2 md:pt-3"
     >
