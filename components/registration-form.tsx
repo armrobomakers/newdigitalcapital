@@ -6,6 +6,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { BriefcaseIcon, MailIcon, PhoneIcon, UserIcon } from "@/components/icons";
+import {
+  ChoiceCard,
+  ConsentRow,
+  IconField,
+  StatusLine,
+} from "@/components/ui/form-controls";
 import type { LeadCaptureAvailability, LeadType } from "@/data/event-registry";
 import { getEventContent } from "@/data/events";
 import { useLeadCaptureAvailability } from "@/hooks/use-lead-capture-availability";
@@ -214,8 +220,10 @@ export function RegistrationForm({
     );
   }
 
+  const statusTone = status === "success" ? "success" : status === "error" ? "error" : "neutral";
+
   return (
-    <form className="space-y-4" onSubmit={handleSubmit} onFocusCapture={handleFormFocus}>
+    <form className="space-y-3.5" onSubmit={handleSubmit} onFocusCapture={handleFormFocus}>
       <input type="hidden" name="event_id" value={eventId} />
       <input type="hidden" name="lead_type" value={leadType} />
 
@@ -227,152 +235,109 @@ export function RegistrationForm({
       </div>
 
       {ticketOptions.length > 0 ? (
-        <fieldset className="rounded-[24px] border border-white/10 bg-white/[0.025] p-3">
-          <legend className="px-2 text-sm font-semibold text-white/85">Выберите билет</legend>
-          <div className="mt-2 grid gap-2 md:grid-cols-3">
+        <fieldset
+          data-ui="ticket-selector"
+          className="rounded-[26px] border border-white/[0.08] bg-white/[0.018] p-3.5"
+        >
+          <legend className="px-2 text-[13px] font-semibold text-white/78">Выберите билет</legend>
+          <div className="mt-2.5 grid gap-2.5 md:grid-cols-3">
             {ticketOptions.map((ticket, index) => (
-              <label
+              <ChoiceCard
                 key={ticket.id}
-                className={`relative cursor-pointer rounded-[20px] border p-4 transition has-[:checked]:border-violet-300/70 has-[:checked]:bg-violet-500/12 ${
-                  ticket.highlighted
-                    ? "border-violet-400/35 bg-violet-500/[0.06]"
-                    : "border-white/10 bg-black/15"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="ticket"
-                  value={ticket.id}
-                  required
-                  defaultChecked={index === 0}
-                  className="absolute right-3 top-3 h-4 w-4 accent-violet-500"
-                />
-                <p className="pr-7 text-sm font-semibold text-white">{ticket.name}</p>
-                <p className="mt-2 font-display text-3xl leading-none text-white">{ticket.price}</p>
-                <p className="mt-2 text-xs leading-5 text-white/55">{ticket.description}</p>
-                <ul className="mt-3 space-y-1.5 text-xs leading-5 text-white/68">
-                  {ticket.benefits.map((benefit) => (
-                    <li key={benefit}>• {benefit}</li>
-                  ))}
-                </ul>
-              </label>
+                highlighted={ticket.highlighted}
+                inputProps={{
+                  name: "ticket",
+                  value: ticket.id,
+                  required: true,
+                  defaultChecked: index === 0,
+                }}
+                title={ticket.name}
+                valueLabel={ticket.price}
+                description={ticket.description}
+                benefits={ticket.benefits}
+              />
             ))}
           </div>
-          <p className="mt-3 text-xs leading-5 text-amber-200/70">
+          <p className="mt-3 rounded-[16px] border border-amber-200/10 bg-amber-200/[0.025] px-3 py-2 text-xs leading-5 text-amber-100/58">
             Наполнение тарифов пока предварительное и будет уточняться.
           </p>
         </fieldset>
       ) : null}
 
-      <label className="block">
-        <span className="sr-only">Имя</span>
-        <div className="relative">
-          <UserIcon className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-white/55" />
-          <input
-            name="name"
-            required
-            minLength={2}
-            maxLength={100}
-            autoComplete="name"
-            className="field-input h-14 pl-12 text-base placeholder:text-white/35"
-            placeholder="Ваше имя"
-          />
-        </div>
-      </label>
+      <IconField
+        label="Имя"
+        icon={<UserIcon className="h-4 w-4" />}
+        inputProps={{
+          name: "name",
+          required: true,
+          minLength: 2,
+          maxLength: 100,
+          autoComplete: "name",
+          placeholder: "Ваше имя",
+        }}
+      />
 
-      <label className="block">
-        <span className="sr-only">Телефон</span>
-        <div className="relative">
-          <PhoneIcon className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-white/55" />
-          <input
-            name="phone"
-            type="tel"
-            required
-            minLength={7}
-            maxLength={32}
-            autoComplete="tel"
-            inputMode="tel"
-            className="field-input h-14 pl-12 text-base placeholder:text-white/35"
-            placeholder="Телефон"
-          />
-        </div>
-      </label>
+      <IconField
+        label="Телефон"
+        icon={<PhoneIcon className="h-4 w-4" />}
+        inputProps={{
+          name: "phone",
+          type: "tel",
+          required: true,
+          minLength: 7,
+          maxLength: 32,
+          autoComplete: "tel",
+          inputMode: "tel",
+          placeholder: "Телефон",
+        }}
+      />
 
-      <label className="block">
-        <span className="sr-only">Email</span>
-        <div className="relative">
-          <MailIcon className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-white/55" />
-          <input
-            name="email"
-            type="email"
-            maxLength={160}
-            autoComplete="email"
-            className="field-input h-14 pl-12 text-base placeholder:text-white/35"
-            placeholder="Email"
-          />
-        </div>
-      </label>
+      <IconField
+        label="Email"
+        icon={<MailIcon className="h-4 w-4" />}
+        inputProps={{
+          name: "email",
+          type: "email",
+          maxLength: 160,
+          autoComplete: "email",
+          placeholder: "Email",
+        }}
+      />
 
-      <label className="block">
-        <span className="sr-only">Компания / должность</span>
-        <div className="relative">
-          <BriefcaseIcon className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-white/55" />
-          <input
-            name="company"
-            maxLength={160}
-            autoComplete="organization"
-            className="field-input h-14 pl-12 text-base placeholder:text-white/35"
-            placeholder="Компания / должность"
-          />
-        </div>
-      </label>
+      <IconField
+        label="Компания / должность"
+        icon={<BriefcaseIcon className="h-4 w-4" />}
+        inputProps={{
+          name: "company",
+          maxLength: 160,
+          autoComplete: "organization",
+          placeholder: "Компания / должность",
+        }}
+      />
 
-      <label className="flex items-start gap-3 rounded-[22px] border border-white/10 bg-black/15 px-4 py-3 text-sm leading-6 text-white/70">
-        <input
-          name="privacy_consent"
-          type="checkbox"
-          required
-          className="mt-1 h-4 w-4 rounded border-white/20 bg-white/10 text-violet-500 accent-violet-500"
-        />
-        <span>
-          Согласен на обработку персональных данных в соответствии с{" "}
-          <Link href="/legal/privacy" className="text-violet-200 underline underline-offset-4">
-            политикой обработки персональных данных
-          </Link>
-          .
-        </span>
-      </label>
+      <ConsentRow inputProps={{ name: "privacy_consent", required: true }}>
+        Согласен на обработку персональных данных в соответствии с{" "}
+        <Link href="/legal/privacy" className="text-violet-200 underline underline-offset-4">
+          политикой обработки персональных данных
+        </Link>
+        .
+      </ConsentRow>
 
-      <label className="flex items-start gap-3 rounded-[22px] border border-white/10 bg-black/15 px-4 py-3 text-sm leading-6 text-white/70">
-        <input
-          name="marketing_consent"
-          type="checkbox"
-          className="mt-1 h-4 w-4 rounded border-white/20 bg-white/10 text-violet-500 accent-violet-500"
-        />
-        <span>Хочу получать новости и информационные сообщения о следующих мероприятиях.</span>
-      </label>
+      <ConsentRow inputProps={{ name: "marketing_consent" }}>
+        Хочу получать новости и информационные сообщения о следующих мероприятиях.
+      </ConsentRow>
 
       <button
         type="submit"
-        className="btn-primary w-full justify-center disabled:cursor-not-allowed disabled:opacity-70"
+        className="btn-primary min-h-[58px] w-full justify-center text-[15px] disabled:cursor-not-allowed disabled:opacity-70"
         disabled={status === "loading" || status === "success"}
       >
         {status === "loading" ? "Отправляем..." : status === "success" ? "Заявка сохранена" : "Отправить заявку"}
       </button>
 
-      <p
-        role="status"
-        aria-live="polite"
-        className={`text-sm leading-6 ${
-          status === "success"
-            ? "text-emerald-300"
-            : status === "error"
-              ? "text-rose-300"
-              : "text-white/55"
-        }`}
-      >
+      <StatusLine tone={statusTone}>
         {message || "Мы не считаем заявку принятой, пока сервер не подтвердит ее сохранение."}
-      </p>
+      </StatusLine>
     </form>
   );
 }
