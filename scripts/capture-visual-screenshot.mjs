@@ -188,7 +188,53 @@ try {
     awaitPromise: true,
     returnByValue: true,
   });
-  await new Promise((resolvePromise) => setTimeout(resolvePromise, 900));
+
+  // Walk the document before capture so native/Next image lazy-loading behaves as it
+  // would for a real user scrolling through the page. This is especially important
+  // for tablet/mobile full-page screenshots where below-the-fold portraits are not
+  // requested by Chrome until they approach the viewport.
+  await cdp.send("Runtime.evaluate", {
+    expression: `(async () => {
+      const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+      const root = document.documentElement;
+      const step = Math.max(420, Math.floor(window.innerHeight * 0.78));
+      let lastHeight = 0;
+
+      for (let pass = 0; pass < 2; pass += 1) {
+        const height = Math.max(root.scrollHeight, document.body?.scrollHeight ?? 0);
+        for (let y = 0; y <= height; y += step) {
+          window.scrollTo(0, y);
+          await sleep(65);
+        }
+        window.scrollTo(0, height);
+        await sleep(180);
+        if (height === lastHeight) break;
+        lastHeight = height;
+      }
+
+      const images = Array.from(document.images);
+      await Promise.race([
+        Promise.all(images.map((image) => {
+          if (image.complete) return Promise.resolve();
+          return new Promise((resolve) => {
+            image.addEventListener('load', resolve, { once: true });
+            image.addEventListener('error', resolve, { once: true });
+          });
+        })),
+        sleep(3500),
+      ]);
+
+      window.scrollTo(0, 0);
+      await sleep(300);
+      return {
+        imageCount: images.length,
+        loadedImages: images.filter((image) => image.complete && image.naturalWidth > 0).length,
+        scrollHeight: Math.max(root.scrollHeight, document.body?.scrollHeight ?? 0),
+      };
+    })()`,
+    awaitPromise: true,
+    returnByValue: true,
+  });
 
   const metrics = await cdp.send("Page.getLayoutMetrics");
   const content = metrics.cssContentSize ?? metrics.contentSize;
