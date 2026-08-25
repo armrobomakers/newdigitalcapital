@@ -1,0 +1,91 @@
+{
+  "eventId": "ekb-2026-09-26",
+  "sourceManifest": "config/event-activation.september-draft.json",
+  "policy": {
+    "technicalPlaceholdersMayBeCommitted": true,
+    "technicalPlaceholdersMayBePublic": false,
+    "secretsMayBeStoredHere": false
+  },
+  "items": [
+    {
+      "key": "organizerPhone",
+      "token": "TODO_ORGANIZER_PHONE",
+      "label": "Телефон организатора",
+      "category": "public_contact",
+      "phase": "registration",
+      "requiredFor": ["registration"],
+      "fillTarget": "data/events.ts -> ekbSeptemberEvent.contacts.phone",
+      "publicFallback": "Телефон будет добавлен после подтверждения."
+    },
+    {
+      "key": "privacyEmail",
+      "token": "TODO_PRIVACY_EMAIL",
+      "label": "Email по вопросам персональных данных",
+      "category": "legal",
+      "phase": "registration",
+      "requiredFor": ["registration"],
+      "fillTarget": "NEXT_PUBLIC_LEGAL_PRIVACY_EMAIL in production environment; lib/legal.ts keeps a fail-closed TODO default",
+      "publicFallback": "Контакт по вопросам персональных данных будет указан до открытия регистрации."
+    },
+    {
+      "key": "brandedSiteUrl",
+      "token": "TODO_BRANDED_SITE_URL",
+      "label": "Основной брендированный домен",
+      "category": "domain",
+      "phase": "paid_traffic",
+      "requiredFor": ["paid_traffic", "structured_data", "indexing"],
+      "fillTarget": "Vercel project domain + Cloudflare DNS + NEXT_PUBLIC_SITE_URL",
+      "publicFallback": "Текущий технический адрес не используется как SEO-каноникал."
+    },
+    {
+      "key": "analyticsWebhookUrl",
+      "token": "TODO_ANALYTICS_WEBHOOK_URL",
+      "label": "Webhook аналитики конверсий",
+      "category": "analytics",
+      "phase": "paid_traffic",
+      "requiredFor": ["paid_traffic"],
+      "fillTarget": "ANALYTICS_WEBHOOK_URL in production environment",
+      "publicFallback": "Публичный интерфейс не показывает состояние внутреннего analytics sink."
+    },
+    {
+      "key": "eventHall",
+      "token": "TODO_EVENT_HALL",
+      "label": "Точный зал в БЦ «Саммит»",
+      "category": "event_detail",
+      "phase": "event_ops",
+      "requiredFor": ["attendee_instructions"],
+      "fillTarget": "data/events.ts -> ekbSeptemberEvent.location.hall",
+      "publicFallback": "Точный зал будет указан дополнительно."
+    },
+    {
+      "key": "entryInstructions",
+      "token": "TODO_ENTRY_INSTRUCTIONS",
+      "label": "Инструкция и схема входа",
+      "category": "event_detail",
+      "phase": "event_ops",
+      "requiredFor": ["attendee_instructions"],
+      "fillTarget": "data/events.ts -> ekbSeptemberEvent.location.entryInstructions",
+      "publicFallback": "Схема прохода и инструкция по входу будут опубликованы ближе к событию."
+    },
+    {
+      "key": "partnerList",
+      "token": "TODO_CONFIRMED_PARTNERS_OR_LEAVE_EMPTY",
+      "label": "Подтвержденные партнеры",
+      "category": "content",
+      "phase": "content_polish",
+      "requiredFor": ["paid_traffic_review"],
+      "fillTarget": "data/events.ts -> ekbSeptemberEvent.partners; if no partners are confirmed, keep [] and resolve this TODO explicitly",
+      "publicFallback": "Подтвержденные партнеры будут добавляться по мере согласования."
+    },
+    {
+      "key": "socialLinks",
+      "token": "TODO_CONFIRMED_SOCIAL_LINKS_OR_LEAVE_EMPTY",
+      "label": "Подтвержденные социальные ссылки события",
+      "category": "content",
+      "phase": "content_polish",
+      "requiredFor": ["paid_traffic_review"],
+      "fillTarget": "data/events.ts -> ekbSeptemberEvent.socials; if no event socials are approved, keep [] and resolve this TODO explicitly",
+      "publicFallback": "Неподтвержденные социальные ссылки не показываются."
+    }
+  ]
+}
