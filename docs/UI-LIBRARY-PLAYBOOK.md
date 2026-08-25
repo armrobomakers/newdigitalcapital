@@ -23,7 +23,7 @@ Use as a reference for accessible motion and transitions. Add a motion runtime o
 
 ## Current implementation policy
 
-The site currently runs Next.js 16, React 19 and Tailwind CSS 3 with a deliberately small dependency surface. DC-31 and DC-32 therefore use source-owned, CSS-first patterns and no new runtime package.
+The site currently runs Next.js 16, React 19 and Tailwind CSS 3 with a deliberately small dependency surface. DC-31 through DC-33 use source-owned and CSS-first patterns with no new runtime package.
 
 Rules:
 
@@ -37,6 +37,8 @@ Rules:
 8. One visual system: Digital Capital colors, typography, radius and spacing always override library defaults.
 9. Prefer semantic native elements when they already solve the interaction well; shadcn conventions can be applied without replacing semantics unnecessarily.
 10. Every library-inspired pass must improve hierarchy or usability, not just add decoration.
+11. Repeated production controls should graduate from selector-based styling into source-owned `components/ui` primitives.
+12. Factual placeholders must never be reintroduced visually by CSS when launch configuration is unresolved.
 
 ## Section map
 
@@ -47,20 +49,34 @@ Rules:
 | Audience | 21st / Aceternity bento patterns | DC-32: replace five equal tall cards with compact 5/3/4 + 4/8 bento composition |
 | Speakers | Aceternity card-hover restraint | DC-31: restrained spotlight hover; no 3D tilt |
 | Program | Aceternity Timeline + 21st timeline/card references | DC-31: timeline hierarchy, readable full copy, sticky desktop intro |
-| Registration | Magic UI shine-border restraint + shadcn form conventions | DC-30 reduced decorative noise; form primitives remain a later source-owned refactor |
+| Registration | shadcn source-owned form conventions + restrained Magic UI accents | DC-33: `IconField`, `ChoiceCard`, `ConsentRow`, `StatusLine` moved into repository-owned UI primitives |
 | Partners | Magic UI marquee only after real logos exist | Do not animate placeholders |
 | FAQ | shadcn accordion conventions | DC-32: native `details` retained, but layout and interaction density follow shadcn-style accordion discipline |
 | Location | 21st location/contact references | Keep stable until exact hall/entry data is confirmed |
-| Footer | 21st footer references | Next visual pass: simplify CTA positioning and information density |
+| Footer | 21st footer references | DC-33: remove absolute CTA placement, simplify grid and suppress legacy fake contact placeholders |
+
+## Source-owned form primitives
+
+`components/ui/form-controls.tsx` is the first production component layer following the shadcn ownership model. It intentionally uses React/Tailwind only and exposes stable `data-ui` hooks.
+
+Current primitives:
+
+- `IconField` — icon + accessible input wrapper;
+- `ChoiceCard` — radio choice surface for ticket tiers;
+- `ConsentRow` — checkbox consent row;
+- `StatusLine` — neutral/success/error form status surface.
+
+These primitives must preserve native form controls and should remain independently editable without requiring an external package upgrade.
 
 ## Performance budget
 
 - No WebGL/canvas effect by default.
-- No new animation runtime in DC-31/DC-32.
+- No new animation runtime in DC-31/DC-32/DC-33.
 - CSS animations must disable under `prefers-reduced-motion`.
 - Avoid more than one continuous decorative animation per viewport.
 - Prefer opacity/transform over layout-changing animation.
 - Bento composition must stay CSS-grid based and require no client JavaScript.
+- Source-owned form primitives must add no client state beyond the form state already required by the product flow.
 
 ## Accessibility rules for adopted patterns
 
@@ -70,6 +86,8 @@ Rules:
 - Never depend on animation alone to convey state.
 - Accordion content remains accessible without JavaScript.
 - Mobile layout cannot rely on hover for essential information.
+- Radio/checkbox semantics stay native even when the visual surface is card-like.
+- Status messaging must remain `aria-live` compatible.
 
 ## Release discipline
 

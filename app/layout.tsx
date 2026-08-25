@@ -4,6 +4,7 @@ import { isBrandedPublicUrl } from "@/lib/config-values";
 
 import "./globals.css";
 import "./ui-library.css";
+import "./ui-footer.css";
 
 const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim() ?? "";
 const brandedSiteReady = isBrandedPublicUrl(configuredSiteUrl);
