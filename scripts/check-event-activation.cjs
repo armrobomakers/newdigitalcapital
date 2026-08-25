@@ -6,6 +6,16 @@ const { spawnSync } = require("node:child_process");
 const manifestPath = process.argv[2];
 const mode = process.argv[3] ?? "config";
 const allowedModes = new Set(["config", "registration", "paid-traffic"]);
+const placeholderPatterns = [
+  /^__REQUIRED_/i,
+  /^TODO(?:[_:\s-]|$)/i,
+  /^TBD(?:[_:\s-]|$)/i,
+  /^PLACEHOLDER(?:[_:\s-]|$)/i,
+  /^REPLACE_ME(?:[_:\s-]|$)/i,
+  /^CHANGE_ME(?:[_:\s-]|$)/i,
+  /^\[.+\]$/,
+  /^<.+>$/,
+];
 
 if (!manifestPath || !allowedModes.has(mode)) {
   console.error("Usage: npm run event:check -- <manifest.json> [config|registration|paid-traffic]");
@@ -25,8 +35,17 @@ function readJson(file) {
   }
 }
 
+function isPlaceholder(value) {
+  if (typeof value !== "string") {
+    return false;
+  }
+
+  const normalized = value.trim();
+  return placeholderPatterns.some((pattern) => pattern.test(normalized));
+}
+
 function collectPlaceholders(value, prefix = "$", result = []) {
-  if (typeof value === "string" && value.startsWith("__REQUIRED_")) {
+  if (isPlaceholder(value)) {
     result.push(prefix);
     return result;
   }
@@ -105,12 +124,14 @@ function compileRuntimeModules() {
 
 const manifest = readJson(path.resolve(manifestPath));
 const placeholders = collectPlaceholders(manifest);
-if (manifest.template === true || placeholders.length > 0) {
+if (manifest.template === true || manifest.draft === true || placeholders.length > 0) {
   console.error(
     JSON.stringify(
       {
         ok: false,
         error: "activation_manifest_is_template",
+        draft: manifest.draft === true,
+        template: manifest.template === true,
         placeholders,
       },
       null,

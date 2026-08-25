@@ -2,7 +2,7 @@
 
 Conference platform for «Цифровой капитал», built with Next.js App Router, TypeScript and Tailwind CSS.
 
-The repository currently serves the verified archive event and contains the lifecycle, lead-capture and launch-readiness infrastructure for future events.
+The repository serves the conference platform and contains lifecycle, lead-capture, launch-readiness and release-safety infrastructure for the September 2026 event.
 
 ## Toolchain
 
@@ -20,7 +20,7 @@ npm run dev
 
 Keep `.env.example` as the single documented environment-variable source of truth. Never commit real secrets to `.env.local`.
 
-Open `http://127.0.0.1:7485/ekb`.
+Open `http://127.0.0.1:7485/ekb-2026-09-26` for the active September event.
 
 ## Quality gate
 
@@ -28,7 +28,7 @@ Open `http://127.0.0.1:7485/ekb`.
 npm run check
 ```
 
-This first verifies the environment contract, then runs lint, typecheck and a production build. Pull requests also run lifecycle/readiness matrices, release invariants, runtime/security smoke and a production Docker smoke.
+This verifies the environment contract, lead-storage checker, launch-placeholder contract, SEO release safety, lint, typecheck and a production build. Pull requests additionally run lifecycle/readiness matrices, release invariants, runtime/security smoke and a production Docker smoke.
 
 To check only environment documentation drift:
 
@@ -36,15 +36,58 @@ To check only environment documentation drift:
 npm run env:check
 ```
 
-## Next event activation
+## September launch TODO
 
-Do not invent event facts in runtime catalogs. Start from the activation manifest and validate it first:
+The current source of truth for unresolved launch data is:
+
+`config/event-activation.september-draft.json`
+
+Show the remaining placeholders without failing development:
 
 ```bash
-npm run event:check -- config/event-activation.template.json config
+npm run launch:todo
 ```
 
-See `docs/NEXT-EVENT-ACTIVATION.md`.
+The output includes JSON paths and values such as `TODO_ORGANIZER_PHONE`, `TODO_PRIVACY_EMAIL`, `TODO_BRANDED_SITE_URL` and `TODO_ANALYTICS_WEBHOOK_URL`.
+
+Before a release candidate is considered complete, run the strict gate:
+
+```bash
+npm run launch:check
+```
+
+This command intentionally exits non-zero while the manifest is marked `draft`, `template`, or contains unresolved placeholders. Removing a TODO from the manifest is not enough by itself: the real value must also be wired into the corresponding runtime config/content and the regular readiness checks must pass.
+
+## Event activation
+
+Generic future events start from:
+
+`config/event-activation.template.json`
+
+The September working draft is:
+
+`config/event-activation.september-draft.json`
+
+Validate a final, fully resolved activation manifest with:
+
+```bash
+npm run event:check -- <resolved-manifest.json> registration
+npm run event:check -- <resolved-manifest.json> paid-traffic
+```
+
+`event:check` rejects draft/template manifests and recognizes `TODO_*`, `TBD_*`, placeholder markers and `__REQUIRED_*` values before any release-readiness evaluation.
+
+See `docs/NEXT-EVENT-ACTIVATION.md` and `docs/CONFERENCE-LAUNCH-RUNBOOK.md`.
+
+## Release order
+
+1. Replace only confirmed public placeholders; never invent production contacts, partners, domains or legal data.
+2. Run `npm run launch:todo` until the remaining list is understood.
+3. Run `npm run check`.
+4. Prepare a resolved activation manifest and run both `event:check` release modes.
+5. Verify `/api/health` is ready for the intended launch level.
+6. Keep Vercel Git auto-deploy disabled until a reviewed batch is intentionally released.
+7. Deploy once, then run production smoke and compare `/api/health` with the pre-release baseline.
 
 ## Docker
 
@@ -59,8 +102,10 @@ See `docs/CONTAINER-RUNTIME.md`.
 ## Architecture
 
 - `data/event-registry.ts` — lifecycle and lead-capture rules.
-- `data/events.ts` — event page content.
+- `data/events.ts` — event page content and public contact placeholders.
 - `data/conferences.ts` — Conference Engine integrity layer.
+- `data/event-seo.ts` — Event JSON-LD readiness and draft fields.
+- `lib/config-values.ts` — placeholder / secure URL / branded URL validation.
 - `lib/launch-readiness.ts` — runtime launch gate adapter.
 - `lib/launch-readiness-core.ts` — pure launch-readiness evaluator.
 - `/api/register` — fail-closed lead submission endpoint.
