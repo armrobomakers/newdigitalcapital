@@ -54,7 +54,7 @@
       "category": "event_detail",
       "phase": "event_ops",
       "requiredFor": ["attendee_instructions"],
-      "fillTarget": "data/events.ts -> ekbSeptemberEvent.location.hall",
+      "fillTarget": "data/event-operational-details.ts -> ekb-2026-09-26.hall",
       "publicFallback": "Точный зал будет указан дополнительно."
     },
     {
@@ -64,7 +64,7 @@
       "category": "event_detail",
       "phase": "event_ops",
       "requiredFor": ["attendee_instructions"],
-      "fillTarget": "data/events.ts -> ekbSeptemberEvent.location.entryInstructions",
+      "fillTarget": "data/event-operational-details.ts -> ekb-2026-09-26.entryInstructions",
       "publicFallback": "Схема прохода и инструкция по входу будут опубликованы ближе к событию."
     },
     {
