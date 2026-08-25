@@ -137,22 +137,120 @@ a {
   mix-blend-mode: screen;
 }
 
-/* DC-20: production visual cleanup for the active registration experience. */
+/* DC-30: calmer premium ticket summary for the active registration experience. */
 #register [class~="min-h-[520px]"][class~="border-violet-400/60"] {
   min-height: 0;
-  border-color: rgba(167, 139, 250, 0.34);
+  padding: clamp(1.4rem, 2.4vw, 2rem);
+  border-color: rgba(167, 139, 250, 0.28);
   background:
-    radial-gradient(circle at 14% 12%, rgba(124, 60, 255, 0.22), transparent 32%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.065), rgba(255, 255, 255, 0.025));
-  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.22);
+    radial-gradient(circle at 8% 4%, rgba(124, 60, 255, 0.2), transparent 34%),
+    radial-gradient(circle at 92% 100%, rgba(124, 60, 255, 0.08), transparent 36%),
+    linear-gradient(155deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.022));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 28px 80px rgba(0, 0, 0, 0.24);
+}
+
+#register [class~="min-h-[520px]"][class~="border-violet-400/60"] > span {
+  width: 1.15rem;
+  height: 2.7rem;
+  border-color: rgba(167, 139, 250, 0.34);
+  opacity: 0.72;
+}
+
+#register [class~="min-h-[520px]"][class~="border-violet-400/60"] h3[class~="text-3xl"] {
+  margin-top: 0;
+  font-family: var(--font-sans), sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(221, 214, 254, 0.72);
+}
+
+#register [class~="min-h-[520px]"][class~="border-violet-400/60"] p[class~="text-7xl"] {
+  margin-top: 0.65rem;
+  font-size: clamp(3.7rem, 6vw, 5rem);
+  line-height: 0.9;
+  letter-spacing: -0.045em;
 }
 
 #register [class~="text-5xl"][class~="font-semibold"][class~="rounded-full"] {
   display: none;
 }
 
+#register [class~="min-h-[520px]"][class~="border-violet-400/60"] .mt-7.h-px {
+  margin-top: 1.4rem;
+  background: linear-gradient(90deg, rgba(196, 181, 253, 0.34), rgba(255, 255, 255, 0.08), transparent);
+}
+
+#register [class~="min-h-[520px]"][class~="border-violet-400/60"] .mt-6.grid.flex-1 {
+  display: block;
+  margin-top: 1.25rem;
+}
+
+#register [class~="min-h-[520px]"][class~="border-violet-400/60"] ul[class~="space-y-4"] {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+#register [class~="min-h-[520px]"][class~="border-violet-400/60"] ul[class~="space-y-4"] > :not([hidden]) ~ :not([hidden]) {
+  margin-top: 0;
+}
+
+#register [class~="min-h-[520px]"][class~="border-violet-400/60"] ul[class~="space-y-4"] li {
+  min-height: 72px;
+  align-items: flex-start;
+  gap: 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.085);
+  border-radius: 18px;
+  background: rgba(4, 3, 13, 0.2);
+  padding: 0.9rem 1rem;
+  font-size: 0.94rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+#register [class~="min-h-[520px]"][class~="border-violet-400/60"] ul[class~="space-y-4"] li:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+#register [class~="min-h-[520px]"][class~="border-violet-400/60"] ul[class~="space-y-4"] svg {
+  width: 1.9rem;
+  height: 1.9rem;
+  flex: 0 0 auto;
+  margin-top: -0.1rem;
+  padding: 0.42rem;
+  border: 1px solid rgba(196, 181, 253, 0.18);
+  border-radius: 999px;
+  background: rgba(124, 60, 255, 0.12);
+  color: rgba(221, 214, 254, 0.95);
+}
+
 #register .mx-auto.flex.w-32.justify-center {
   display: none;
+}
+
+#register [class~="min-h-[520px]"][class~="border-violet-400/60"] p[class~="tracking-[0.22em]"] {
+  align-self: flex-start;
+  margin-top: 1.15rem;
+  border: 1px solid rgba(241, 194, 104, 0.2);
+  border-radius: 999px;
+  background: rgba(241, 194, 104, 0.065);
+  padding: 0.52rem 0.8rem;
+  text-align: left;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  color: rgba(249, 216, 153, 0.78);
+}
+
+#register [class~="min-h-[520px]"][class~="border-violet-400/60"] p[class~="tracking-[0.22em]"]::before {
+  content: "•";
+  margin-right: 0.45rem;
+  color: rgba(249, 216, 153, 0.95);
 }
 
 #register fieldset {
@@ -231,8 +329,24 @@ footer #footer-contacts + div {
     min-height: 0;
   }
 
-  #register [class~="text-7xl"] {
-    font-size: clamp(3rem, 15vw, 4.4rem);
+  #register [class~="min-h-[520px]"][class~="border-violet-400/60"] {
+    padding: 1.2rem;
+  }
+
+  #register [class~="min-h-[520px]"][class~="border-violet-400/60"] p[class~="text-7xl"] {
+    font-size: clamp(3.1rem, 15vw, 4.25rem);
+  }
+
+  #register [class~="min-h-[520px]"][class~="border-violet-400/60"] ul[class~="space-y-4"] {
+    grid-template-columns: 1fr;
+  }
+
+  #register [class~="min-h-[520px]"][class~="border-violet-400/60"] ul[class~="space-y-4"] li:last-child:nth-child(odd) {
+    grid-column: auto;
+  }
+
+  #register [class~="min-h-[520px]"][class~="border-violet-400/60"] ul[class~="space-y-4"] li {
+    min-height: 0;
   }
 
   footer h3 {
