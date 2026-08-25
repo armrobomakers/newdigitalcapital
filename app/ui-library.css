@@ -1,0 +1,375 @@
+/*
+ * DC-31 UI library pilot.
+ * Pattern sources: shadcn-style source ownership, 21st discovery,
+ * Aceternity-style restrained spotlight/timeline composition and
+ * Magic UI-style micro-interaction accents.
+ * No third-party runtime dependency is required for this pass.
+ */
+
+/* Magic UI-inspired: a single restrained shine on the primary hero CTA. */
+#top .btn-primary {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+#top .btn-primary > * {
+  position: relative;
+  z-index: 1;
+}
+
+#top .btn-primary::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: -90%;
+  left: -28%;
+  width: 18%;
+  height: 280%;
+  pointer-events: none;
+  transform: rotate(18deg);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.05),
+    rgba(255, 255, 255, 0.34),
+    rgba(255, 255, 255, 0.05),
+    transparent
+  );
+  animation: dc-hero-shine 6.5s ease-in-out infinite;
+}
+
+@keyframes dc-hero-shine {
+  0%,
+  62% {
+    transform: translateX(0) rotate(18deg);
+    opacity: 0;
+  }
+  68% {
+    opacity: 0.8;
+  }
+  82% {
+    transform: translateX(780%) rotate(18deg);
+    opacity: 0.55;
+  }
+  100% {
+    transform: translateX(780%) rotate(18deg);
+    opacity: 0;
+  }
+}
+
+/* Aceternity-style spotlight restraint for speaker cards. */
+#speakers article {
+  position: relative;
+  isolation: isolate;
+}
+
+#speakers article::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: -24% -12% 48% 30%;
+  pointer-events: none;
+  border-radius: 999px;
+  background: radial-gradient(
+    circle at center,
+    rgba(178, 133, 255, 0.18),
+    rgba(124, 60, 255, 0.07) 36%,
+    transparent 70%
+  );
+  filter: blur(10px);
+  opacity: 0.42;
+  transform: translate3d(12px, -8px, 0) scale(0.92);
+  transition: opacity 320ms ease, transform 320ms ease;
+}
+
+#speakers article > * {
+  position: relative;
+  z-index: 1;
+}
+
+#speakers article:hover::before {
+  opacity: 0.88;
+  transform: translate3d(-4px, 3px, 0) scale(1.04);
+}
+
+/*
+ * Program: Aceternity Timeline / 21st timeline-card direction.
+ * The current DOM remains unchanged; this pass improves hierarchy and
+ * removes the dense two-column dashboard feeling seen in the visual audit.
+ */
+#program {
+  min-height: auto;
+  padding-top: clamp(3.5rem, 7vw, 6.5rem);
+  padding-bottom: clamp(3.5rem, 7vw, 6.5rem);
+}
+
+#program > .grid {
+  align-items: start;
+}
+
+#program h2 {
+  max-width: 430px;
+  font-size: clamp(3.9rem, 5.4vw, 6rem) !important;
+  line-height: 0.88 !important;
+  letter-spacing: -0.035em;
+}
+
+#program h2 + p,
+#program h2 + p + p {
+  max-width: 420px;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+#program > .grid > div:last-child {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: 0.85rem;
+  border-color: rgba(196, 181, 253, 0.17);
+  background:
+    radial-gradient(circle at 82% -6%, rgba(124, 60, 255, 0.17), transparent 34%),
+    radial-gradient(circle at 6% 106%, rgba(178, 133, 255, 0.08), transparent 36%),
+    linear-gradient(165deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.018));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.055),
+    0 32px 90px rgba(0, 0, 0, 0.25);
+}
+
+#program > .grid > div:last-child::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: -140px;
+  right: -90px;
+  width: 380px;
+  height: 380px;
+  pointer-events: none;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(178, 133, 255, 0.13), transparent 68%);
+  filter: blur(12px);
+}
+
+#program > .grid > div:last-child > div {
+  position: relative;
+  z-index: 1;
+  padding: 0.35rem;
+  border: 0;
+  background: transparent;
+}
+
+#program ul {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr !important;
+  gap: 0 !important;
+}
+
+#program ul::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: 1.5rem;
+  bottom: 1.5rem;
+  left: 106px;
+  width: 1px;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(196, 181, 253, 0.38) 10%,
+    rgba(124, 60, 255, 0.24) 78%,
+    transparent
+  );
+}
+
+#program li {
+  position: relative;
+  z-index: 1;
+  min-height: 0 !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.075) !important;
+  border-radius: 18px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 1.05rem 1rem !important;
+  transition: background-color 220ms ease, transform 220ms ease !important;
+}
+
+#program li:last-child {
+  border-bottom-color: transparent !important;
+}
+
+#program li:hover {
+  background: rgba(255, 255, 255, 0.035) !important;
+  transform: translateX(2px);
+}
+
+#program li[class~="border-violet-300/35"],
+#program li[class~="border-violet-400/45"] {
+  margin-block: 0.35rem;
+  border-bottom-color: transparent !important;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(124, 60, 255, 0.14), transparent 42%),
+    rgba(124, 60, 255, 0.055) !important;
+  box-shadow: inset 3px 0 0 rgba(196, 181, 253, 0.42) !important;
+}
+
+#program li > div {
+  align-items: flex-start;
+  gap: 0.9rem;
+}
+
+#program li > div > div:first-child {
+  width: 88px;
+  padding-top: 0.18rem;
+}
+
+#program li > div > div:first-child > div {
+  font-size: 1.16rem !important;
+  font-weight: 650;
+  letter-spacing: -0.025em;
+  color: rgba(221, 214, 254, 0.92) !important;
+}
+
+#program li > div > div:first-child > span {
+  right: -12px;
+  top: 0.44rem;
+  width: 10px;
+  height: 10px;
+  border: 2px solid rgba(196, 181, 253, 0.42);
+  background: #09071b;
+  box-shadow: 0 0 0 4px rgba(124, 60, 255, 0.08), 0 0 18px rgba(178, 133, 255, 0.34);
+}
+
+#program li > div > div:nth-child(2) {
+  width: 2.35rem;
+  height: 2.35rem;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(124, 60, 255, 0.16), rgba(255, 255, 255, 0.018));
+}
+
+#program li p[style] {
+  display: block !important;
+  overflow: visible !important;
+  -webkit-box-orient: initial !important;
+  -webkit-line-clamp: unset !important;
+}
+
+#program li > div > div:nth-child(3) > p:first-child {
+  font-size: 1rem;
+  line-height: 1.32;
+}
+
+#program li > div > div:nth-child(3) > p:nth-child(2) {
+  margin-top: 0.28rem;
+  font-size: 0.76rem;
+  line-height: 1.45;
+  color: rgba(221, 214, 254, 0.72);
+}
+
+#program li > div > div:nth-child(3) > p:nth-child(3) {
+  margin-top: 0.3rem;
+  max-width: 620px;
+  font-size: 0.76rem;
+  line-height: 1.48;
+  color: rgba(255, 255, 255, 0.52);
+}
+
+#program li > div > div:last-child:not(:nth-child(3)) {
+  opacity: 0.72;
+}
+
+@media (min-width: 1024px) {
+  #program > .grid {
+    grid-template-columns: minmax(315px, 0.72fr) minmax(0, 1.48fr);
+    gap: clamp(2.5rem, 4vw, 4.5rem);
+  }
+
+  #program > .grid > div:first-child {
+    position: sticky;
+    top: 3.5rem;
+  }
+}
+
+@media (max-width: 1023px) {
+  #program h2 {
+    max-width: 720px;
+    font-size: clamp(3.6rem, 10vw, 5.4rem) !important;
+  }
+
+  #program h2 + p,
+  #program h2 + p + p {
+    max-width: 680px;
+  }
+
+  #program ul::before {
+    display: none;
+  }
+
+  #program li > div > div:first-child > span {
+    display: none;
+  }
+}
+
+@media (max-width: 639px) {
+  #program {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+
+  #program h2 {
+    font-size: clamp(3.1rem, 15vw, 4.4rem) !important;
+  }
+
+  #program > .grid > div:last-child {
+    padding: 0.45rem;
+    border-radius: 26px;
+  }
+
+  #program li {
+    padding: 1rem 0.65rem !important;
+  }
+
+  #program li > div {
+    display: grid;
+    grid-template-columns: 74px 34px minmax(0, 1fr);
+    gap: 0.6rem;
+  }
+
+  #program li > div > div:first-child {
+    width: 74px;
+  }
+
+  #program li > div > div:first-child > div {
+    font-size: 1rem !important;
+  }
+
+  #program li > div > div:nth-child(2) {
+    width: 2.1rem;
+    height: 2.1rem;
+  }
+
+  #program li > div > div:last-child:not(:nth-child(3)) {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #top .btn-primary::after {
+    display: none;
+  }
+
+  #speakers article::before,
+  #speakers article:hover::before {
+    transition: none;
+    transform: none;
+  }
+
+  #program li,
+  #program li:hover {
+    transition: none !important;
+    transform: none;
+  }
+}
