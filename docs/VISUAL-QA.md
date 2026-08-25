@@ -20,6 +20,10 @@ The artifact is retained for 14 days and contains:
 - `manifest.txt` — commit, viewport and screenshot hashes;
 - `server.log` — local production server log.
 
+Screenshots use the Chrome already present on the GitHub hosted runner. `scripts/capture-visual-screenshot.mjs` talks directly to Chrome DevTools Protocol from Node 24, so the workflow does not install Playwright, Puppeteer or another browser runtime.
+
+The capture script also fails when the rendered document is wider than the configured viewport. This turns horizontal overflow into a CI failure instead of a visual surprise after deployment.
+
 ## Internal gallery
 
 `/internal/visual-review` is a runtime-gated visual fixture.
@@ -28,7 +32,7 @@ It returns 404 unless:
 
 `VISUAL_REVIEW_ENABLED=true`
 
-The GitHub screenshot workflow sets this value explicitly. Normal production does not.
+The GitHub screenshot workflow sets this value explicitly. Normal production keeps the documented default `false`.
 
 The gallery may use safe unresolved markers such as:
 
