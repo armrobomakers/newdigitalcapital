@@ -137,6 +137,50 @@ a {
   mix-blend-mode: screen;
 }
 
+/* DC-38: keep the program headline inside its column and give the schedule visual priority. */
+@media (min-width: 1024px) {
+  #program > div.grid {
+    grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
+    gap: clamp(2rem, 3vw, 3.25rem);
+  }
+
+  #program > div.grid > div:first-child {
+    max-width: 360px;
+  }
+
+  #program h2 {
+    max-width: 360px;
+    font-size: clamp(4rem, 4.2vw, 4.9rem);
+    line-height: 0.88;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+}
+
+@media (min-width: 1280px) {
+  #program > div.grid {
+    grid-template-columns: minmax(0, 380px) minmax(0, 1fr);
+  }
+
+  #program > div.grid > div:first-child {
+    max-width: 380px;
+  }
+
+  #program h2 {
+    max-width: 380px;
+    font-size: clamp(4.5rem, 4.3vw, 5.25rem);
+  }
+}
+
+@media (max-width: 1023px) {
+  #program h2 {
+    max-width: 720px;
+    font-size: clamp(3.4rem, 9vw, 5rem);
+    line-height: 0.9;
+    text-wrap: balance;
+  }
+}
+
 /* DC-30: calmer premium ticket summary for the active registration experience. */
 #register [class~="min-h-[520px]"][class~="border-violet-400/60"] {
   min-height: 0;
