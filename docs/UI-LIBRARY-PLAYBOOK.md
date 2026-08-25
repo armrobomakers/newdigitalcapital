@@ -23,7 +23,7 @@ Use as a reference for accessible motion and transitions. Add a motion runtime o
 
 ## Current implementation policy
 
-The site currently runs Next.js 16, React 19 and Tailwind CSS 3 with a deliberately small dependency surface. DC-31 through DC-33 use source-owned and CSS-first patterns with no new runtime package.
+The site currently runs Next.js 16, React 19 and Tailwind CSS 3 with a deliberately small dependency surface. DC-31 through DC-34 use source-owned and CSS-first patterns with no new runtime package.
 
 Rules:
 
@@ -39,20 +39,23 @@ Rules:
 10. Every library-inspired pass must improve hierarchy or usability, not just add decoration.
 11. Repeated production controls should graduate from selector-based styling into source-owned `components/ui` primitives.
 12. Factual placeholders must never be reintroduced visually by CSS when launch configuration is unresolved.
+13. Public organizer contacts and legal/privacy contacts are separate concepts and must not silently substitute for each other.
+14. Verification labels may only render from already-verified product state; never hard-code an unverified claim.
 
 ## Section map
 
 | Site area | Source pattern | Decision |
 | --- | --- | --- |
+| Top trust bar | 21st compact announcement/contact strips | DC-34: render verified venue/date and resolved public organizer contacts only |
 | Hero | Aceternity spotlight / aurora restraint | Keep current composition; only subtle CTA motion |
 | Stats | 21st bento cards + shadcn card discipline | DC-32: asymmetric 12-column bento, quieter icon treatment and consistent hover |
 | Audience | 21st / Aceternity bento patterns | DC-32: replace five equal tall cards with compact 5/3/4 + 4/8 bento composition |
 | Speakers | Aceternity card-hover restraint | DC-31: restrained spotlight hover; no 3D tilt |
 | Program | Aceternity Timeline + 21st timeline/card references | DC-31: timeline hierarchy, readable full copy, sticky desktop intro |
 | Registration | shadcn source-owned form conventions + restrained Magic UI accents | DC-33: `IconField`, `ChoiceCard`, `ConsentRow`, `StatusLine` moved into repository-owned UI primitives |
-| Partners | Magic UI marquee only after real logos exist | Do not animate placeholders |
+| Partners | 21st empty-state discipline; Magic UI marquee only after real logos exist | DC-34 hides empty partner grid and emphasizes the actual partnership CTA; do not animate placeholders |
 | FAQ | shadcn accordion conventions | DC-32: native `details` retained, but layout and interaction density follow shadcn-style accordion discipline |
-| Location | 21st location/contact references | Keep stable until exact hall/entry data is confirmed |
+| Location | 21st location/contact references | DC-34: verified venue gets a clear trust badge and denser advantages layout; exact hall/entry details remain unresolved until confirmed |
 | Footer | 21st footer references | DC-33: remove absolute CTA placement, simplify grid and suppress legacy fake contact placeholders |
 
 ## Source-owned form primitives
@@ -68,15 +71,28 @@ Current primitives:
 
 These primitives must preserve native form controls and should remain independently editable without requiring an external package upgrade.
 
+## Trust/contact policy
+
+`components/event-trust-bar.tsx` reads public event contacts from `eventData.contacts`, not from `legalConfig`.
+
+Rules:
+
+- organizer email/phone render only when `isResolvedConfigValue()` accepts them;
+- TODO/TBD/placeholder contacts fail closed and remain invisible;
+- venue verification comes from `eventData.location.verified`;
+- verified-location styling applies only to the verified location markup path;
+- privacy/legal pages continue to use their own legal configuration and remain independent from event organizer contacts.
+
 ## Performance budget
 
 - No WebGL/canvas effect by default.
-- No new animation runtime in DC-31/DC-32/DC-33.
+- No new animation runtime in DC-31/DC-32/DC-33/DC-34.
 - CSS animations must disable under `prefers-reduced-motion`.
 - Avoid more than one continuous decorative animation per viewport.
 - Prefer opacity/transform over layout-changing animation.
 - Bento composition must stay CSS-grid based and require no client JavaScript.
 - Source-owned form primitives must add no client state beyond the form state already required by the product flow.
+- Trust/contact surfaces stay server-rendered and require no client JavaScript.
 
 ## Accessibility rules for adopted patterns
 
@@ -88,6 +104,7 @@ These primitives must preserve native form controls and should remain independen
 - Mobile layout cannot rely on hover for essential information.
 - Radio/checkbox semantics stay native even when the visual surface is card-like.
 - Status messaging must remain `aria-live` compatible.
+- Public organizer email and verified venue links must remain usable without JavaScript.
 
 ## Release discipline
 
