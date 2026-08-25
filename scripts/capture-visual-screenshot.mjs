@@ -126,6 +126,42 @@ function createCdpClient(webSocketUrl) {
   return { socket, ready, send, once };
 }
 
+function waitForBrowserExit(timeoutMs) {
+  if (browser.exitCode !== null) {
+    return Promise.resolve(true);
+  }
+
+  return new Promise((resolveExit) => {
+    const onExit = () => {
+      clearTimeout(timer);
+      resolveExit(true);
+    };
+    const timer = setTimeout(() => {
+      browser.off("exit", onExit);
+      resolveExit(false);
+    }, timeoutMs);
+    browser.once("exit", onExit);
+  });
+}
+
+async function stopBrowser() {
+  if (browser.exitCode === null) {
+    browser.kill("SIGTERM");
+    const stopped = await waitForBrowserExit(1500);
+    if (!stopped && browser.exitCode === null) {
+      browser.kill("SIGKILL");
+      await waitForBrowserExit(1000);
+    }
+  }
+
+  rmSync(userDataDir, {
+    recursive: true,
+    force: true,
+    maxRetries: 10,
+    retryDelay: 100,
+  });
+}
+
 try {
   await waitForDebugger();
   const page = await createPage();
@@ -180,6 +216,5 @@ try {
   console.log(`visual_screenshot_ok output=${outputArg} viewport=${width}x${height} content=${contentWidth}x${contentHeight}`);
   cdp.socket.close();
 } finally {
-  browser.kill("SIGTERM");
-  rmSync(userDataDir, { recursive: true, force: true });
+  await stopBrowser();
 }
