@@ -23,7 +23,7 @@ Use as a reference for accessible motion and transitions. Add a motion runtime o
 
 ## Current implementation policy
 
-The site currently runs Next.js 16, React 19 and Tailwind CSS 3 with a deliberately small dependency surface. DC-31 therefore starts with source-owned, CSS-first patterns and no new runtime package.
+The site currently runs Next.js 16, React 19 and Tailwind CSS 3 with a deliberately small dependency surface. DC-31 and DC-32 therefore use source-owned, CSS-first patterns and no new runtime package.
 
 Rules:
 
@@ -35,28 +35,41 @@ Rules:
 6. No visual effect may block reading, focus, form interaction or scrolling.
 7. Avoid layout shift and expensive always-on canvas/WebGL effects.
 8. One visual system: Digital Capital colors, typography, radius and spacing always override library defaults.
+9. Prefer semantic native elements when they already solve the interaction well; shadcn conventions can be applied without replacing semantics unnecessarily.
+10. Every library-inspired pass must improve hierarchy or usability, not just add decoration.
 
 ## Section map
 
 | Site area | Source pattern | Decision |
 | --- | --- | --- |
-| Hero | Aceternity spotlight / aurora restraint | Keep current composition; later add only a subtle background treatment if needed |
-| Stats | 21st card discovery + shadcn card discipline | Normalize density and hover behavior |
-| Audience | 21st bento/card patterns | Consider denser bento layout in a later pass |
-| Speakers | Aceternity card-hover restraint | Improve hierarchy; no 3D tilt |
-| Program | Aceternity Timeline + 21st timeline/card references | DC-31 priority: improve hierarchy, readability, framing and featured state |
-| Registration | Magic UI shine-border restraint + shadcn form conventions | DC-30 already reduced decorative noise; later move form styling toward source-owned primitives |
+| Hero | Aceternity spotlight / aurora restraint | Keep current composition; only subtle CTA motion |
+| Stats | 21st bento cards + shadcn card discipline | DC-32: asymmetric 12-column bento, quieter icon treatment and consistent hover |
+| Audience | 21st / Aceternity bento patterns | DC-32: replace five equal tall cards with compact 5/3/4 + 4/8 bento composition |
+| Speakers | Aceternity card-hover restraint | DC-31: restrained spotlight hover; no 3D tilt |
+| Program | Aceternity Timeline + 21st timeline/card references | DC-31: timeline hierarchy, readable full copy, sticky desktop intro |
+| Registration | Magic UI shine-border restraint + shadcn form conventions | DC-30 reduced decorative noise; form primitives remain a later source-owned refactor |
 | Partners | Magic UI marquee only after real logos exist | Do not animate placeholders |
-| FAQ | shadcn accordion conventions | Keep native `details` until a real interaction need appears |
-| Footer | 21st footer references | Later simplify density and strengthen contact/trust information |
+| FAQ | shadcn accordion conventions | DC-32: native `details` retained, but layout and interaction density follow shadcn-style accordion discipline |
+| Location | 21st location/contact references | Keep stable until exact hall/entry data is confirmed |
+| Footer | 21st footer references | Next visual pass: simplify CTA positioning and information density |
 
 ## Performance budget
 
 - No WebGL/canvas effect by default.
-- No new animation runtime in DC-31.
+- No new animation runtime in DC-31/DC-32.
 - CSS animations must disable under `prefers-reduced-motion`.
 - Avoid more than one continuous decorative animation per viewport.
 - Prefer opacity/transform over layout-changing animation.
+- Bento composition must stay CSS-grid based and require no client JavaScript.
+
+## Accessibility rules for adopted patterns
+
+- Preserve native keyboard interaction where possible.
+- Every focusable control needs a visible `focus-visible` state.
+- Decorative glow/spotlight layers must be pointer-events disabled.
+- Never depend on animation alone to convey state.
+- Accordion content remains accessible without JavaScript.
+- Mobile layout cannot rely on hover for essential information.
 
 ## Release discipline
 
