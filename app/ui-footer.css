@@ -1,0 +1,124 @@
+/*
+ * DC-33 footer cleanup.
+ * 21st-style layout discipline: predictable grid, restrained CTA grouping,
+ * no absolute-positioned conversion controls and no fake contact placeholders.
+ */
+
+footer > div {
+  padding: clamp(1rem, 2vw, 1.5rem);
+}
+
+footer > div > div:first-child {
+  padding: clamp(1.15rem, 2vw, 1.65rem);
+  border-color: rgba(255, 255, 255, 0.085);
+  background:
+    radial-gradient(circle at 86% 6%, rgba(124, 60, 255, 0.16), transparent 34%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.018));
+}
+
+footer > div > div:first-child > div {
+  align-items: center;
+}
+
+footer > div > div:first-child > div > div:first-child h3 {
+  max-width: 760px;
+  font-size: clamp(2.5rem, 4.4vw, 4.4rem);
+  line-height: 0.92;
+}
+
+footer > div > div:first-child > div > div:first-child p {
+  max-width: 680px;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+footer > div > div:first-child > div > div:nth-child(2) {
+  position: static !important;
+  left: auto !important;
+  top: auto !important;
+  transform: none !important;
+  align-items: stretch;
+  gap: 0.65rem;
+}
+
+footer > div > div:first-child > div > div:nth-child(2) a {
+  min-width: 0;
+  justify-content: center;
+}
+
+footer > div > div:first-child > div > div:nth-child(3) {
+  min-height: 210px;
+  border-radius: 24px;
+}
+
+/* Restore honest unresolved-contact copy instead of legacy visual placeholders. */
+#footer-contacts > p:last-child {
+  font-size: 0.875rem !important;
+  line-height: 1.75 !important;
+  color: rgba(255, 255, 255, 0.58) !important;
+}
+
+#footer-contacts > p:last-child::before {
+  content: none !important;
+  display: none !important;
+}
+
+footer .mt-8.grid:has(#footer-contacts) {
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+footer .mt-8.grid:has(#footer-contacts) > div:not(:first-child) {
+  border-left-color: rgba(255, 255, 255, 0.075);
+}
+
+footer .mt-8.grid:has(#footer-contacts) p.text-sm.font-medium {
+  color: rgba(221, 214, 254, 0.76);
+}
+
+footer .mt-8.grid:has(#footer-contacts) ul {
+  color: rgba(255, 255, 255, 0.64);
+}
+
+@media (min-width: 1024px) {
+  footer > div > div:first-child > div {
+    grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr) !important;
+    grid-template-areas:
+      "copy visual"
+      "actions visual";
+    column-gap: clamp(2rem, 4vw, 4rem);
+    row-gap: 1.2rem;
+  }
+
+  footer > div > div:first-child > div > div:first-child {
+    grid-area: copy;
+    padding-right: 0 !important;
+  }
+
+  footer > div > div:first-child > div > div:nth-child(2) {
+    grid-area: actions;
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+
+  footer > div > div:first-child > div > div:nth-child(2) a {
+    flex: 0 1 260px;
+  }
+
+  footer > div > div:first-child > div > div:nth-child(3) {
+    grid-area: visual;
+    min-height: 270px !important;
+  }
+}
+
+@media (max-width: 1023px) {
+  footer > div > div:first-child > div > div:nth-child(2) {
+    flex-direction: column;
+  }
+
+  footer > div > div:first-child > div > div:nth-child(2) a {
+    width: 100%;
+  }
+
+  footer > div > div:first-child > div > div:nth-child(3) {
+    min-height: 180px;
+  }
+}
