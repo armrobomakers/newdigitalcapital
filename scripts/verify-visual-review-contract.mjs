@@ -39,6 +39,9 @@ expect(capture.includes("Page.captureScreenshot"), "capture script must use Chro
 expect(capture.includes("captureBeyondViewport: true"), "capture script must capture beyond the initial viewport");
 expect(capture.includes("horizontal_overflow"), "capture script must fail on horizontal overflow");
 expect(capture.includes("Emulation.setDeviceMetricsOverride"), "capture script must set explicit responsive viewport metrics");
+expect(capture.includes("window.scrollTo"), "capture script must walk the page before capture to trigger lazy loading");
+expect(capture.includes("document.images"), "capture script must settle document images before capture");
+expect(capture.includes("image.complete"), "capture script must check lazy image completion");
 expect(!capture.includes("playwright"), "capture script must stay dependency-free");
 
 if (failures.length) {
@@ -50,6 +53,7 @@ if (failures.length) {
 console.log("visual_review_contract_ok");
 console.log("viewports=desktop,tablet,mobile");
 console.log("capture=chrome-cdp-node24");
+console.log("lazy_images=scroll_and_settle");
 console.log("horizontal_overflow_gate=enabled");
 console.log("production_route_default=404");
 console.log("vercel_dependency=none");
