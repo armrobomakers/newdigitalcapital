@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { ConversionTracker } from "@/components/conversion-tracker";
 import { EventStructuredData } from "@/components/event-structured-data";
+import { EventTrustBar } from "@/components/event-trust-bar";
 import { LandingPage } from "@/components/landing";
 import {
   assertConferenceCatalog,
@@ -107,6 +108,7 @@ export default async function EventPage({
     <>
       <EventStructuredData eventData={eventData} />
       <ConversionTracker eventId={lifecycle.id} />
+      <EventTrustBar eventData={eventData} />
       <LandingPage eventData={eventData} />
     </>
   );
