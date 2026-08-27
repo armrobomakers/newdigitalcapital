@@ -1,0 +1,97 @@
+/*
+ * DC-39 battle-ready presentation layer.
+ * The public page stays honest when launch configuration is incomplete,
+ * while ?preview=sales renders the exact open-sales composition without
+ * bypassing the real registration API readiness gate.
+ */
+
+/* Future-event pending state should feel intentional, not archived/disabled. */
+[data-ui="registration-pending-card"] {
+  border-color: rgba(196, 181, 253, 0.2);
+  background:
+    radial-gradient(circle at 14% 8%, rgba(124, 60, 255, 0.24), transparent 36%),
+    radial-gradient(circle at 92% 100%, rgba(178, 133, 255, 0.08), transparent 38%),
+    linear-gradient(155deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.018));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.045),
+    0 30px 82px rgba(0, 0, 0, 0.22);
+}
+
+[data-ui="registration-pending-card"] h3 {
+  text-wrap: balance;
+}
+
+/* Keep operational placeholders out of the premium top-of-page trust strip. */
+[data-ui="event-trust-bar"] [data-ui="event-ops-strip"]:empty {
+  display: none;
+}
+
+/* Registration note reads as supporting copy instead of a warning/error rail. */
+#register > div > .mt-5.flex.items-center.gap-4 {
+  display: none;
+}
+
+#register > div > .mt-5.flex.items-center.gap-4 + p {
+  max-width: 780px;
+  margin: 1rem auto 0;
+  padding: 0.8rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.022);
+  color: rgba(255, 255, 255, 0.56);
+}
+
+/* The organizer email already lives in the verified trust bar. Until the
+ * footer gets its final legal/privacy contact, omit the unresolved duplicate
+ * rather than showing draft wording or fabricated values. */
+#footer-contacts {
+  display: none;
+}
+
+footer #footer-contacts + div {
+  display: none !important;
+}
+
+@media (min-width: 1024px) {
+  footer .mt-8.grid:has(#footer-contacts) {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.72fr) minmax(0, 0.72fr) !important;
+  }
+}
+
+/* Partner lead capture is not yet a confirmed public funnel. Keep the
+ * partnership card visible as social-proof scaffolding, but make its CTA look
+ * deliberately informational until the real packages are activated. */
+#partners a[href^="/apply/partner/"] {
+  pointer-events: none;
+  cursor: default;
+  border: 1px solid rgba(196, 181, 253, 0.16);
+  background: rgba(124, 60, 255, 0.08);
+  box-shadow: none;
+  color: rgba(221, 214, 254, 0.72);
+}
+
+/* Small readability lift for secondary copy on dark glass surfaces. */
+.section-copy,
+#program p,
+#speakers article p,
+#audience article p,
+#faq details p,
+#location p,
+footer p {
+  text-rendering: optimizeLegibility;
+}
+
+@media (max-width: 767px) {
+  [data-ui="registration-pending-card"] {
+    min-height: 360px;
+    padding: 1.25rem;
+  }
+
+  [data-ui="registration-pending-card"] h3 {
+    font-size: clamp(2.7rem, 13vw, 4rem);
+  }
+
+  #register > div > .mt-5.flex.items-center.gap-4 + p {
+    text-align: left;
+  }
+}
