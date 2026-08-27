@@ -181,7 +181,7 @@ export default async function EventPage({
   return (
     <>
       <EventStructuredData eventData={eventData} />
-      <ConversionTracker eventId={lifecycle.id} />
+      {salesPreview ? null : <ConversionTracker eventId={lifecycle.id} />}
       <EventTrustBar eventData={eventData} />
       <LandingPage eventData={eventData} />
     </>
