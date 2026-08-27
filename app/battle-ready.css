@@ -26,6 +26,47 @@
   display: none;
 }
 
+/* Registration is intentionally two independent surfaces. The old shared
+ * shell made the short ticket summary create a large empty right-hand area
+ * beside the taller form on desktop. */
+#register > div {
+  overflow: visible;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+#register > div > .grid {
+  align-items: start;
+  gap: clamp(1rem, 2vw, 1.5rem);
+}
+
+#register > div > .grid > div:first-child {
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 32px;
+  background:
+    radial-gradient(circle at 8% 2%, rgba(124, 60, 255, 0.1), transparent 28%),
+    linear-gradient(155deg, rgba(255, 255, 255, 0.048), rgba(255, 255, 255, 0.018));
+  padding: clamp(1rem, 2vw, 1.5rem);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.035),
+    0 28px 72px rgba(0, 0, 0, 0.18);
+}
+
+#register #register-form {
+  border-color: rgba(255, 255, 255, 0.075);
+  background: rgba(4, 3, 13, 0.28);
+}
+
+@media (min-width: 1024px) {
+  #register > div > .grid > div:last-child {
+    position: sticky;
+    top: 1.5rem;
+  }
+}
+
 /* Registration note reads as supporting copy instead of a warning/error rail. */
 #register > div > .mt-5.flex.items-center.gap-4 {
   display: none;
@@ -89,6 +130,11 @@ footer p {
 
   [data-ui="registration-pending-card"] h3 {
     font-size: clamp(2.7rem, 13vw, 4rem);
+  }
+
+  #register > div > .grid > div:first-child {
+    border-radius: 26px;
+    padding: 1rem;
   }
 
   #register > div > .mt-5.flex.items-center.gap-4 + p {
