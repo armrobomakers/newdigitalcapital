@@ -21,7 +21,7 @@ expect(route.includes("TODO_ORGANIZER_PHONE"), "visual review fixture must use s
 expect(route.includes("TODO_PRIVACY_EMAIL"), "visual review fixture must use safe privacy placeholder");
 expect(route.includes("TODO_BRANDED_SITE_URL"), "visual review fixture must use safe branded URL placeholder");
 
-expect(workflow.includes("VISUAL_REVIEW_ENABLED: \"true\""), "visual review workflow must explicitly enable the internal route");
+expect(workflow.includes('VISUAL_REVIEW_ENABLED: "true"'), "visual review workflow must explicitly enable the internal route");
 expect(workflow.includes("actions/upload-artifact@v4"), "visual review workflow must upload screenshots");
 expect(workflow.includes("Resolve runner Chrome"), "visual review workflow must resolve the preinstalled runner browser");
 expect(workflow.includes("capture-visual-screenshot.mjs"), "visual review workflow must use the source-owned capture script");
@@ -35,10 +35,15 @@ expect(workflow.includes("ui-gallery-mobile.png"), "mobile UI gallery screenshot
 expect(workflow.includes("/tmp/september-public.html"), "visual review must inspect public September HTML");
 expect(workflow.includes("/tmp/september-sales.html"), "visual review must inspect battle-ready sales HTML");
 expect(workflow.includes("?preview=sales"), "visual review must explicitly exercise battle-ready sales preview");
-expect(workflow.includes("! grep -Eq 'TODO_|TBD_|PLACEHOLDER_|REPLACE_ME_|CHANGE_ME_'"), "public HTML must reject raw technical placeholders");
-expect(workflow.includes("Регистрация готовится к запуску"), "public pending registration state must be asserted");
-expect(workflow.includes("Точный зал и схема входа будут опубликованы ближе к событию."), "public operational fallback must stay human-readable");
-expect(workflow.includes("! grep -q 'Смотреть архив программы'"), "future event must not expose archive copy");
+expect(workflow.includes("assert_absent /tmp/september-public.html"), "public HTML must have an explicit absence assertion");
+expect(workflow.includes("TODO_|TBD_|PLACEHOLDER_|REPLACE_ME_|CHANGE_ME_"), "public HTML must reject raw technical placeholders");
+expect(workflow.includes("Продажи скоро откроются|Регистрация готовится к запуску"), "public pending registration state must be asserted semantically");
+expect(workflow.includes("Точный зал.*схем"), "public operational hall/entry fallback must stay human-readable");
+expect(workflow.includes("Смотреть архив программы"), "future event archive copy must remain explicitly rejected");
+expect(workflow.includes("assert_contains /tmp/september-sales.html 'Выберите билет'"), "sales preview must assert ticket selection");
+expect(workflow.includes("assert_contains /tmp/september-sales.html 'Зарегистрироваться'"), "sales preview must assert registration CTA");
+expect(workflow.includes("cp /tmp/september-public.html visual-review/september-public.html"), "failed visual runs must preserve public HTML diagnostics");
+expect(workflow.includes("cp /tmp/september-sales.html visual-review/september-sales.html"), "failed visual runs must preserve sales HTML diagnostics");
 expect(workflow.includes("battle_ready_sales_preview=enabled"), "visual manifest must record battle-ready sales preview");
 expect(workflow.includes("retention-days: 14"), "visual review artifacts must have bounded retention");
 expect(!workflow.includes("playwright"), "visual review workflow must not add a temporary browser package");
