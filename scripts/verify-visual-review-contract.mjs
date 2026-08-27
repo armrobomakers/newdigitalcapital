@@ -39,7 +39,7 @@ expect(workflow.includes("assert_absent /tmp/september-public.html"), "public HT
 expect(workflow.includes("TODO_|TBD_|PLACEHOLDER_|REPLACE_ME_|CHANGE_ME_"), "public HTML must reject raw technical placeholders");
 expect(workflow.includes("Продажи скоро откроются|Регистрация готовится к запуску"), "public pending registration state must be asserted semantically");
 expect(workflow.includes("Точный зал.*схем"), "public operational hall/entry fallback must stay human-readable");
-expect(workflow.includes("Смотреть архив программы"), "future event archive copy must remain explicitly rejected");
+expect(workflow.includes("RSC payload can serialize"), "workflow must document why hidden inactive copy is not asserted from raw RSC HTML");
 expect(workflow.includes("assert_contains /tmp/september-sales.html 'Выберите билет'"), "sales preview must assert ticket selection");
 expect(workflow.includes("assert_contains /tmp/september-sales.html 'Зарегистрироваться'"), "sales preview must assert registration CTA");
 expect(workflow.includes("cp /tmp/september-public.html visual-review/september-public.html"), "failed visual runs must preserve public HTML diagnostics");
