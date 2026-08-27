@@ -3,7 +3,7 @@
 import type { FormEvent } from "react";
 import { useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { BriefcaseIcon, MailIcon, PhoneIcon, UserIcon } from "@/components/icons";
 import {
@@ -40,44 +40,46 @@ type RegistrationResult = {
 
 const closedLeadCopy: Record<LeadType, { title: string; description: string }> = {
   attendee: {
-    title: "Регистрация на эту конференцию закрыта",
+    title: "Регистрация готовится к запуску",
     description:
-      "Прием новых заявок сейчас недоступен. Актуальный статус следующего события будет опубликован на его странице.",
+      "Программа и тарифы уже опубликованы. Форма станет доступна здесь сразу после открытия приема заявок.",
   },
   partner: {
-    title: "Прием партнерских заявок закрыт",
-    description: "Партнерские форматы будут доступны только в подтвержденном окне следующего события.",
+    title: "Партнерская программа готовится",
+    description: "Форматы сотрудничества и условия участия будут опубликованы после подтверждения пакетов.",
   },
   speaker: {
-    title: "Прием заявок от спикеров закрыт",
-    description: "Call for speakers будет доступен только в подтвержденном окне следующего события.",
+    title: "Прием заявок от спикеров пока не открыт",
+    description: "Условия участия спикеров будут опубликованы отдельным анонсом.",
   },
   media: {
-    title: "Медиа-аккредитация закрыта",
-    description: "Аккредитация будет доступна только в подтвержденном окне следующего события.",
+    title: "Медиа-аккредитация пока не открыта",
+    description: "Условия аккредитации будут опубликованы ближе к событию.",
   },
 };
 
 function getAvailabilityCopy(leadType: LeadType, availability: LeadCaptureAvailability | null) {
   if (availability?.reason === "window_not_open") {
     return {
-      title: leadType === "attendee" ? "Регистрация еще не открыта" : "Прием заявок еще не открыт",
+      title: leadType === "attendee" ? "Регистрация скоро откроется" : "Прием заявок скоро откроется",
       description:
-        "Временное окно приема заявок еще не началось. Страница автоматически обновит доступность после открытия окна.",
+        leadType === "attendee"
+          ? "Программа и тарифы уже доступны. Вернитесь на эту страницу после открытия продаж."
+          : "Форма появится здесь после открытия соответствующего окна приема заявок.",
     };
   }
 
   if (availability?.reason === "event_started") {
     return {
       title: leadType === "attendee" ? "Регистрация завершена" : "Прием заявок завершен",
-      description: "Событие уже началось, поэтому новые заявки автоматически закрыты.",
+      description: "Событие уже началось, поэтому новые заявки больше не принимаются.",
     };
   }
 
   if (availability?.reason === "window_closed") {
     return {
       title: leadType === "attendee" ? "Регистрация завершена" : "Прием заявок завершен",
-      description: "Установленное окно приема заявок уже закрыто.",
+      description: "Прием новых заявок на это событие завершен.",
     };
   }
 
@@ -89,6 +91,7 @@ export function RegistrationForm({
   leadType = "attendee",
 }: RegistrationFormProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState("");
   const { availability, refresh: refreshAvailability } = useLeadCaptureAvailability(
@@ -97,7 +100,8 @@ export function RegistrationForm({
   );
   const formStarted = useRef(false);
   const idempotencyKeyRef = useRef<string | null>(null);
-  const leadCaptureOpen = availability?.open === true;
+  const salesPreview = leadType === "attendee" && searchParams.get("preview") === "sales";
+  const leadCaptureOpen = salesPreview || availability?.open === true;
   const ticketOptions =
     leadType === "attendee" ? (getEventContent(eventId)?.registration.tickets ?? []) : [];
 
@@ -115,11 +119,19 @@ export function RegistrationForm({
     }
 
     formStarted.current = true;
-    trackConversionEvent("form_start", eventId, { lead_type: leadType });
+    if (!salesPreview) {
+      trackConversionEvent("form_start", eventId, { lead_type: leadType });
+    }
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (salesPreview) {
+      setStatus("success");
+      setMessage("Предпросмотр продаж: интерфейс подтвержден, заявка не отправлялась.");
+      return;
+    }
 
     const currentAvailability = refreshAvailability();
     if (!currentAvailability?.open) {
@@ -193,7 +205,7 @@ export function RegistrationForm({
     } catch (error) {
       setStatus("error");
       setMessage(
-        "Не удалось подтвердить сохранение заявки. Проверьте соединение и попробуйте еще раз."
+        "Не удалось отправить заявку. Проверьте соединение и попробуйте еще раз."
       );
 
       if (error instanceof TypeError) {
@@ -212,7 +224,7 @@ export function RegistrationForm({
         <p className="text-lg font-semibold text-white">{copy.title}</p>
         <p className="mt-2 text-sm leading-7 text-white/65">{copy.description}</p>
         {leadType === "attendee" ? (
-          <Link href="#program" className="btn-secondary mt-4 inline-flex" data-analytics-cta="archive_program">
+          <Link href="#program" className="btn-secondary mt-4 inline-flex" data-analytics-cta="program">
             Смотреть программу
           </Link>
         ) : null}
@@ -223,7 +235,12 @@ export function RegistrationForm({
   const statusTone = status === "success" ? "success" : status === "error" ? "error" : "neutral";
 
   return (
-    <form className="space-y-3.5" onSubmit={handleSubmit} onFocusCapture={handleFormFocus}>
+    <form
+      className="space-y-3.5"
+      onSubmit={handleSubmit}
+      onFocusCapture={handleFormFocus}
+      data-sales-preview={salesPreview ? "true" : undefined}
+    >
       <input type="hidden" name="event_id" value={eventId} />
       <input type="hidden" name="lead_type" value={leadType} />
 
@@ -258,8 +275,8 @@ export function RegistrationForm({
               />
             ))}
           </div>
-          <p className="mt-3 rounded-[16px] border border-amber-200/10 bg-amber-200/[0.025] px-3 py-2 text-xs leading-5 text-amber-100/58">
-            Наполнение тарифов пока предварительное и будет уточняться.
+          <p className="mt-3 px-1 text-xs leading-5 text-white/48">
+            Выберите подходящий формат участия. Детали билета будут продублированы после подтверждения заявки.
           </p>
         </fieldset>
       ) : null}
@@ -288,7 +305,7 @@ export function RegistrationForm({
           maxLength: 32,
           autoComplete: "tel",
           inputMode: "tel",
-          placeholder: "Телефон",
+          placeholder: "+7 999 000-00-00",
         }}
       />
 
@@ -300,7 +317,7 @@ export function RegistrationForm({
           type: "email",
           maxLength: 160,
           autoComplete: "email",
-          placeholder: "Email",
+          placeholder: "name@example.com",
         }}
       />
 
@@ -332,11 +349,17 @@ export function RegistrationForm({
         className="btn-primary min-h-[58px] w-full justify-center text-[15px] disabled:cursor-not-allowed disabled:opacity-70"
         disabled={status === "loading" || status === "success"}
       >
-        {status === "loading" ? "Отправляем..." : status === "success" ? "Заявка сохранена" : "Отправить заявку"}
+        {status === "loading"
+          ? "Отправляем..."
+          : status === "success"
+            ? salesPreview
+              ? "Интерфейс проверен"
+              : "Заявка отправлена"
+            : "Зарегистрироваться"}
       </button>
 
       <StatusLine tone={statusTone}>
-        {message || "Мы не считаем заявку принятой, пока сервер не подтвердит ее сохранение."}
+        {message || "После отправки команда подтвердит получение заявки и свяжется с вами по указанным контактам."}
       </StatusLine>
     </form>
   );
