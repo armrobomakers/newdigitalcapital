@@ -65,10 +65,14 @@ jobs:
 
           test "$(curl -sS -o /tmp/september-public.html -w '%{http_code}' "$BASE/ekb-2026-09-26")" = "200"
           ! grep -Eq 'TODO_|TBD_|PLACEHOLDER_|REPLACE_ME_|CHANGE_ME_' /tmp/september-public.html
-          grep -q 'Зал:' /tmp/september-public.html
-          grep -q 'будет указан дополнительно' /tmp/september-public.html
-          grep -q 'Вход:' /tmp/september-public.html
-          grep -q 'схема прохода появится ближе к событию' /tmp/september-public.html
+          grep -q 'Регистрация готовится к запуску' /tmp/september-public.html
+          grep -q 'Точный зал и схема входа будут опубликованы ближе к событию.' /tmp/september-public.html
+          ! grep -q 'Смотреть архив программы' /tmp/september-public.html
+
+          test "$(curl -sS -o /tmp/september-sales.html -w '%{http_code}' "$BASE/ekb-2026-09-26?preview=sales")" = "200"
+          ! grep -Eq 'TODO_|TBD_|PLACEHOLDER_|REPLACE_ME_|CHANGE_ME_' /tmp/september-sales.html
+          grep -q 'Выберите билет' /tmp/september-sales.html
+          grep -q 'Зарегистрироваться' /tmp/september-sales.html
 
           test "$(curl -sS -o /tmp/visual-gallery.html -w '%{http_code}' "$BASE/internal/visual-review")" = "200"
           grep -q 'CI visual review' /tmp/visual-gallery.html
@@ -76,17 +80,27 @@ jobs:
 
           node scripts/capture-visual-screenshot.mjs \
             "$BASE/ekb-2026-09-26" \
-            visual-review/landing-desktop.png \
+            visual-review/landing-pending-desktop.png \
             1440 1000
 
           node scripts/capture-visual-screenshot.mjs \
             "$BASE/ekb-2026-09-26" \
-            visual-review/landing-tablet.png \
+            visual-review/landing-pending-mobile.png \
+            390 844
+
+          node scripts/capture-visual-screenshot.mjs \
+            "$BASE/ekb-2026-09-26?preview=sales" \
+            visual-review/landing-sales-desktop.png \
+            1440 1000
+
+          node scripts/capture-visual-screenshot.mjs \
+            "$BASE/ekb-2026-09-26?preview=sales" \
+            visual-review/landing-sales-tablet.png \
             1024 900
 
           node scripts/capture-visual-screenshot.mjs \
-            "$BASE/ekb-2026-09-26" \
-            visual-review/landing-mobile.png \
+            "$BASE/ekb-2026-09-26?preview=sales" \
+            visual-review/landing-sales-mobile.png \
             390 844
 
           node scripts/capture-visual-screenshot.mjs \
@@ -103,9 +117,11 @@ jobs:
           {
             echo "commit=${GITHUB_SHA}"
             echo "event=/ekb-2026-09-26"
+            echo "sales_preview=/ekb-2026-09-26?preview=sales"
             echo "gallery=/internal/visual-review"
             echo "capture=chrome-cdp-node24"
             echo "public_placeholder_gate=enabled"
+            echo "battle_ready_sales_preview=enabled"
             echo "viewports=1440x1000,1024x900,390x844"
             echo "generated_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
             sha256sum visual-review/*.png

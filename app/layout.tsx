@@ -7,6 +7,7 @@ import "./ui-library.css";
 import "./ui-footer.css";
 import "./ui-trust.css";
 import "./ui-responsive.css";
+import "./battle-ready.css";
 
 const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim() ?? "";
 const brandedSiteReady = isBrandedPublicUrl(configuredSiteUrl);

@@ -12,6 +12,7 @@ export function EventTrustBar({ eventData }: { eventData: EventData }) {
   const operationalDetails = getEventOperationalDetails(eventData.eventId);
   const hallReady = isResolvedConfigValue(operationalDetails?.hall);
   const entryInstructionsReady = isResolvedConfigValue(operationalDetails?.entryInstructions);
+  const hasResolvedOperationalDetails = hallReady || entryInstructionsReady;
 
   if (!emailReady && !phoneReady && !venueReady) {
     return null;
@@ -19,7 +20,7 @@ export function EventTrustBar({ eventData }: { eventData: EventData }) {
 
   return (
     <aside
-      aria-label="Данные события и организационные детали"
+      aria-label="Данные события и контакты организатора"
       data-ui="event-trust-bar"
       className="section-shell pt-2 md:pt-3"
     >
@@ -70,21 +71,21 @@ export function EventTrustBar({ eventData }: { eventData: EventData }) {
           </div>
         </div>
 
-        {venueReady && operationalDetails ? (
+        {venueReady && operationalDetails && hasResolvedOperationalDetails ? (
           <div
             data-ui="event-ops-strip"
             className="mt-2 flex flex-col gap-1 border-t border-white/[0.055] pt-2 text-[11px] leading-5 text-white/45 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-4 sm:gap-y-1"
           >
-            <span>
-              <span className="text-white/58">Зал:</span>{" "}
-              {hallReady ? operationalDetails.hall : "будет указан дополнительно"}
-            </span>
-            <span>
-              <span className="text-white/58">Вход:</span>{" "}
-              {entryInstructionsReady
-                ? operationalDetails.entryInstructions
-                : "схема прохода появится ближе к событию"}
-            </span>
+            {hallReady ? (
+              <span>
+                <span className="text-white/58">Зал:</span> {operationalDetails.hall}
+              </span>
+            ) : null}
+            {entryInstructionsReady ? (
+              <span>
+                <span className="text-white/58">Вход:</span> {operationalDetails.entryInstructions}
+              </span>
+            ) : null}
           </div>
         ) : null}
       </div>
