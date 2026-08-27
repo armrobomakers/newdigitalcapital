@@ -87,7 +87,9 @@ jobs:
           assert_absent /tmp/september-public.html 'TODO_|TBD_|PLACEHOLDER_|REPLACE_ME_|CHANGE_ME_' 'public page must not expose technical placeholders'
           assert_contains /tmp/september-public.html 'Продажи скоро откроются|Регистрация готовится к запуску' 'public page must show a pending registration state'
           assert_contains /tmp/september-public.html 'Точный зал.*схем(а|ы).*(входа|прохода)|схем(а|ы).*(входа|прохода).*Точный зал' 'public page must explain that hall/entry details will be published later'
-          assert_absent /tmp/september-public.html 'Смотреть архив программы' 'future event must not use archive CTA copy'
+
+          # Do not grep raw HTML for hidden closed/archive copy: Next.js RSC payload can serialize
+          # inactive branches that are not visible in the hydrated page. Lifecycle tests cover this rule.
 
           test "$(curl -sS -o /tmp/september-sales.html -w '%{http_code}' "$BASE/ekb-2026-09-26?preview=sales")" = "200"
           assert_absent /tmp/september-sales.html 'TODO_|TBD_|PLACEHOLDER_|REPLACE_ME_|CHANGE_ME_' 'sales preview must not expose technical placeholders'
