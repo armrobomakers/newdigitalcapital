@@ -18,13 +18,14 @@ export function TemporalRegistrationGate({
   const searchParams = useSearchParams();
   const { availability } = useLeadCaptureAvailability(eventId, "attendee");
   const salesPreview = searchParams.get("preview") === "sales";
+  const lifecycleContent = availability?.open === true ? openContent : closedContent;
 
   if (salesPreview || availability?.open === true) {
     return openContent;
   }
 
   if (availability?.reason === "event_started" || availability?.reason === "window_closed") {
-    return closedContent;
+    return lifecycleContent;
   }
 
   return (
