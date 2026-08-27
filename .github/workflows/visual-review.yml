@@ -50,7 +50,27 @@ jobs:
 
           npm run start >/tmp/digital-capital-visual-server.log 2>&1 &
           PID=$!
-          trap 'STATUS=$?; cp /tmp/digital-capital-visual-server.log visual-review/server.log 2>/dev/null || true; if [ "$STATUS" -ne 0 ]; then echo "--- visual server log ---"; cat /tmp/digital-capital-visual-server.log || true; fi; kill "$PID" 2>/dev/null || true' EXIT
+          trap 'STATUS=$?; cp /tmp/digital-capital-visual-server.log visual-review/server.log 2>/dev/null || true; cp /tmp/september-public.html visual-review/september-public.html 2>/dev/null || true; cp /tmp/september-sales.html visual-review/september-sales.html 2>/dev/null || true; if [ "$STATUS" -ne 0 ]; then echo "--- visual server log ---"; cat /tmp/digital-capital-visual-server.log || true; fi; kill "$PID" 2>/dev/null || true' EXIT
+
+          assert_contains() {
+            local file="$1"
+            local pattern="$2"
+            local label="$3"
+            if ! grep -Eq "$pattern" "$file"; then
+              echo "Visual assertion failed: $label"
+              return 1
+            fi
+          }
+
+          assert_absent() {
+            local file="$1"
+            local pattern="$2"
+            local label="$3"
+            if grep -Eq "$pattern" "$file"; then
+              echo "Visual assertion failed: $label"
+              return 1
+            fi
+          }
 
           BASE=http://127.0.0.1:7485
           READY=0
@@ -64,19 +84,20 @@ jobs:
           test "$READY" = "1"
 
           test "$(curl -sS -o /tmp/september-public.html -w '%{http_code}' "$BASE/ekb-2026-09-26")" = "200"
-          ! grep -Eq 'TODO_|TBD_|PLACEHOLDER_|REPLACE_ME_|CHANGE_ME_' /tmp/september-public.html
-          grep -q 'Регистрация готовится к запуску' /tmp/september-public.html
-          grep -q 'Точный зал и схема входа будут опубликованы ближе к событию.' /tmp/september-public.html
-          ! grep -q 'Смотреть архив программы' /tmp/september-public.html
+          assert_absent /tmp/september-public.html 'TODO_|TBD_|PLACEHOLDER_|REPLACE_ME_|CHANGE_ME_' 'public page must not expose technical placeholders'
+          assert_contains /tmp/september-public.html 'Продажи скоро откроются|Регистрация готовится к запуску' 'public page must show a pending registration state'
+          assert_contains /tmp/september-public.html 'Точный зал.*схем(а|ы).*(входа|прохода)|схем(а|ы).*(входа|прохода).*Точный зал' 'public page must explain that hall/entry details will be published later'
+          assert_absent /tmp/september-public.html 'Смотреть архив программы' 'future event must not use archive CTA copy'
 
           test "$(curl -sS -o /tmp/september-sales.html -w '%{http_code}' "$BASE/ekb-2026-09-26?preview=sales")" = "200"
-          ! grep -Eq 'TODO_|TBD_|PLACEHOLDER_|REPLACE_ME_|CHANGE_ME_' /tmp/september-sales.html
-          grep -q 'Выберите билет' /tmp/september-sales.html
-          grep -q 'Зарегистрироваться' /tmp/september-sales.html
+          assert_absent /tmp/september-sales.html 'TODO_|TBD_|PLACEHOLDER_|REPLACE_ME_|CHANGE_ME_' 'sales preview must not expose technical placeholders'
+          assert_contains /tmp/september-sales.html 'Выберите билет' 'sales preview must render ticket selection'
+          assert_contains /tmp/september-sales.html 'Зарегистрироваться' 'sales preview must render registration CTA'
+          assert_contains /tmp/september-sales.html 'Программа' 'sales preview must render the agenda'
 
           test "$(curl -sS -o /tmp/visual-gallery.html -w '%{http_code}' "$BASE/internal/visual-review")" = "200"
-          grep -q 'CI visual review' /tmp/visual-gallery.html
-          grep -q 'TODO_ORGANIZER_PHONE' /tmp/visual-gallery.html
+          assert_contains /tmp/visual-gallery.html 'CI visual review' 'internal visual gallery must be enabled in CI'
+          assert_contains /tmp/visual-gallery.html 'TODO_ORGANIZER_PHONE' 'internal gallery must expose unresolved placeholders for operator review'
 
           node scripts/capture-visual-screenshot.mjs \
             "$BASE/ekb-2026-09-26" \
