@@ -137,48 +137,189 @@ a {
   mix-blend-mode: screen;
 }
 
-/* DC-38: keep the program headline inside its column and give the schedule visual priority. */
-@media (min-width: 1024px) {
-  #program > div.grid {
-    grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
-    gap: clamp(2rem, 3vw, 3.25rem);
-  }
-
-  #program > div.grid > div:first-child {
-    max-width: 360px;
-  }
-
-  #program h2 {
-    max-width: 360px;
-    font-size: clamp(4rem, 4.2vw, 4.9rem);
-    line-height: 0.88;
-    letter-spacing: -0.035em;
-    text-wrap: balance;
-  }
+/* DC-40: production-style program layout. Editorial header, full-width agenda, no dashboard timeline. */
+#program {
+  min-height: 0;
+  padding-top: clamp(4.5rem, 7vw, 7rem);
+  padding-bottom: clamp(4.5rem, 7vw, 7rem);
 }
 
-@media (min-width: 1280px) {
-  #program > div.grid {
-    grid-template-columns: minmax(0, 380px) minmax(0, 1fr);
-  }
-
-  #program > div.grid > div:first-child {
-    max-width: 380px;
-  }
-
-  #program h2 {
-    max-width: 380px;
-    font-size: clamp(4.5rem, 4.3vw, 5.25rem);
-  }
+#program > div.grid {
+  display: block;
 }
 
-@media (max-width: 1023px) {
-  #program h2 {
-    max-width: 720px;
-    font-size: clamp(3.4rem, 9vw, 5rem);
-    line-height: 0.9;
-    text-wrap: balance;
-  }
+#program > div.grid > div:first-child {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "badge action"
+    "title action"
+    "lead action";
+  align-items: end;
+  gap: 0.7rem 2rem;
+  max-width: none;
+  padding: 0 0 2rem;
+}
+
+#program > div.grid > div:first-child > div:first-child {
+  grid-area: badge;
+  justify-self: start;
+}
+
+#program h2 {
+  grid-area: title;
+  max-width: 980px;
+  margin-top: 0.65rem;
+  font-size: clamp(3.5rem, 6vw, 6.6rem);
+  line-height: 0.86;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+#program > div.grid > div:first-child > p:first-of-type {
+  grid-area: lead;
+  max-width: 720px;
+  margin-top: 0.7rem;
+  font-size: clamp(1rem, 1.5vw, 1.2rem);
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+#program > div.grid > div:first-child > p:nth-of-type(2) {
+  display: none;
+}
+
+#program > div.grid > div:first-child > a {
+  grid-area: action;
+  align-self: end;
+  margin-top: 0;
+  white-space: nowrap;
+}
+
+#program > div.grid > div:nth-child(2) {
+  margin-top: 0.4rem;
+  border: 1px solid rgba(255, 255, 255, 0.075);
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at 10% 0%, rgba(124, 60, 255, 0.12), transparent 32%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.018));
+  padding: clamp(0.8rem, 1.5vw, 1.25rem);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.035),
+    0 30px 80px rgba(0, 0, 0, 0.18);
+}
+
+#program > div.grid > div:nth-child(2) > div {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+}
+
+#program ul {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+#program ul > li {
+  min-height: 148px;
+  border-color: rgba(255, 255, 255, 0.075);
+  border-radius: 22px;
+  background: rgba(4, 3, 13, 0.32);
+  padding: 1.15rem 1.2rem;
+  box-shadow: none;
+}
+
+#program ul > li:hover {
+  border-color: rgba(196, 181, 253, 0.22);
+  background: rgba(255, 255, 255, 0.045);
+}
+
+#program ul > li > div {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas:
+    "time spacer icon"
+    "content content content";
+  align-content: start;
+  gap: 0.85rem 1rem;
+}
+
+#program ul > li > div > div:nth-child(1) {
+  grid-area: time;
+  width: auto;
+}
+
+#program ul > li > div > div:nth-child(1) > div {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  border: 1px solid rgba(196, 181, 253, 0.16);
+  border-radius: 999px;
+  background: rgba(124, 60, 255, 0.08);
+  padding: 0.32rem 0.7rem;
+  font-family: var(--font-sans), sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.05em;
+  color: rgba(221, 214, 254, 0.88);
+}
+
+#program ul > li > div > div:nth-child(1) > span {
+  display: none;
+}
+
+#program ul > li > div > div:nth-child(2) {
+  grid-area: icon;
+  justify-self: end;
+  width: 2.25rem;
+  height: 2.25rem;
+  margin-top: 0;
+  border-radius: 12px;
+  border-color: rgba(196, 181, 253, 0.14);
+  background: rgba(124, 60, 255, 0.08);
+}
+
+#program ul > li > div > div:nth-child(2) svg {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+#program ul > li > div > div:nth-child(3) {
+  grid-area: content;
+}
+
+#program ul > li > div > div:nth-child(3) > p:first-child {
+  font-size: clamp(1.05rem, 1.5vw, 1.2rem);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+#program ul > li > div > div:nth-child(3) > p:nth-child(2) {
+  margin-top: 0.35rem;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: rgba(221, 214, 254, 0.72);
+}
+
+#program ul > li > div > div:nth-child(3) > p:nth-child(3) {
+  margin-top: 0.45rem;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+#program ul > li > div > div:nth-child(4) {
+  display: none;
+}
+
+#program ul > li[class*="border-violet-300"] {
+  border-color: rgba(196, 181, 253, 0.3);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(124, 60, 255, 0.14), transparent 42%),
+    rgba(124, 60, 255, 0.075);
 }
 
 /* DC-30: calmer premium ticket summary for the active registration experience. */
@@ -342,15 +483,6 @@ footer h3 span {
 }
 
 #footer-contacts > p:last-child {
-  font-size: 0;
-  line-height: 1.75;
-}
-
-#footer-contacts > p:last-child::before {
-  content: "Email: placeholder@digitalcapital.ru\AТелефон: +7 (000) 000-00-00";
-  display: block;
-  white-space: pre-line;
-  font-size: 0.875rem;
   color: rgba(255, 255, 255, 0.62);
 }
 
@@ -364,9 +496,42 @@ footer #footer-contacts + div {
   }
 }
 
+@media (max-width: 1023px) {
+  #program > div.grid > div:first-child {
+    display: block;
+    padding-bottom: 1.5rem;
+  }
+
+  #program h2 {
+    margin-top: 1rem;
+    font-size: clamp(3.2rem, 10vw, 5rem);
+  }
+
+  #program > div.grid > div:first-child > p:first-of-type {
+    margin-top: 1rem;
+  }
+
+  #program > div.grid > div:first-child > a {
+    margin-top: 1.25rem;
+  }
+}
+
 @media (max-width: 767px) {
   body {
     background-attachment: scroll;
+  }
+
+  #program {
+    padding-top: 3.75rem;
+    padding-bottom: 3.75rem;
+  }
+
+  #program ul {
+    grid-template-columns: 1fr;
+  }
+
+  #program ul > li {
+    min-height: 0;
   }
 
   #register fieldset label {

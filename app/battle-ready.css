@@ -122,6 +122,249 @@ footer p {
   text-rendering: optimizeLegibility;
 }
 
+/*
+ * DC-40 production agenda.
+ * This is intentionally loaded after the earlier UI-library timeline layer so
+ * the final event page cannot regress to a narrow dashboard-style timeline.
+ */
+#program {
+  min-height: 0 !important;
+  padding-top: clamp(4.5rem, 7vw, 7rem) !important;
+  padding-bottom: clamp(4.5rem, 7vw, 7rem) !important;
+}
+
+#program > .grid {
+  display: block !important;
+  width: 100% !important;
+  max-width: none !important;
+}
+
+#program > .grid > div:first-child {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  grid-template-areas:
+    "badge action"
+    "title action"
+    "lead action" !important;
+  align-items: end !important;
+  gap: 0.7rem 2rem !important;
+  width: 100% !important;
+  max-width: none !important;
+  padding-bottom: 2rem !important;
+}
+
+#program > .grid > div:first-child > div:first-child {
+  grid-area: badge !important;
+  justify-self: start;
+}
+
+#program h2 {
+  grid-area: title !important;
+  max-width: 980px !important;
+  margin-top: 0.65rem !important;
+  font-size: clamp(3.5rem, 5vw, 4.9rem) !important;
+  line-height: 0.88 !important;
+  letter-spacing: -0.035em !important;
+  text-wrap: balance;
+}
+
+#program h2 + p {
+  grid-area: lead !important;
+  max-width: 760px !important;
+  margin-top: 0.75rem !important;
+  font-size: clamp(1rem, 1.35vw, 1.18rem) !important;
+  line-height: 1.55 !important;
+  color: rgba(255, 255, 255, 0.62) !important;
+}
+
+#program h2 + p + p {
+  display: none !important;
+}
+
+#program > .grid > div:first-child > a {
+  grid-area: action !important;
+  align-self: end !important;
+  margin-top: 0 !important;
+  white-space: nowrap;
+}
+
+#program > .grid > div:last-child {
+  position: relative;
+  width: 100% !important;
+  max-width: none !important;
+  margin-top: 0.35rem !important;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.075) !important;
+  border-radius: 30px !important;
+  background:
+    radial-gradient(circle at 10% 0%, rgba(124, 60, 255, 0.12), transparent 32%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.018)) !important;
+  padding: clamp(0.8rem, 1.5vw, 1.25rem) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.035),
+    0 30px 80px rgba(0, 0, 0, 0.18) !important;
+}
+
+#program > .grid > div:last-child::before,
+#program ul::before {
+  display: none !important;
+}
+
+#program > .grid > div:last-child > div {
+  position: relative;
+  z-index: 1;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+#program ul {
+  position: relative;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 0.75rem !important;
+}
+
+#program li {
+  position: relative;
+  min-height: 148px !important;
+  margin: 0 !important;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.075) !important;
+  border-radius: 22px !important;
+  background: rgba(4, 3, 13, 0.32) !important;
+  padding: 1.15rem 1.2rem !important;
+  box-shadow: none !important;
+  transform: none !important;
+  transition: border-color 220ms ease, background-color 220ms ease !important;
+}
+
+#program li:hover {
+  border-color: rgba(196, 181, 253, 0.22) !important;
+  background: rgba(255, 255, 255, 0.045) !important;
+  transform: none !important;
+}
+
+#program li[class~="border-violet-300/35"],
+#program li[class~="border-violet-400/45"] {
+  border-color: rgba(196, 181, 253, 0.3) !important;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(124, 60, 255, 0.14), transparent 42%),
+    rgba(124, 60, 255, 0.075) !important;
+  box-shadow: inset 3px 0 0 rgba(196, 181, 253, 0.42) !important;
+}
+
+#program li > div {
+  display: grid !important;
+  grid-template-columns: auto 1fr auto !important;
+  grid-template-areas:
+    "time spacer icon"
+    "content content content" !important;
+  align-content: start !important;
+  align-items: start !important;
+  gap: 0.85rem 1rem !important;
+}
+
+#program li > div > div:first-child {
+  grid-area: time !important;
+  width: auto !important;
+  padding-top: 0 !important;
+}
+
+#program li > div > div:first-child > div {
+  display: inline-flex !important;
+  min-height: 32px;
+  align-items: center;
+  border: 1px solid rgba(196, 181, 253, 0.16);
+  border-radius: 999px;
+  background: rgba(124, 60, 255, 0.08);
+  padding: 0.32rem 0.7rem;
+  font-family: var(--font-sans), sans-serif;
+  font-size: 0.78rem !important;
+  font-weight: 700;
+  line-height: 1 !important;
+  letter-spacing: 0.05em !important;
+  color: rgba(221, 214, 254, 0.88) !important;
+}
+
+#program li > div > div:first-child > span {
+  display: none !important;
+}
+
+#program li > div > div:nth-child(2) {
+  grid-area: icon !important;
+  justify-self: end;
+  width: 2.25rem !important;
+  height: 2.25rem !important;
+  margin-top: 0 !important;
+  border-radius: 12px !important;
+  border-color: rgba(196, 181, 253, 0.14) !important;
+  background: rgba(124, 60, 255, 0.08) !important;
+}
+
+#program li > div > div:nth-child(2) svg {
+  width: 1.05rem !important;
+  height: 1.05rem !important;
+}
+
+#program li > div > div:nth-child(3) {
+  grid-area: content !important;
+  min-width: 0;
+}
+
+#program li p[style] {
+  display: block !important;
+  overflow: visible !important;
+  -webkit-box-orient: initial !important;
+  -webkit-line-clamp: unset !important;
+}
+
+#program li > div > div:nth-child(3) > p:first-child {
+  font-size: clamp(1.05rem, 1.45vw, 1.2rem) !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.01em;
+}
+
+#program li > div > div:nth-child(3) > p:nth-child(2) {
+  margin-top: 0.35rem !important;
+  font-size: 0.82rem !important;
+  line-height: 1.45 !important;
+  color: rgba(221, 214, 254, 0.72) !important;
+}
+
+#program li > div > div:nth-child(3) > p:nth-child(3) {
+  max-width: none !important;
+  margin-top: 0.45rem !important;
+  font-size: 0.78rem !important;
+  line-height: 1.5 !important;
+  color: rgba(255, 255, 255, 0.52) !important;
+}
+
+#program li > div > div:nth-child(4) {
+  display: none !important;
+}
+
+@media (max-width: 1023px) {
+  #program > .grid > div:first-child {
+    display: block !important;
+    padding-bottom: 1.5rem !important;
+  }
+
+  #program h2 {
+    margin-top: 1rem !important;
+    font-size: clamp(3.2rem, 10vw, 5rem) !important;
+  }
+
+  #program h2 + p {
+    margin-top: 1rem !important;
+  }
+
+  #program > .grid > div:first-child > a {
+    margin-top: 1.25rem !important;
+  }
+}
+
 @media (max-width: 767px) {
   [data-ui="registration-pending-card"] {
     min-height: 360px;
@@ -139,5 +382,18 @@ footer p {
 
   #register > div > .mt-5.flex.items-center.gap-4 + p {
     text-align: left;
+  }
+
+  #program {
+    padding-top: 3.75rem !important;
+    padding-bottom: 3.75rem !important;
+  }
+
+  #program ul {
+    grid-template-columns: 1fr !important;
+  }
+
+  #program li {
+    min-height: 0 !important;
   }
 }
